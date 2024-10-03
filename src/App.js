@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
-
+import { useState, useEffect } from "react";
+import FirstStartUp from "./components/FirstStartUp";
+import Home from "./components/Home";
+import "./style.css";
+import axios from "axios";
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [data, setData] = useState(Boolean);
+  const fetchData = async () => {
+    const res = await axios.get("http://192.168.1.34:5000");
+    setData(res.data[0].isFirstStartUp);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  return data ? <FirstStartUp /> : <Home />;
 }
 
 export default App;
