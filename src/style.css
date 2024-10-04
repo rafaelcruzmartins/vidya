@@ -208,6 +208,8 @@ i {
 }
 .feat-stats {
   display: flex;
+  justify-content: space-between;
+  height: 22rem;
 }
 .featured-course {
   background: radial-gradient(
@@ -219,7 +221,7 @@ i {
   box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(0.8rem);
   border-radius: 2rem;
-  width: 70%;
+  width: 60%;
 }
 .stats {
   background: radial-gradient(
@@ -230,16 +232,18 @@ i {
   border: 1px solid #ffffff;
   box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(0.8rem);
-
-  border-radius: 2rem;
   width: 30%;
+  border-radius: 2rem;
 }
 
 .featured-image {
   width: 60%;
+  height: 100%;
 }
 
 img {
   width: 100%;
-  object-fit: contain;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 2rem 0 0 2rem;
 }
