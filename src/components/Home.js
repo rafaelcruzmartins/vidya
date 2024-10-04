@@ -1,9 +1,7 @@
-import Background from "./Background";
 const Home = () => {
   return (
-    <div>
-      <Background />
-      <div className="home">
+    <div className="main">
+      <div className="container">
         <div className="pre-nav">
           <div className="left-group">
             <div className="menu-bar">
@@ -38,7 +36,9 @@ const Home = () => {
           <div className="nav-item">Health</div>
           <div className="nav-item">Business</div>
         </div>
-        <div className="featured">Featured</div>
+        <div className="featured">
+          <p className="featured-title">FEATURED</p>
+        </div>
         <div className="progress">Progress</div>
         <div className="continue">Continue learning</div>
         <div className="latest-courses">Latest Courses</div>

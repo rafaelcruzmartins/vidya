@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import FirstStartUp from "./components/FirstStartUp";
 import Home from "./components/Home";
+import Background from "./components/Background";
 import "./style.css";
 import axios from "axios";
 function App() {
@@ -14,7 +15,16 @@ function App() {
     fetchData();
   }, []);
 
-  return data ? <FirstStartUp /> : <Home />;
+  if (data) {
+    return <FirstStartUp />;
+  } else {
+    return (
+      <>
+        <Background />
+        <Home />
+      </>
+    );
+  }
 }
 
 export default App;
