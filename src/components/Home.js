@@ -1,3 +1,4 @@
+import featured from "../assets/Untitled design.png";
 const Home = () => {
   return (
     <div className="main">
@@ -29,7 +30,8 @@ const Home = () => {
           </div>
         </div>
         <div className="nav-bar">
-          <div className="nav-item">Your Courses</div>
+          <div className="nav-item active">Your Courses</div>
+
           <div className="nav-item">Web</div>
           <div className="nav-item">Mobile</div>
           <div className="nav-item">Finance</div>
@@ -38,6 +40,15 @@ const Home = () => {
         </div>
         <div className="featured">
           <p className="featured-title">FEATURED</p>
+          <div className="feat-stats">
+            <div className="featured-course">
+              <div className="featured-image">
+                <img src={featured} alt="" />
+              </div>
+              <div className="featured-info"></div>
+            </div>
+            <div className="stats"></div>
+          </div>
         </div>
         <div className="progress">Progress</div>
         <div className="continue">Continue learning</div>
