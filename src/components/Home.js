@@ -45,7 +45,11 @@ const Home = () => {
               <div className="featured-image">
                 <img src={featured} alt="" />
               </div>
-              <div className="featured-info"></div>
+              <div className="featured-info">
+                <div className="info-title">Master Python in 30 Days</div>
+                <div className="instructor-name">by Andre Sivan</div>
+                <div className="play-button">Play Now</div>
+              </div>
             </div>
             <div className="stats"></div>
           </div>
