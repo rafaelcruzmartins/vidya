@@ -1,4 +1,11 @@
-import featured from "../assets/Untitled design.png";
+import python from "../assets/python.png";
+import rails from "../assets/rails.png";
+import javascript from "../assets/javascript.png";
+import node from "../assets/node.png";
+import mongodb from "../assets/mongodb.png";
+import php from "../assets/php.png";
+import webdev from "../assets/web-dev.jpg";
+import Stats from "./Stats";
 const Home = () => {
   return (
     <div className="main">
@@ -39,24 +46,99 @@ const Home = () => {
           <div className="nav-item">Business</div>
         </div>
         <div className="featured">
-          <p className="featured-title">FEATURED</p>
+          <p className="pinned-title">FEATURED</p>
           <div className="feat-stats">
             <div className="featured-course">
               <div className="featured-image">
-                <img src={featured} alt="" />
+                <img src={python} alt="" />
               </div>
               <div className="featured-info">
-                <div className="info-title">Master Python in 30 Days</div>
-                <div className="instructor-name">by Andre Sivan</div>
-                <div className="play-button">Play Now</div>
+                <div className="featured-info-details">
+                  <div className="info-title">Master Python in 30 Days</div>
+                  <div className="instructor-name">by Andre Sivan</div>
+                  <div className="play-button">Play Now</div>
+                </div>
               </div>
             </div>
-            <div className="stats"></div>
+            <div className="stats">
+              <Stats />
+              <div className="watch">
+                <div className="watch-hours">WATCH HOURS</div>
+                <div className="hours">19H</div>
+              </div>
+              <div className="labels">
+                <div className="label-names">
+                  <div className="rectangle first"></div>Web - 40%
+                </div>
+                <div className="label-names">
+                  <div className="rectangle second"></div>Mobile - 30%
+                </div>
+                <div className="label-names">
+                  <div className="rectangle third"></div>Finance - 10%
+                </div>
+                <div className="label-names">
+                  <div className="rectangle fourth"></div>Health - 12%
+                </div>
+                <div className="label-names">
+                  <div className="rectangle fifth"></div>Others - 8%
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div className="progress">Progress</div>
-        <div className="continue">Continue learning</div>
-        <div className="latest-courses">Latest Courses</div>
+
+        <div className="continue">
+          <p className="pinned-title">CONTINUE LEARNING</p>
+          <div className="continue-divs">
+            <div className="cards">
+              <div className="card-image">
+                <img src={rails} alt="" />
+              </div>
+              <div className="card-info">
+                Building Scalable Web Apps with Ruby on Rails
+              </div>
+            </div>
+            <div className="cards">
+              <div className="card-image">
+                <img src={node} alt="" />
+              </div>
+              <div className="card-info">Node For Beginners</div>
+            </div>
+            <div className="cards">
+              <div className="card-image">
+                <img src={php} alt="" />
+              </div>
+              <div className="card-info">
+                PHP Fundamentals: Web Development with PHP
+              </div>
+            </div>
+          </div>
+        </div>
+        <div className="latest-courses">
+          <p className="pinned-title">LATEST COURSES</p>
+          <div className="continue-divs">
+            <div className="cards">
+              <div className="card-image">
+                <img src={javascript} alt="" />
+              </div>
+              <div className="card-info">
+                JavaScript: From Basics to Advanced
+              </div>
+            </div>
+            <div className="cards">
+              <div className="card-image">
+                <img src={mongodb} alt="" />
+              </div>
+              <div className="card-info">Mastering MongoDB for Developers</div>
+            </div>
+            <div className="cards">
+              <div className="card-image">
+                <img src={webdev} alt="" />
+              </div>
+              <div className="card-info">Full Stack Web Development</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

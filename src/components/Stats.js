@@ -1,0 +1,23 @@
+import React from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Doughnut } from "react-chartjs-2";
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
+const data = {
+  datasets: [
+    {
+      data: [40, 30, 10, 12, 8],
+      backgroundColor: ["#605F5E", "#FB3640", "#0A2463", "#247BA0", "#E9A7FF"],
+
+      cutout: "87%",
+      borderWidth: 0,
+    },
+  ],
+};
+
+const Stats = () => {
+  return <Doughnut data={data} />;
+};
+
+export default Stats;
