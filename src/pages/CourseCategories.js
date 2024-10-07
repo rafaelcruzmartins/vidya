@@ -1,15 +1,6 @@
 import Navbar from "../components/Navbar/Navbar";
 import Cards from "../components/Cards/Cards";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  python,
-  rails,
-  javascript,
-  node,
-  mongodb,
-  php,
-  webdev,
-} from "../assets";
 
 const CourseCategories = ({ name, cardData }) => {
   return (

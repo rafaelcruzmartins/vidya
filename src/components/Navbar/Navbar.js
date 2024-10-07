@@ -7,6 +7,11 @@ const Navbar = ({ name }) => {
   const handleBack = () => navigate(-1);
   const handleHome = () => navigate("/");
   const handleYourCourses = () => navigate("/courses");
+  const handleWeb = () => navigate("/web");
+  const handleMobile = () => navigate("/mobile");
+  const handleFinance = () => navigate("/finance");
+  const handleHealth = () => navigate("/health");
+  const handleBusiness = () => navigate("/business");
 
   const isRootPage = location.pathname === "/";
   return (
@@ -85,15 +90,55 @@ const Navbar = ({ name }) => {
         </div>
       </div>
       <div className="nav-bar">
-        <div className="nav-item active" onClick={handleYourCourses}>
+        <div
+          className={
+            location.pathname === "/courses" ? "active nav-item" : "nav-item"
+          }
+          onClick={handleYourCourses}
+        >
           Your Courses
         </div>
 
-        <div className="nav-item">Web</div>
-        <div className="nav-item">Mobile</div>
-        <div className="nav-item">Finance</div>
-        <div className="nav-item">Health</div>
-        <div className="nav-item">Business</div>
+        <div
+          className={
+            location.pathname === "/web" ? "active nav-item" : "nav-item"
+          }
+          onClick={handleWeb}
+        >
+          Web
+        </div>
+        <div
+          className={
+            location.pathname === "/mobile" ? "active nav-item" : "nav-item"
+          }
+          onClick={handleMobile}
+        >
+          Mobile
+        </div>
+        <div
+          className={
+            location.pathname === "/finance" ? "active nav-item" : "nav-item"
+          }
+          onClick={handleFinance}
+        >
+          Finance
+        </div>
+        <div
+          className={
+            location.pathname === "/health" ? "active nav-item" : "nav-item"
+          }
+          onClick={handleHealth}
+        >
+          Health
+        </div>
+        <div
+          className={
+            location.pathname === "/business" ? "active nav-item" : "nav-item"
+          }
+          onClick={handleBusiness}
+        >
+          Business
+        </div>
       </div>
     </>
   );

@@ -50,6 +50,30 @@ function App() {
                 <CourseCategories name={"COURSES"} cardData={cardData} />
               }
             />
+            <Route
+              path="/web"
+              element={<CourseCategories name={"WEB"} cardData={cardData} />}
+            />
+            <Route
+              path="/mobile"
+              element={<CourseCategories name={"MOBILE"} cardData={cardData} />}
+            />
+            <Route
+              path="/finance"
+              element={
+                <CourseCategories name={"FINANCE"} cardData={cardData} />
+              }
+            />
+            <Route
+              path="/health"
+              element={<CourseCategories name={"HEALTH"} cardData={cardData} />}
+            />
+            <Route
+              path="/business"
+              element={
+                <CourseCategories name={"BUSINESS"} cardData={cardData} />
+              }
+            />
           </Routes>
         </Router>
       </>

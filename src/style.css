@@ -49,8 +49,7 @@ body {
   position: fixed;
   width: 13rem;
   height: 13rem;
-  right: 26rem;
-  top: 5rem;
+
   border-radius: 100%;
 
   background: linear-gradient(224.47deg, #ffb6a8 17.44%, #ba897f 82.2%);
@@ -61,8 +60,7 @@ body {
   position: fixed;
   width: 5rem;
   height: 5rem;
-  left: 24rem;
-  top: 37rem;
+
   border-radius: 100%;
 
   background: linear-gradient(224.47deg, #ffb6a8 17.44%, #ba897f 82.2%);
@@ -73,8 +71,7 @@ body {
   position: fixed;
   width: 15rem;
   height: 15rem;
-  left: 0rem;
-  top: 33rem;
+
   border-radius: 100%;
 
   background: linear-gradient(224.47deg, #ffb6a8 17.44%, #ba897f 82.2%);
@@ -85,8 +82,7 @@ body {
   position: fixed;
   width: 10rem;
   height: 10rem;
-  right: 5rem;
-  top: 39rem;
+
   border-radius: 100%;
 
   background: linear-gradient(224.47deg, #ffb6a8 17.44%, #ba897f 82.2%);
