@@ -128,13 +128,18 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-right: 1rem;
+}
+
+.navbar-btn {
+  margin: 0rem 0.5rem;
+  cursor: pointer;
 }
 .server-name {
   color: #e20044;
   font-weight: 500;
   letter-spacing: 0.08rem;
   font-size: 1.5rem;
+  margin: 0rem 0.5rem;
 }
 
 svg {
@@ -184,6 +189,7 @@ i {
   border-radius: 0.7rem;
   font-weight: 500;
   color: #45312d;
+  cursor: pointer;
 }
 
 .active {
@@ -409,4 +415,15 @@ img {
 
 .latest-courses {
   margin: 2rem;
+}
+
+.card-divs-wrap {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem;
+  flex-wrap: wrap;
+}
+
+.card-divs-wrap .cards {
+  margin: 1rem;
 }

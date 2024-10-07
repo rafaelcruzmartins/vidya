@@ -1,14 +1,71 @@
-const Navbar = () => {
+import { useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+const Navbar = ({ name }) => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleBack = () => navigate(-1);
+  const handleHome = () => navigate("/");
+  const handleYourCourses = () => navigate("/courses");
+
+  const isRootPage = location.pathname === "/";
   return (
     <>
       <div className="pre-nav">
         <div className="left-group">
-          <div className="menu-bar">
+          <AnimatePresence>
+            {!isRootPage && (
+              <>
+                <motion.div
+                  key="back-button"
+                  className="navbar-btn"
+                  onClick={handleBack}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <i class="bx bx-arrow-back"></i>
+                </motion.div>
+
+                <motion.div
+                  key="home-button"
+                  className="navbar-btn"
+                  onClick={handleHome}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <i class="bx bx-home-alt-2"></i>
+                </motion.div>
+              </>
+            )}
+          </AnimatePresence>
+          <motion.div
+            className="menu-bar navbar-btn"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <i className="bx bx-menu"></i>
-          </div>
-          <div className="server-name">VIDYA</div>
+          </motion.div>
+
+          <motion.div
+            className="server-name"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            {name}
+          </motion.div>
         </div>
-        <div className="search-bar">
+        <motion.div
+          className="search-bar"
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5 }}
+        >
           <div className="search">
             <svg
               className="search-icon"
@@ -22,13 +79,15 @@ const Navbar = () => {
               />
             </svg>
           </div>
-        </div>
+        </motion.div>
         <div className="profile">
           <i className="bx bx-user"></i>
         </div>
       </div>
       <div className="nav-bar">
-        <div className="nav-item active">Your Courses</div>
+        <div className="nav-item active" onClick={handleYourCourses}>
+          Your Courses
+        </div>
 
         <div className="nav-item">Web</div>
         <div className="nav-item">Mobile</div>
