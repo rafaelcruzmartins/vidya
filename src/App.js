@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import FirstStartUp from "./components/FirstStartUp";
-import Home from "./components/Home";
-import Background from "./components/Background";
+import FirstStartUp from "./pages/FirstStartUp";
+import Home from "./pages/Home";
+import Background from "./components/Background/Background";
+import Courses from "./pages/Courses";
 import "./style.css";
 import axios from "axios";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 function App() {
   const [data, setData] = useState(Boolean);
   const fetchData = async () => {
@@ -20,8 +22,13 @@ function App() {
   } else {
     return (
       <>
-        <Background />
-        <Home />
+        <Router>
+          <Background />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/courses" element={<Courses />} />
+          </Routes>
+        </Router>
       </>
     );
   }
