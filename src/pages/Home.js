@@ -10,8 +10,12 @@ import {
 import Stats from "../components/Stats";
 import Navbar from "../components/Navbar/Navbar";
 import Cards from "../components/Cards/Cards";
+import Tilt from "react-parallax-tilt";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+  const handlePlayer = () => navigate("/player");
   return (
     <div className="main">
       <div className="container">
@@ -27,11 +31,13 @@ const Home = () => {
                 <div className="featured-info-details">
                   <div className="info-title">Master Python in 30 Days</div>
                   <div className="instructor-name">by Andre Sivan</div>
-                  <div className="play-button">Play Now</div>
+                  <div className="play-button" onClick={handlePlayer}>
+                    Play Now
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="stats">
+            <Tilt className="stats" perspective={4000} gyroscope={true}>
               <Stats />
               <div className="watch">
                 <div className="watch-hours">WATCH HOURS</div>
@@ -54,7 +60,7 @@ const Home = () => {
                   <div className="rectangle fifth"></div>Others - 8%
                 </div>
               </div>
-            </div>
+            </Tilt>
           </div>
         </div>
 

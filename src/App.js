@@ -3,6 +3,8 @@ import FirstStartUp from "./pages/FirstStartUp";
 import Home from "./pages/Home";
 import Background from "./components/Background/Background";
 import CourseCategories from "./pages/CourseCategories";
+import Player from "./pages/Player";
+
 import "./style.css";
 import axios from "axios";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
@@ -19,7 +21,7 @@ import {
 function App() {
   const [data, setData] = useState(Boolean);
   const fetchData = async () => {
-    const res = await axios.get("http://192.168.1.34:5000");
+    const res = await axios.get("http://192.168.1.36:5000");
     setData(res.data[0].isFirstStartUp);
   };
   const cardData = [
@@ -74,6 +76,7 @@ function App() {
                 <CourseCategories name={"BUSINESS"} cardData={cardData} />
               }
             />
+            <Route path="/player" element={<Player />} />
           </Routes>
         </Router>
       </>
