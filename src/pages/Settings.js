@@ -65,7 +65,7 @@ const Settings = () => {
 };
 
 const ProfileSettings = () => (
-  <motion.div
+  <div
     initial={{ opacity: 0, y: 40 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: -40 }}
@@ -85,11 +85,11 @@ const ProfileSettings = () => (
       <input type="password" className="password" />
       <div className="change-password-button">Change Password</div>
     </div>
-  </motion.div>
+  </div>
 );
 
 const DisplaySettings = () => (
-  <motion.div
+  <div
     initial={{ opacity: 0, y: -40 }}
     animate={{ opacity: 1, y: 0 }}
     exit={{ opacity: 0, y: 40 }}
@@ -103,7 +103,7 @@ const DisplaySettings = () => (
       <option value="clean">Clean</option>
       <option value="dark">Dark</option>
     </select>
-  </motion.div>
+  </div>
 );
 
 export default Settings;

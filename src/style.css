@@ -857,6 +857,7 @@ video {
 
 .settings-content {
   margin: 1rem 2rem;
+  opacity: 1;
 }
 
 .settings-title {
@@ -963,23 +964,83 @@ select option {
   color: rgb(10, 36, 99);
 }
 
-.user-list {
+.users-title {
+  margin: 1rem 0;
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+}
+
+.bx-plus {
+  background: rgba(255, 255, 255, 0.34);
+  margin-left: 1rem;
+  padding: 0.2rem;
+  border-radius: 100%;
 }
 
 .user-item {
   display: flex;
+  background: rgba(255, 255, 255, 0.34);
+  border-radius: 0.7rem;
+  margin-right: 1rem;
   align-items: center;
-  justify-content: space-between;
   padding: 10px;
-  background-color: #f0f0f0;
-  border-radius: 5px;
+  width: 10vw;
+  margin-bottom: 1rem;
+}
+
+.user-info {
   cursor: pointer;
 }
 
-.user-actions {
+.bx-dots-vertical-rounded {
+  cursor: pointer;
+  font-size: 20px;
+  margin-left: 10px;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.2);
   display: flex;
-  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.modal {
+  background: radial-gradient(
+    100% 195.79% at 0% 0%,
+    rgba(255, 255, 255, 0.28) 1.29%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  border: 1px solid #ffffff;
+  border-radius: 1rem;
+  width: 40vw;
+  padding: 1rem 0;
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+}
+
+.modal-action-button {
+  display: flex;
+  gap: 1rem;
+}
+
+.modal-buttons {
+  background: rgba(255, 255, 255, 0.5);
+  width: 9vw;
+  height: 5vh;
+  border-radius: 0.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 500;
 }

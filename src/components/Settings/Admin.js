@@ -1,78 +1,152 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+
 const Admin = () => {
-  // Handle User Show With Animated icons
   const [selectedUser, setSelectedUser] = useState(null);
-  const users = [
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [users, setUsers] = useState([
     { id: 1, name: "John Doe" },
     { id: 2, name: "Jane Smith" },
     { id: 3, name: "Alice Johnson" },
-  ];
+  ]);
+  const [newUserName, setNewUserName] = useState("");
 
-  const handleUserClick = (user) => {
-    if (selectedUser === user) {
-      setSelectedUser(null); // Deselect if the user is clicked again
-    } else {
-      setSelectedUser(user); // Select the user
-    }
+  const openModal = (user) => {
+    setSelectedUser(user);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const openAddUserModal = () => {
+    setIsAddUserModalOpen(true);
+  };
+
+  const closeAddUserModal = () => {
+    setIsAddUserModalOpen(false);
+    setNewUserName("");
   };
 
   const makeAdmin = (user) => {
     console.log(`${user.name} is now an admin.`);
-    // Add your admin logic here
   };
 
   const removeUser = (user) => {
     console.log(`${user.name} has been removed.`);
-    // Add your remove logic here
   };
+
+  const addUser = () => {
+    if (newUserName.trim()) {
+      const newUser = {
+        id: users.length + 1,
+        name: newUserName.trim(),
+      };
+      setUsers([...users, newUser]);
+      closeAddUserModal();
+    }
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: -40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 40 }}
-      transition={{ duration: 0.2 }}
-      className="settings-content"
-    >
+    <div className="settings-content">
       <div className="settings-title">Admin Settings</div>
       <div className="folders-title">Folders</div>
       <div className="folder-div">
         <div className="folder-name-div">C:/Lectures/</div>
-        <i class="bx bxs-folder-minus"></i>
+        <i className="bx bxs-folder-minus"></i>
       </div>
       <div className="folders-action-group">
         <div>
-          Add Folder<i class="bx bxs-folder-plus"></i>
+          Add Folder<i className="bx bxs-folder-plus"></i>
         </div>
         <div>
-          Scan Folders<i class="bx bx-refresh"></i>
+          Scan Folders<i className="bx bx-refresh"></i>
         </div>
       </div>
-      <div className="users-title">Users</div>
+      <div className="users-title">
+        Users
+        <i
+          title="Add User"
+          className="bx bx-plus"
+          onClick={openAddUserModal}
+        ></i>
+      </div>
       <div className="user-list">
         {users.map((user) => (
           <div key={user.id} className="user-item">
-            <div className="user-info" onClick={() => handleUserClick(user.id)}>
-              {user.name}
-            </div>
-            {selectedUser === user.id && (
-              <div className="user-actions">
-                <i
-                  title="Make Admin"
-                  className="bx bx-shield-plus"
-                  onClick={() => makeAdmin(user)}
-                ></i>
-                <i
-                  title="Remove User"
-                  className="bx bxs-user-minus"
-                  onClick={() => removeUser(user)}
-                ></i>
-              </div>
-            )}
+            <div className="user-info">{user.name}</div>
+            <i
+              title="Edit User"
+              className="bx bx-dots-vertical-rounded"
+              onClick={() => openModal(user)}
+            ></i>
           </div>
         ))}
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <div className="user-edit-form">
+                <label htmlFor="">Change Username</label>
+                <input type="text" className="password" />
+                <label htmlFor="">Change Password</label>
+                <input type="password" className="password" />
+                <div className="change-password-button">Change Password</div>
+              </div>
+
+              <div className="modal-action-button">
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#00a6a6" }}
+                  onClick={() => makeAdmin(selectedUser)}
+                >
+                  Make Admin
+                </motion.div>
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#e20044" }}
+                  onClick={() => removeUser(selectedUser)}
+                >
+                  Remove User
+                </motion.div>
+
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#45312d" }}
+                  onClick={closeModal}
+                >
+                  Close
+                </motion.div>
+              </div>
+            </div>
+          </div>
+        )}
+        {isAddUserModalOpen && (
+          <div className="modal-overlay">
+            <div className="modal">
+              <h2>Add New User</h2>
+              <input
+                type="text"
+                value={newUserName}
+                onChange={(e) => setNewUserName(e.target.value)}
+                placeholder="Enter user name"
+              />
+              <div>
+                <button onClick={addUser}>Add User</button>
+                <button onClick={closeAddUserModal}>Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
