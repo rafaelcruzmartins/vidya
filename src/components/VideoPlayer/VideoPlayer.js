@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
-import { video1, video2, video3 } from "../../assets";
 
-const VideoPlayer = () => {
+const VideoPlayer = ({ videoSource, onProgressUpdate, onPlayRequest }) => {
   const videoRef = useRef(null);
   const playerRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const videoSources = [video1, video2, video3];
-  const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isControlsVisible, setIsControlsVisible] = useState(true);
   const [controlsTimeout, setControlsTimeout] = useState(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -19,6 +16,7 @@ const VideoPlayer = () => {
   const [quality, setQuality] = useState("auto");
   const [isFullScreen, setIsFullScreen] = useState(false);
 
+  // Effect to add and remove event listeners for video events
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
@@ -33,17 +31,34 @@ const VideoPlayer = () => {
     };
   }, []);
 
+  // Effect to handle play request and video source change
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.currentTime = 0;
+      setProgress(0);
+      setCurrentTime(0);
+      if (onPlayRequest) {
+        videoRef.current.play();
+        setIsPlaying(true);
+      }
+    }
+  }, [videoSource, onPlayRequest]);
+
+  // Function to handle video metadata loading
   const handleLoadedMetadata = () => {
     setDuration(videoRef.current.duration);
   };
 
+  // Function to update time and progress as video plays
   const handleTimeUpdate = () => {
-    setCurrentTime(videoRef.current.currentTime);
-    setProgress(
-      (videoRef.current.currentTime / videoRef.current.duration) * 100
-    );
+    const currentTime = videoRef.current.currentTime;
+    setCurrentTime(currentTime);
+    const newProgress = (currentTime / videoRef.current.duration) * 100;
+    setProgress(newProgress);
+    onProgressUpdate(currentTime, newProgress);
   };
 
+  // Function to toggle play/pause
   const togglePlay = () => {
     if (isPlaying) {
       videoRef.current.pause();
@@ -53,6 +68,7 @@ const VideoPlayer = () => {
     setIsPlaying(!isPlaying);
   };
 
+  // Function to stop the video
   const handleStop = () => {
     videoRef.current.pause();
     videoRef.current.currentTime = 0;
@@ -61,18 +77,7 @@ const VideoPlayer = () => {
     setCurrentTime(0);
   };
 
-  const handleNext = () => {
-    setCurrentVideoIndex((prevIndex) => (prevIndex + 1) % videoSources.length);
-    handleStop();
-  };
-
-  const handlePrevious = () => {
-    setCurrentVideoIndex((prevIndex) =>
-      prevIndex === 0 ? videoSources.length - 1 : prevIndex - 1
-    );
-    handleStop();
-  };
-
+  // Function to handle manual progress change
   const handleProgressChange = (e) => {
     const newTime = (e.target.value / 100) * duration;
     videoRef.current.currentTime = newTime;
@@ -80,12 +85,14 @@ const VideoPlayer = () => {
     setCurrentTime(newTime);
   };
 
+  // Function to format time in MM:SS format
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
+  // Function to show controls
   const showControls = () => {
     setIsControlsVisible(true);
     if (controlsTimeout) {
@@ -93,6 +100,7 @@ const VideoPlayer = () => {
     }
   };
 
+  // Function to hide controls after a delay
   const hideControls = () => {
     const timeout = setTimeout(() => {
       if (!isSettingsOpen) {
@@ -102,6 +110,7 @@ const VideoPlayer = () => {
     setControlsTimeout(timeout);
   };
 
+  // Event handlers for mouse interactions
   const handleMouseEnter = () => {
     showControls();
   };
@@ -115,16 +124,19 @@ const VideoPlayer = () => {
     hideControls();
   };
 
+  // Function to toggle mute
   const toggleMute = () => {
     videoRef.current.muted = !isMuted;
     setIsMuted(!isMuted);
   };
 
+  // Function to toggle captions
   const toggleCaption = () => {
     setIsCaptionOn(!isCaptionOn);
     // Implement caption logic here
   };
 
+  // Function to toggle settings menu
   const toggleSettings = () => {
     setIsSettingsOpen(!isSettingsOpen);
     if (!isSettingsOpen) {
@@ -132,16 +144,19 @@ const VideoPlayer = () => {
     }
   };
 
+  // Function to change playback speed
   const handlePlaybackSpeedChange = (speed) => {
     videoRef.current.playbackRate = speed;
     setPlaybackSpeed(speed);
   };
 
+  // Function to change video quality
   const handleQualityChange = (newQuality) => {
     setQuality(newQuality);
     // Implement quality change logic here
   };
 
+  // Function to toggle fullscreen
   const toggleFullScreen = () => {
     if (!document.fullscreenElement) {
       if (playerRef.current.requestFullscreen) {
@@ -184,7 +199,7 @@ const VideoPlayer = () => {
     >
       <video
         ref={videoRef}
-        src={videoSources[currentVideoIndex]}
+        src={videoSource}
         className="video-element"
         onClick={togglePlay}
       />
@@ -194,9 +209,6 @@ const VideoPlayer = () => {
         }`}
       >
         <div className="button-group">
-          <button onClick={handlePrevious} className="control-button previous">
-            <i className="bx bx-skip-previous"></i>
-          </button>
           <button onClick={togglePlay} className="control-button play-pause">
             {isPlaying ? (
               <i className="bx bx-pause"></i>
@@ -206,9 +218,6 @@ const VideoPlayer = () => {
           </button>
           <button onClick={handleStop} className="control-button stop">
             <i className="bx bx-stop"></i>
-          </button>
-          <button onClick={handleNext} className="control-button next">
-            <i className="bx bx-skip-next"></i>
           </button>
           <button onClick={toggleMute} className="control-button mute">
             <i

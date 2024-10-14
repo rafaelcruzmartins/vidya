@@ -9,6 +9,7 @@ import {
 } from "../assets";
 import Stats from "../components/Stats";
 import Navbar from "../components/Navbar/Navbar";
+import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
 import Tilt from "react-parallax-tilt";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +20,8 @@ const Home = () => {
   return (
     <div className="main">
       <div className="container">
-        <Navbar name={"VIDYA"} />
+        <PreNav name={"VIDYA"} />
+        <Navbar />
         <div className="featured">
           <p className="pinned-title">FEATURED</p>
           <div className="feat-stats">

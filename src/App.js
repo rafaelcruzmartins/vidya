@@ -4,6 +4,9 @@ import Home from "./pages/Home";
 import Background from "./components/Background/Background";
 import CourseCategories from "./pages/CourseCategories";
 import Player from "./pages/Player";
+import Categories from "./pages/Categories";
+import Instructor from "./pages/Instructor";
+import Settings from "./pages/Settings";
 
 import "./style.css";
 import axios from "axios";
@@ -21,7 +24,7 @@ import {
 function App() {
   const [data, setData] = useState(Boolean);
   const fetchData = async () => {
-    const res = await axios.get("http://192.168.1.36:5000");
+    const res = await axios.get("http://localhost:5000");
     setData(res.data[0].isFirstStartUp);
   };
   const cardData = [
@@ -77,6 +80,9 @@ function App() {
               }
             />
             <Route path="/player" element={<Player />} />
+            <Route path="/categories" element={<Categories />} />
+            <Route path="/instructor" element={<Instructor />} />
+            <Route path="/settings/*" element={<Settings />} />
           </Routes>
         </Router>
       </>

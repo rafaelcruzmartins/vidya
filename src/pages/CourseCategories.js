@@ -1,4 +1,5 @@
 import Navbar from "../components/Navbar/Navbar";
+import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -7,19 +8,14 @@ const CourseCategories = ({ name, cardData }) => {
     <>
       <div className="main">
         <div className="container">
-          <Navbar name={name} />
-          <AnimatePresence>
-            <motion.div
-              className="card-divs-wrap"
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              {cardData.map((item, index) => (
-                <Cards key={index} imgsrc={item.imgsrc} info={item.info} />
-              ))}
-            </motion.div>
-          </AnimatePresence>
+          <PreNav name={name} />
+          <Navbar />
+
+          <div className="card-divs-wrap">
+            {cardData.map((item, index) => (
+              <Cards key={index} imgsrc={item.imgsrc} info={item.info} />
+            ))}
+          </div>
         </div>
       </div>
     </>
