@@ -11,6 +11,9 @@ const Admin = () => {
     { id: 3, name: "Alice Johnson" },
   ]);
   const [newUserName, setNewUserName] = useState("");
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [action, setAction] = useState("");
+  const [activeTab, setActiveTab] = useState("profile");
 
   const openModal = (user) => {
     setSelectedUser(user);
@@ -19,6 +22,7 @@ const Admin = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
+    setShowConfirmation(false);
   };
 
   const openAddUserModal = () => {
@@ -32,10 +36,13 @@ const Admin = () => {
 
   const makeAdmin = (user) => {
     console.log(`${user.name} is now an admin.`);
+    closeModal();
   };
 
   const removeUser = (user) => {
     console.log(`${user.name} has been removed.`);
+    setUsers(users.filter((u) => u.id !== user.id));
+    closeModal();
   };
 
   const addUser = () => {
@@ -46,6 +53,74 @@ const Admin = () => {
       };
       setUsers([...users, newUser]);
       closeAddUserModal();
+    }
+  };
+
+  const handleAction = (actionType) => {
+    setAction(actionType);
+    setShowConfirmation(true);
+  };
+
+  const confirmAction = () => {
+    if (action === "make admin") {
+      makeAdmin(selectedUser);
+    } else if (action === "remove") {
+      removeUser(selectedUser);
+    }
+    setShowConfirmation(false);
+  };
+
+  const cancelAction = () => {
+    setShowConfirmation(false);
+  };
+
+  const tabs = [
+    { id: "profile", label: "Profile" },
+    { id: "admin", label: "Admin" },
+  ];
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "profile":
+        return <div>Profile content goes here</div>;
+      case "admin":
+        return (
+          <>
+            <div className="modal-action-button">
+              <motion.div
+                className="modal-buttons"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                style={{ color: "#00a6a6" }}
+                onClick={() => handleAction("make admin")}
+              >
+                Make Admin
+              </motion.div>
+              <motion.div
+                className="modal-buttons"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                style={{ color: "#e20044" }}
+                onClick={() => handleAction("remove")}
+              >
+                Remove User
+              </motion.div>
+            </div>
+            {showConfirmation && (
+              <div className="confirmation-popup">
+                <p className="confirmation-message">
+                  Are you sure you want to {action} {selectedUser?.name}?
+                </p>
+                <div className="confirmation-buttons">
+                  <button onClick={confirmAction}>Yes</button>
+                  <button onClick={cancelAction}>No</button>
+                </div>
+              </div>
+            )}
+          </>
+        );
+      default:
+        return null;
     }
   };
 
@@ -87,44 +162,31 @@ const Admin = () => {
         {isModalOpen && (
           <div className="modal-overlay">
             <div className="modal">
-              <div className="user-edit-form">
-                <label htmlFor="">Change Username</label>
-                <input type="text" className="password" />
-                <label htmlFor="">Change Password</label>
-                <input type="password" className="password" />
-                <div className="change-password-button">Change Password</div>
+              <div className="tabs-container">
+                <div className="tabs">
+                  {tabs.map((tab) => (
+                    <div
+                      key={tab.id}
+                      className={`tab ${
+                        activeTab === tab.id ? "active-tab" : ""
+                      }`}
+                      onClick={() => setActiveTab(tab.id)}
+                    >
+                      {tab.label}
+                    </div>
+                  ))}
+                </div>
+                <div className="tab-content">{renderTabContent()}</div>
               </div>
-
-              <div className="modal-action-button">
-                <motion.div
-                  className="modal-buttons"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{ color: "#00a6a6" }}
-                  onClick={() => makeAdmin(selectedUser)}
-                >
-                  Make Admin
-                </motion.div>
-                <motion.div
-                  className="modal-buttons"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{ color: "#e20044" }}
-                  onClick={() => removeUser(selectedUser)}
-                >
-                  Remove User
-                </motion.div>
-
-                <motion.div
-                  className="modal-buttons"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{ color: "#45312d" }}
-                  onClick={closeModal}
-                >
-                  Close
-                </motion.div>
-              </div>
+              <motion.div
+                className="modal-buttons"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                style={{ color: "#45312d" }}
+                onClick={closeModal}
+              >
+                Close
+              </motion.div>
             </div>
           </div>
         )}
