@@ -655,7 +655,6 @@ video {
   border-radius: 0.5rem;
   display: flex;
   justify-content: end;
-  transform-style: preserve-3d;
 }
 .search-icon {
   margin-right: 0.5rem;
@@ -1020,11 +1019,10 @@ select option {
   border: 1px solid #ffffff;
   border-radius: 1rem;
   width: 40vw;
-  height: 35vh;
+  height: 47vh;
   padding: 1rem 0;
   z-index: 1001;
   display: flex;
-  justify-content: center;
   align-items: center;
   flex-direction: column;
   backdrop-filter: blur(10px);
@@ -1076,4 +1074,78 @@ select option {
 
 .active-tab {
   background: rgb(255 255 255 / 50%);
+}
+
+.tab-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.confirmation-popup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.confirmation-buttons {
+  display: flex;
+  gap: 1rem;
+  div {
+    width: 7vw;
+    height: 4vh;
+  }
+}
+
+.input {
+  background: radial-gradient(
+    98.58% 260.42% at 0% 2.28%,
+    rgba(255, 255, 255, 0.098) 4.75%,
+    rgba(255, 255, 255, 0.014) 100%
+  );
+  border: 1px solid #ffffff;
+  border-radius: 1rem;
+  width: 13vw;
+  height: 4vh;
+  padding-left: 1rem;
+  font-size: 1rem;
+}
+
+.modal-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  label {
+    width: 100%;
+  }
+}
+
+.modal-heading {
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.add-user-modal {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.small-modal {
+  width: 20vw;
+  height: 20vh;
+}
+
+.modal-buttons-group-user {
+  display: flex;
+  gap: 1rem;
+  .modal-buttons {
+    width: 6vw;
+    height: 4vh;
+    font-size: 0.8rem;
+  }
 }

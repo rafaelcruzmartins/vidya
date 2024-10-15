@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
 const Admin = () => {
@@ -14,10 +14,16 @@ const Admin = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [action, setAction] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
+  const [inputValue, setInputValue] = useState(null);
+
+  useEffect(() => {
+    setShowConfirmation(false);
+  }, [activeTab]);
 
   const openModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
+    setInputValue(user.name);
   };
 
   const closeModal = () => {
@@ -82,10 +88,32 @@ const Admin = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case "profile":
-        return <div>Profile content goes here</div>;
+        return (
+          <div className="modal-profile">
+            <div className="modal-heading">{selectedUser.name}</div>
+            <label htmlFor="">Username</label>
+            <input
+              type="text"
+              className="input"
+              onChange={(e) => setInputValue(e.target.value)}
+              value={inputValue}
+            />
+            <label htmlFor="">Password</label>
+            <input className="input" type="password" />
+            <motion.div
+              className="modal-buttons"
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.95 }}
+              style={{ color: "#00a6a6" }}
+            >
+              Save
+            </motion.div>
+          </div>
+        );
       case "admin":
         return (
           <>
+            <div className="user-edit-title">{selectedUser.name}</div>
             <div className="modal-action-button">
               <motion.div
                 className="modal-buttons"
@@ -112,8 +140,26 @@ const Admin = () => {
                   Are you sure you want to {action} {selectedUser?.name}?
                 </p>
                 <div className="confirmation-buttons">
-                  <button onClick={confirmAction}>Yes</button>
-                  <button onClick={cancelAction}>No</button>
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      color: action === "make admin" ? "#00a6a6" : "#e20044",
+                    }}
+                    onClick={confirmAction}
+                  >
+                    Yes
+                  </motion.div>
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#0a2463" }}
+                    onClick={cancelAction}
+                  >
+                    No
+                  </motion.div>
                 </div>
               </div>
             )}
@@ -182,7 +228,7 @@ const Admin = () => {
                 className="modal-buttons"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
-                style={{ color: "#45312d" }}
+                style={{ color: "#45312d", marginTop: "1rem" }}
                 onClick={closeModal}
               >
                 Close
@@ -192,17 +238,36 @@ const Admin = () => {
         )}
         {isAddUserModalOpen && (
           <div className="modal-overlay">
-            <div className="modal">
-              <h2>Add New User</h2>
-              <input
-                type="text"
-                value={newUserName}
-                onChange={(e) => setNewUserName(e.target.value)}
-                placeholder="Enter user name"
-              />
-              <div>
-                <button onClick={addUser}>Add User</button>
-                <button onClick={closeAddUserModal}>Cancel</button>
+            <div className="modal small-modal">
+              <div className="add-user-modal">
+                <div className="modal-heading">Add New User</div>
+                <input
+                  className="input"
+                  type="text"
+                  value={newUserName}
+                  onChange={(e) => setNewUserName(e.target.value)}
+                  autoFocus
+                />
+                <div className="modal-buttons-group-user">
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#00a6a6" }}
+                    onClick={addUser}
+                  >
+                    Add User
+                  </motion.div>
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#45312d" }}
+                    onClick={closeAddUserModal}
+                  >
+                    Cancel
+                  </motion.div>
+                </div>
               </div>
             </div>
           </div>
