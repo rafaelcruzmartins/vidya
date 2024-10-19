@@ -1,14 +1,21 @@
 import { profile } from "../../assets";
 import Tilt from "react-parallax-tilt";
-const InstructorInfo = () => {
+import { useNavigate } from "react-router-dom";
+const InstructorInfo = ({ data }) => {
+  const navigate = useNavigate();
+  const handleInstructor = () => {
+    navigate(`/instructor/${data.id}`);
+  };
   return (
     <Tilt className="instructor-card">
-      <div className="img-container">
-        <img src={profile} alt="" />
+      <div className="instructor-psuedo-div" onClick={handleInstructor}>
+        <div className="img-container">
+          <img src={profile} alt="" />
+        </div>
+        <div className="instructor-title">{data.name}</div>
+        <div>Courses : {data.Courses}</div>
+        <div>Duration : 40 hr</div>
       </div>
-      <div className="instructor-title">Alex Batalia</div>
-      <div>Courses : 5</div>
-      <div>Duration : 40 hr</div>
     </Tilt>
   );
 };

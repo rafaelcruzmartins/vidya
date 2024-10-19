@@ -72,11 +72,13 @@ const Home = () => {
             <Cards
               imgsrc={rails}
               info={"Building Scalable Web Apps with Ruby on Rails"}
+              courseId={2}
             />
-            <Cards imgsrc={node} info={"Node For Beginners"} />
+            <Cards imgsrc={node} info={"Node For Beginners"} courseId={3} />
             <Cards
               imgsrc={php}
               info={"PHP Fundamentals: Web Development with PHP"}
+              courseId={4}
             />
           </div>
         </div>
@@ -86,9 +88,18 @@ const Home = () => {
             <Cards
               imgsrc={javascript}
               info={"JavaScript: From Basics to Advanced"}
+              courseId={5}
             />
-            <Cards imgsrc={mongodb} info={"Mastering MongoDB for Developers"} />
-            <Cards imgsrc={webdev} info={"Mastering MongoDB for Developers"} />
+            <Cards
+              imgsrc={mongodb}
+              info={"Mastering MongoDB for Developers"}
+              courseId={6}
+            />
+            <Cards
+              imgsrc={webdev}
+              info={"Mastering MongoDB for Developers"}
+              courseId={7}
+            />
           </div>
         </div>
       </div>

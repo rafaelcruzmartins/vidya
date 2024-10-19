@@ -10,7 +10,7 @@ const CategoriesInfo = ({ name, bxname, color, animation, delay }) => {
     >
       <Tilt className="categories">
         <div className="categories-icon-circle">
-          <i style={{ color: color }} class={bxname}></i>
+          <i style={{ color: color }} className={bxname}></i>
         </div>
         {name}
       </Tilt>

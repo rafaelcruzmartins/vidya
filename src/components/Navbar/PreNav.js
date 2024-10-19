@@ -79,7 +79,7 @@ const PreNav = ({ name }) => {
             <i className="bx bx-menu"></i>
           </motion.div>
           <motion.div
-            className="server-name"
+            className="pre-nav-name"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
@@ -134,7 +134,7 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleCourses}
           >
-            <i class="bx bxs-chalkboard"></i> All Courses
+            <i className="bx bxs-chalkboard"></i> All Courses
           </motion.div>
           <motion.div
             className="lecture-categories"
@@ -143,7 +143,7 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleCategories}
           >
-            <i class="bx bx-category-alt"></i> Categories
+            <i className="bx bx-category-alt"></i> Categories
           </motion.div>
           <motion.div
             className="lecture-instructor"
@@ -152,7 +152,7 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleInstructor}
           >
-            <i class="bx bxs-graduation"></i>
+            <i className="bx bxs-graduation"></i>
             Instructors
           </motion.div>
         </div>
@@ -165,7 +165,7 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleSettings}
           >
-            <i class="bx bx-cog"></i>Settings
+            <i className="bx bx-cog"></i>Settings
           </motion.div>
           <motion.div
             className="log-out"
@@ -173,7 +173,7 @@ const PreNav = ({ name }) => {
             whileTap={{ scale: 0.95 }}
             style={{ color: "#0a2463" }}
           >
-            <i class="bx bx-log-out-circle"></i>Log Out
+            <i className="bx bx-log-out-circle"></i>Log Out
           </motion.div>
         </div>
       </motion.div>

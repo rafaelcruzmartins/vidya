@@ -14,11 +14,17 @@ const tabs = [
 const Settings = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
+  const path = location.pathname.split("/").pop();
+  const validTab = tabs.find((tab) => tab.id === path);
+  var statetab = null;
+  if (validTab) {
+    statetab = validTab.id;
+  } else {
+    navigate(`/settings/${tabs[0].id}`);
+  }
+  const [activeTab, setActiveTab] = useState(statetab);
 
   useEffect(() => {
-    const path = location.pathname.split("/").pop();
-    const validTab = tabs.find((tab) => tab.id === path);
     if (validTab) {
       setActiveTab(validTab.id);
     } else {

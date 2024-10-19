@@ -29,6 +29,7 @@ const Admin = () => {
   const closeModal = () => {
     setIsModalOpen(false);
     setShowConfirmation(false);
+    setActiveTab("profile");
   };
 
   const openAddUserModal = () => {

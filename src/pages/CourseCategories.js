@@ -1,7 +1,6 @@
 import Navbar from "../components/Navbar/Navbar";
 import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
-import { motion, AnimatePresence } from "framer-motion";
 
 const CourseCategories = ({ name, cardData }) => {
   return (
@@ -13,7 +12,12 @@ const CourseCategories = ({ name, cardData }) => {
 
           <div className="card-divs-wrap">
             {cardData.map((item, index) => (
-              <Cards key={index} imgsrc={item.imgsrc} info={item.info} />
+              <Cards
+                key={index}
+                imgsrc={item.imgsrc}
+                info={item.info}
+                courseId={item.id}
+              />
             ))}
           </div>
         </div>

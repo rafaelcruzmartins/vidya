@@ -7,6 +7,8 @@ import Player from "./pages/Player";
 import Categories from "./pages/Categories";
 import Instructor from "./pages/Instructor";
 import Settings from "./pages/Settings";
+import IndividualInstrucor from "./pages/IndividualInstructor";
+import IndividualCourses from "./pages/IndividualCourses";
 
 import "./style.css";
 import axios from "axios";
@@ -21,20 +23,24 @@ import {
   webdev,
 } from "./assets";
 
-function App() {
+const App = () => {
   const [data, setData] = useState(Boolean);
   const fetchData = async () => {
     const res = await axios.get("http://localhost:5000");
     setData(res.data[0].isFirstStartUp);
   };
   const cardData = [
-    { imgsrc: python, info: "Master Python in 30 Days" },
-    { imgsrc: rails, info: "Building Scalable Web Apps with Ruby on Rails" },
-    { imgsrc: node, info: "Node For Beginners" },
-    { imgsrc: php, info: "PHP Fundamentals: Web Development with PHP" },
-    { imgsrc: javascript, info: "JavaScript: From Basics to Advanced" },
-    { imgsrc: mongodb, info: "Mastering MongoDB for Developers" },
-    { imgsrc: webdev, info: "Mastering MongoDB for Developers" },
+    { imgsrc: python, info: "Master Python in 30 Days", id: 1 },
+    {
+      imgsrc: rails,
+      info: "Building Scalable Web Apps with Ruby on Rails",
+      id: 2,
+    },
+    { imgsrc: node, info: "Node For Beginners", id: 3 },
+    { imgsrc: php, info: "PHP Fundamentals: Web Development with PHP", id: 4 },
+    { imgsrc: javascript, info: "JavaScript: From Basics to Advanced", id: 5 },
+    { imgsrc: mongodb, info: "Mastering MongoDB for Developers", id: 6 },
+    { imgsrc: webdev, info: "Mastering MongoDB for Developers", id: 7 },
   ];
   useEffect(() => {
     fetchData();
@@ -83,11 +89,13 @@ function App() {
             <Route path="/categories" element={<Categories />} />
             <Route path="/instructor" element={<Instructor />} />
             <Route path="/settings/*" element={<Settings />} />
+            <Route path="/instructor/:id" element={<IndividualInstrucor />} />
+            <Route path="/courses/:id" element={<IndividualCourses />} />
           </Routes>
         </Router>
       </>
     );
   }
-}
+};
 
 export default App;
