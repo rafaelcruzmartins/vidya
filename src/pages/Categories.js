@@ -8,7 +8,43 @@ const colors = [
   "#7A306C",
   "#00A6A6",
 ];
-
+const categoriesList = [
+  {
+    id: 1,
+    name: "Web",
+    bxname: "bx bxs-file-js",
+    delay: "0",
+    color: "#FB3640",
+  },
+  {
+    id: 2,
+    name: "Mobile",
+    bxname: "bx bx-mobile-alt",
+    delay: ".25s",
+    color: "#0A2463",
+  },
+  {
+    id: 3,
+    name: "Finance",
+    bxname: "bx bxs-bank",
+    delay: ".5s",
+    color: "#DDD92A",
+  },
+  {
+    id: 4,
+    name: "Health",
+    bxname: "bx bx-plus-medical",
+    delay: ".75s",
+    color: "#7A306C",
+  },
+  {
+    id: 5,
+    name: "Business",
+    bxname: "bx bxs-business",
+    delay: "1s",
+    color: "#00A6A6",
+  },
+];
 const animation = "fade .5s linear forwards";
 const Categories = () => {
   return (
@@ -17,41 +53,15 @@ const Categories = () => {
         <PreNav name={"Categories"} />
 
         <div className="categories-container">
-          <CategoriesInfo
-            name={"Web"}
-            bxname={"bx bxs-file-js"}
-            color={"#FB3640"}
-            animation={animation}
-            delay={"0"}
-          />
-          <CategoriesInfo
-            name={"Mobile"}
-            bxname={"bx bx-mobile-alt"}
-            color={"#0A2463"}
-            animation={animation}
-            delay={".25s"}
-          />
-          <CategoriesInfo
-            name={"Finance"}
-            bxname={"bx bxs-bank"}
-            color={"#DDD92A"}
-            animation={animation}
-            delay={".5s"}
-          />
-          <CategoriesInfo
-            name={"Health"}
-            bxname={"bx bx-plus-medical"}
-            color={"#7A306C"}
-            animation={animation}
-            delay={".75s"}
-          />
-          <CategoriesInfo
-            name={"Business"}
-            bxname={"bx bxs-business"}
-            color={"#00A6A6"}
-            animation={animation}
-            delay={"1s"}
-          />
+          {categoriesList.map((e) => (
+            <CategoriesInfo
+              name={e.name}
+              bxname={e.bxname}
+              color={e.color}
+              animation={animation}
+              delay={e.delay}
+            />
+          ))}
         </div>
       </div>
     </div>
