@@ -2,6 +2,8 @@ import PreNav from "../components/Navbar/PreNav";
 import { useParams } from "react-router-dom";
 import { profile } from "../assets";
 import Cards from "../components/Cards/Cards";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   python,
   rails,
@@ -11,6 +13,7 @@ import {
   php,
   webdev,
 } from "../assets";
+
 const cardData = [
   { imgsrc: python, info: "Master Python in 30 Days", id: 1 },
   {
@@ -34,8 +37,18 @@ const instructorsData = [
 
 const IndividualInstrucor = () => {
   const { id } = useParams();
-
   const user = instructorsData.find((user) => user.id === parseInt(id));
+  // State for modals
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // State for Instructor input fields
+  const [instructorTitle, setInstructorTitle] = useState(user.name);
+  const [instructorDescription, setInstructorDescription] = useState(
+    "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fuga ipsam corporis natus explicabo magnam voluptatem libero quos provident ad fugiat, autem quasi, nemo ut beatae. Eius cumque repudiandae quos quo."
+  );
+  // Modal handlers
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <div className="main">
       <div className="container">
@@ -46,6 +59,12 @@ const IndividualInstrucor = () => {
               <div className="top-container">
                 <div className="course-instructor-title">
                   {user?.name || "Instructor Not Found"}
+                  <div className="edit-information">
+                    <i
+                      className="bx bx-dots-vertical-rounded"
+                      onClick={openModal}
+                    ></i>
+                  </div>
                 </div>
               </div>
             </div>
@@ -67,7 +86,73 @@ const IndividualInstrucor = () => {
             </div>
           </div>
         </div>
-
+        <AnimatePresence>
+          {isModalOpen && (
+            <div className="modal-overlay">
+              <motion.div
+                initial={{ opacity: 0, scale: 0 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0 }}
+                className="modal big-modal"
+              >
+                <div className="edit-course-modal">
+                  <div className="edit-course-modal-inner">
+                    <div className="modal-heading">Edit Instructor</div>
+                    <div className="edit-course-form">
+                      <div className="course-title-edit">
+                        <div>Edit Title</div>
+                        <div className="modal-input-course-edit">
+                          <input
+                            onChange={(e) => setInstructorTitle(e.target.value)}
+                            className="input"
+                            value={instructorTitle}
+                            type="text"
+                          />
+                        </div>
+                      </div>
+                      <div className="course-title-edit">
+                        <div>Edit Image</div>
+                        <div className="modal-input-course-edit">
+                          <input className="input" type="file" />
+                        </div>
+                      </div>
+                      <div className="course-title-edit">
+                        <div>Edit Description</div>
+                        <div className="modal-input-description-edit">
+                          <textarea
+                            onChange={(e) =>
+                              setInstructorDescription(e.target.value)
+                            }
+                            value={instructorDescription}
+                          ></textarea>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="modal-buttons-group-user modal-buttons-group-edit-course">
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#00a6a6" }}
+                  >
+                    Save
+                  </motion.div>
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#45312d" }}
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </motion.div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
         <div className="courses">Courses</div>
 
         <div className="card-divs-wrap">

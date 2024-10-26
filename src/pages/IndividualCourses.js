@@ -422,26 +422,26 @@ const IndividualCourses = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="modal-buttons-group-user modal-buttons-group-edit-course">
-                      <motion.div
-                        className="modal-buttons"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        style={{ color: "#00a6a6" }}
-                      >
-                        Save
-                      </motion.div>
-                      <motion.div
-                        className="modal-buttons"
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.95 }}
-                        style={{ color: "#45312d" }}
-                        onClick={closeModal}
-                      >
-                        Cancel
-                      </motion.div>
-                    </div>
                   </div>
+                </div>
+                <div className="modal-buttons-group-user modal-buttons-group-edit-course">
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#00a6a6" }}
+                  >
+                    Save
+                  </motion.div>
+                  <motion.div
+                    className="modal-buttons"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{ color: "#45312d" }}
+                    onClick={closeModal}
+                  >
+                    Cancel
+                  </motion.div>
                 </div>
               </motion.div>
             </div>
