@@ -13,6 +13,7 @@ import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
 import Tilt from "react-parallax-tilt";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -22,86 +23,92 @@ const Home = () => {
       <div className="container">
         <PreNav name={"VIDYA"} />
         <Navbar />
-        <div className="featured">
-          <p className="pinned-title">FEATURED</p>
-          <div className="feat-stats">
-            <div className="featured-course">
-              <div className="featured-image">
-                <img src={python} alt="" />
-              </div>
-              <div className="featured-info">
-                <div className="featured-info-details">
-                  <div className="info-title">Master Python in 30 Days</div>
-                  <div className="instructor-name">by Andre Sivan</div>
-                  <div className="play-button" onClick={handlePlayer}>
-                    Play Now
+        <motion.div
+          initial={{ opacity: 0, x: -200 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 200 }}
+        >
+          <div className="featured">
+            <p className="pinned-title">FEATURED</p>
+            <div className="feat-stats">
+              <div className="featured-course">
+                <div className="featured-image">
+                  <img src={python} alt="" />
+                </div>
+                <div className="featured-info">
+                  <div className="featured-info-details">
+                    <div className="info-title">Master Python in 30 Days</div>
+                    <div className="instructor-name">by Andre Sivan</div>
+                    <div className="play-button" onClick={handlePlayer}>
+                      Play Now
+                    </div>
                   </div>
                 </div>
               </div>
+              <Tilt className="stats" perspective={4000} gyroscope={true}>
+                <Stats />
+                <div className="watch">
+                  <div className="watch-hours">WATCH HOURS</div>
+                  <div className="hours">19H</div>
+                </div>
+                <div className="labels">
+                  <div className="label-names">
+                    <div className="rectangle first"></div>Web - 40%
+                  </div>
+                  <div className="label-names">
+                    <div className="rectangle second"></div>Mobile - 30%
+                  </div>
+                  <div className="label-names">
+                    <div className="rectangle third"></div>Finance - 10%
+                  </div>
+                  <div className="label-names">
+                    <div className="rectangle fourth"></div>Health - 12%
+                  </div>
+                  <div className="label-names">
+                    <div className="rectangle fifth"></div>Others - 8%
+                  </div>
+                </div>
+              </Tilt>
             </div>
-            <Tilt className="stats" perspective={4000} gyroscope={true}>
-              <Stats />
-              <div className="watch">
-                <div className="watch-hours">WATCH HOURS</div>
-                <div className="hours">19H</div>
-              </div>
-              <div className="labels">
-                <div className="label-names">
-                  <div className="rectangle first"></div>Web - 40%
-                </div>
-                <div className="label-names">
-                  <div className="rectangle second"></div>Mobile - 30%
-                </div>
-                <div className="label-names">
-                  <div className="rectangle third"></div>Finance - 10%
-                </div>
-                <div className="label-names">
-                  <div className="rectangle fourth"></div>Health - 12%
-                </div>
-                <div className="label-names">
-                  <div className="rectangle fifth"></div>Others - 8%
-                </div>
-              </div>
-            </Tilt>
           </div>
-        </div>
 
-        <div className="continue">
-          <p className="pinned-title">CONTINUE LEARNING</p>
-          <div className="card-divs">
-            <Cards
-              imgsrc={rails}
-              info={"Building Scalable Web Apps with Ruby on Rails"}
-              courseId={2}
-            />
-            <Cards imgsrc={node} info={"Node For Beginners"} courseId={3} />
-            <Cards
-              imgsrc={php}
-              info={"PHP Fundamentals: Web Development with PHP"}
-              courseId={4}
-            />
+          <div className="continue">
+            <p className="pinned-title">CONTINUE LEARNING</p>
+            <div className="card-divs">
+              <Cards
+                imgsrc={rails}
+                info={"Building Scalable Web Apps with Ruby on Rails"}
+                courseId={2}
+              />
+              <Cards imgsrc={node} info={"Node For Beginners"} courseId={3} />
+              <Cards
+                imgsrc={php}
+                info={"PHP Fundamentals: Web Development with PHP"}
+                courseId={4}
+              />
+            </div>
           </div>
-        </div>
-        <div className="latest-courses">
-          <p className="pinned-title">LATEST COURSES</p>
-          <div className="card-divs">
-            <Cards
-              imgsrc={javascript}
-              info={"JavaScript: From Basics to Advanced"}
-              courseId={5}
-            />
-            <Cards
-              imgsrc={mongodb}
-              info={"Mastering MongoDB for Developers"}
-              courseId={6}
-            />
-            <Cards
-              imgsrc={webdev}
-              info={"Mastering MongoDB for Developers"}
-              courseId={7}
-            />
+          <div className="latest-courses">
+            <p className="pinned-title">LATEST COURSES</p>
+            <div className="card-divs">
+              <Cards
+                imgsrc={javascript}
+                info={"JavaScript: From Basics to Advanced"}
+                courseId={5}
+              />
+              <Cards
+                imgsrc={mongodb}
+                info={"Mastering MongoDB for Developers"}
+                courseId={6}
+              />
+              <Cards
+                imgsrc={webdev}
+                info={"Mastering MongoDB for Developers"}
+                courseId={7}
+              />
+            </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </div>
   );

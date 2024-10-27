@@ -1,7 +1,7 @@
 import Navbar from "../components/Navbar/Navbar";
 import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
-
+import { motion } from "framer-motion";
 const CourseCategories = ({ name, cardData }) => {
   return (
     <>
@@ -10,7 +10,13 @@ const CourseCategories = ({ name, cardData }) => {
           <PreNav name={name} />
           <Navbar />
 
-          <div className="card-divs-wrap">
+          <motion.div
+            initial={{ opacity: 0, x: -200 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 200 }}
+            transition={{ ease: "easeInOut" }}
+            className="card-divs-wrap"
+          >
             {cardData.map((item, index) => (
               <Cards
                 key={index}
@@ -19,7 +25,7 @@ const CourseCategories = ({ name, cardData }) => {
                 courseId={item.id}
               />
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </>

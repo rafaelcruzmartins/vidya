@@ -109,7 +109,10 @@ body {
 
   margin-top: 1rem;
 }
-
+.motion-container {
+  width: 100%;
+  height: 100%;
+}
 .pre-nav {
   display: flex;
   align-items: center;
@@ -528,6 +531,7 @@ img {
   padding-top: 1rem;
   align-items: center;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 .videos {
@@ -548,7 +552,6 @@ img {
 video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
   border-radius: 2rem;
 }
 
@@ -561,10 +564,13 @@ video {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background-color: rgba(255, 255, 255, 0.34);
   padding: 1rem;
   transition: opacity 1s ease;
   border-radius: 0 0 2rem 2rem;
+  border: 1px solid white;
+  backdrop-filter: blur(40px);
+  font-weight: 500;
 }
 
 .controls-container.visible {
@@ -578,20 +584,18 @@ video {
 
 .button-group {
   display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
+  justify-content: space-between;
 }
 
 .control-button {
   background: none;
   border: none;
-  color: white;
+
   cursor: pointer;
   margin: 0 5px;
 }
 
 .time-display {
-  color: white;
   text-align: center;
   margin-bottom: 5px;
 }
@@ -604,9 +608,12 @@ video {
   position: absolute;
   bottom: 60px;
   right: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  backdrop-filter: blur(10px);
+  padding: 1rem;
+  width: 14rem;
+  font-weight: 500;
 }
 
 .settings-option {
@@ -614,14 +621,14 @@ video {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
-  color: white;
 }
 
 .settings-option select {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(255, 255, 255, 0.3);
   border: 1px solid white;
-  color: white;
-  padding: 2px 5px;
+  width: 20%;
+  margin: 0.5rem;
+  height: 3vh;
 }
 
 .custom-video-player:-webkit-full-screen {
@@ -649,7 +656,9 @@ video {
   height: 100%;
   border-radius: 0;
 }
-
+.custom-video-player:fullscreen .controls-container {
+  border-radius: 0;
+}
 .sidebar {
   position: fixed;
   top: 0;
@@ -1540,5 +1549,428 @@ input[type="file"]::file-selector-button:hover {
     border-radius: 0.5rem;
     width: 100%;
     height: 10vh;
+  }
+}
+/* Custom range input styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: none;
+  border-radius: 2px;
+  outline: none;
+  position: relative;
+  margin: 10px 0; /* Add margin to prevent thumb cutoff */
+}
+
+/* Thumb styling */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  background: #45312d;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  top: -5px; /* Center the thumb vertically */
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: #45312d;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  top: 0; /* Firefox handles vertical alignment differently */
+}
+
+/* Track styling */
+input[type="range"]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 2px;
+  background: #45312d;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-track {
+  width: 100%;
+  height: 2px;
+  background: #45312d;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+/* Focus state */
+input[type="range"]:focus {
+  outline: none;
+}
+
+/* Hover effects */
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+  background: #e20044;
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  transform: scale(1.2);
+  background: #e20044;
+}
+
+.left-button-group,
+.right-button-group {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  i {
+    color: #45312d;
+  }
+  i:hover {
+    color: #e20044;
+  }
+}
+
+/* CourseSections.css */
+.course-container {
+  width: 100%;
+  max-width: 800px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.section-item {
+  border-bottom: 1px solid #eee;
+}
+
+.section-item:last-child {
+  border-bottom: none;
+}
+
+.section-header {
+  width: 100%;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.2s;
+}
+
+.section-header:hover {
+  background-color: #f8f9fa;
+}
+
+.section-title {
+  font-weight: 500;
+  color: #333;
+  font-size: 16px;
+}
+
+.chevron-icon {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s;
+}
+
+.chevron-icon.expanded {
+  transform: rotate(0deg);
+}
+
+.chevron-icon:not(.expanded) {
+  transform: rotate(-90deg);
+}
+
+.lectures-container {
+  padding: 0 20px 12px 40px;
+}
+
+.lecture-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+}
+
+.lecture-item:hover {
+  background-color: #f8f9fa;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  color: transparent;
+  transition: all 0.2s;
+}
+
+.checkbox.completed {
+  background-color: #ff4081;
+  border-color: #ff4081;
+  color: white;
+  font-size: 12px;
+}
+
+.lecture-title {
+  font-size: 14px;
+  color: #555;
+}
+
+/* Optional: Add animation for section expansion */
+.lectures-container {
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.video-player-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.video-element {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.controls-wrapper {
+  position: absolute;
+  bottom: -100%;
+  left: 0;
+  right: 0;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  transition: bottom 0.3s ease-in-out;
+}
+
+.controls-wrapper.show {
+  bottom: 0;
+}
+
+.video-controls {
+  padding: 10px;
+  color: white;
+}
+
+.progress-container {
+  cursor: pointer;
+  height: 5px;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
+  position: relative;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.buffer-bar {
+  position: absolute;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.progress-fill {
+  position: absolute;
+  height: 100%;
+  background: #ff0000;
+}
+
+.controls-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls-left,
+.controls-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.control-button {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.volume-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.volume-slider {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 5px 10px;
+  border-radius: 4px;
+  margin-left: 10px;
+  display: flex;
+}
+.volume-slider input[type="range"] {
+  width: 80px;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 2px;
+  outline: none;
+}
+
+.volume-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  background: white;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.volume-slider input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.time-display {
+  font-size: 14px;
+  margin-left: 10px;
+}
+
+.playback-speed {
+  min-width: 40px;
+}
+
+/* Hover effects */
+.progress-container:hover {
+  height: 8px;
+  transition: height 0.2s ease-in-out;
+}
+
+.control-button:hover {
+  opacity: 0.8;
+}
+
+/* Fullscreen styles */
+.video-player-container:fullscreen {
+  width: 100vw;
+  height: 100vh;
+}
+
+.video-player-container:fullscreen .video-element {
+  height: 100vh;
+}
+
+/* Hide native video controls */
+video::-webkit-media-controls {
+  display: none !important;
+}
+
+video::-webkit-media-controls-enclosure {
+  display: none !important;
+}
+
+/* For Firefox */
+video::-moz-media-controls {
+  display: none !important;
+}
+
+/* Animation for controls visibility */
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+}
+
+.controls-wrapper {
+  animation: slideDown 0.3s ease-in-out forwards;
+}
+
+.controls-wrapper.show {
+  animation: slideUp 0.3s ease-in-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .control-button {
+    padding: 3px;
+  }
+
+  .time-display {
+    font-size: 12px;
+  }
+
+  .volume-slider input[type="range"] {
+    width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .controls-left,
+  .controls-right {
+    gap: 5px;
+  }
+
+  .time-display {
+    display: none;
+  }
+
+  .playback-speed {
+    display: none;
   }
 }
