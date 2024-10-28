@@ -3,17 +3,18 @@ import axios from "axios";
 import PreNav from "../components/Navbar/PreNav";
 import VideoPlayer from "../components/VideoPlayer/VideoPlayer";
 import { video1, video2, video3 } from "../assets";
+import { AnimatePresence, motion } from "framer-motion";
 
 // Memoized components to prevent unnecessary re-renders
 const SectionHeader = memo(
   ({ sectionId, title, hasLectures, isExpanded, onToggle }) => (
     <div onClick={onToggle} className="section-header">
-      <span className="section-title">
+      <span className="playlist-section-title">
         {sectionId}: {title}
       </span>
       {hasLectures && (
         <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
-          ▼
+          <i class="bx bx-chevron-right"></i>
         </span>
       )}
     </div>
@@ -22,23 +23,23 @@ const SectionHeader = memo(
 
 const LectureItem = memo(
   ({ lectureId, title, isCompleted, videoUrl, onToggle, onVideoSelect }) => (
-    <div className="lecture-item">
+    <div
+      onClick={(e) => {
+        e.stopPropagation();
+        onVideoSelect(videoUrl);
+      }}
+      className="playlist-lecture-item"
+    >
       <span
-        className={`checkbox ${isCompleted ? "completed" : ""}`}
+        className="checkbox"
         onClick={(e) => {
           e.stopPropagation();
           onToggle(lectureId);
         }}
       >
-        {isCompleted ? "✓" : "○"}
+        <i className={isCompleted ? "bx bxs-check-circle" : "bx bx-circle"}></i>
       </span>
-      <span
-        className="lecture-title"
-        onClick={(e) => {
-          e.stopPropagation();
-          onVideoSelect(videoUrl);
-        }}
-      >
+      <span className="lecture-title">
         {lectureId}: {title}
       </span>
     </div>
@@ -153,22 +154,31 @@ const Player = () => {
                   isExpanded={expandedSections.has(section.sectionId)}
                   onToggle={() => toggleSection(section.sectionId)}
                 />
-                {expandedSections.has(section.sectionId) &&
-                  section.lectures.length > 0 && (
-                    <div className="lectures-container">
-                      {section.lectures.map((lecture) => (
-                        <LectureItem
-                          key={lecture.lectureId}
-                          lectureId={lecture.lectureId}
-                          title={lecture.title}
-                          isCompleted={completedLectures.has(lecture.lectureId)}
-                          videoUrl={lecture.videoUrl}
-                          onToggle={toggleLecture}
-                          onVideoSelect={handleVideoSelect}
-                        />
-                      ))}
-                    </div>
-                  )}
+                <AnimatePresence>
+                  {expandedSections.has(section.sectionId) &&
+                    section.lectures.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="lectures-container"
+                      >
+                        {section.lectures.map((lecture) => (
+                          <LectureItem
+                            key={lecture.lectureId}
+                            lectureId={lecture.lectureId}
+                            title={lecture.title}
+                            isCompleted={completedLectures.has(
+                              lecture.lectureId
+                            )}
+                            videoUrl={lecture.videoUrl}
+                            onToggle={toggleLecture}
+                            onVideoSelect={handleVideoSelect}
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                </AnimatePresence>
               </div>
             ))}
           </div>

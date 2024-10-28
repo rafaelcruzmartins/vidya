@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import React, { useState, useRef, useCallback, memo, useEffect } from "react";
 
 const formatTime = (time) => {
@@ -56,27 +57,27 @@ const Controls = memo(
         </div>
         <div className="controls-main">
           <div className="controls-left">
-            <button onClick={onPreviousVideo} className="control-button">
+            <div onClick={onPreviousVideo} className="control-button">
               <i className="bx bx-skip-previous"></i>
-            </button>
-            <button onClick={onSkipBackward} className="control-button">
+            </div>
+            <div onClick={onSkipBackward} className="control-button">
               <i className="bx bx-rewind"></i>
-            </button>
-            <button onClick={onPlayPause} className="control-button">
+            </div>
+            <div onClick={onPlayPause} className="control-button">
               <i className={`bx ${isPlaying ? "bx-pause" : "bx-play"}`}></i>
-            </button>
-            <button onClick={onSkipForward} className="control-button">
+            </div>
+            <div onClick={onSkipForward} className="control-button">
               <i className="bx bx-fast-forward"></i>
-            </button>
-            <button onClick={onNextVideo} className="control-button">
+            </div>
+            <div onClick={onNextVideo} className="control-button">
               <i className="bx bx-skip-next"></i>
-            </button>
+            </div>
             <div
               className="volume-container"
               onMouseEnter={() => setIsVolumeSliderVisible(true)}
               onMouseLeave={() => setIsVolumeSliderVisible(false)}
             >
-              <button onClick={onMute} className="control-button">
+              <div onClick={onMute} className="control-button">
                 <i
                   className={`bx ${
                     isMuted
@@ -88,36 +89,44 @@ const Controls = memo(
                       : "bxs-volume-full"
                   }`}
                 ></i>
-              </button>
-              {isVolumeSliderVisible && (
-                <div className="volume-slider">
-                  <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.1"
-                    value={volume}
-                    onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
-                  />
-                </div>
-              )}
+              </div>
+              <AnimatePresence>
+                {isVolumeSliderVisible && (
+                  <div className="volume-slider">
+                    <motion.input
+                      initial={{ width: 0 }}
+                      animate={{ width: "5rem" }}
+                      exit={{ width: 0 }}
+                      type="range"
+                      min="0"
+                      max="1"
+                      step="0.1"
+                      value={volume}
+                      onChange={(e) =>
+                        onVolumeChange(parseFloat(e.target.value))
+                      }
+                    />
+                  </div>
+                )}
+              </AnimatePresence>
             </div>
-            <span className="time-display">
+            <div className="time-display">
               {formatTime(currentTime)} / {formatTime(duration)}
-            </span>
+            </div>
           </div>
           <div className="controls-right">
-            <button onClick={onAutoplayToggle} className="control-button">
+            <div onClick={onAutoplayToggle} className="control-button">
               <i
-                className={`bx ${isAutoplayOn ? "bx-repeat" : "bx-shuffle"}`}
+                style={{ color: isAutoplayOn ? "#e20044" : "whitesmoke" }}
+                className="bx bx-repeat"
               ></i>
-            </button>
-            <button onClick={onCaption} className="control-button">
+            </div>
+            <div onClick={onCaption} className="control-button">
               <i
                 className={`bx ${isCaptionOn ? "bx-captions" : "bxs-captions"}`}
               ></i>
-            </button>
-            <button
+            </div>
+            <div
               onClick={() =>
                 onPlaybackSpeedChange(
                   playbackSpeed >= 2 ? 0.5 : playbackSpeed + 0.5
@@ -125,15 +134,15 @@ const Controls = memo(
               }
               className="control-button playback-speed"
             >
-              {playbackSpeed}x
-            </button>
-            <button onClick={onFullScreen} className="control-button">
+              {playbackSpeed} X
+            </div>
+            <div onClick={onFullScreen} className="control-button">
               <i
                 className={`bx ${
                   isFullScreen ? "bx-exit-fullscreen" : "bx-fullscreen"
                 }`}
               ></i>
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -164,7 +173,7 @@ const VideoPlayer = ({
     isFullScreen: false,
     playbackSpeed: 1,
     isAutoplayOn: true,
-    showControls: false,
+    showControls: true,
   });
 
   useEffect(() => {
@@ -379,33 +388,43 @@ const VideoPlayer = ({
         className="video-element"
         onClick={handlePlayPause}
       />
-      <div className={`controls-wrapper ${state.showControls ? "show" : ""}`}>
-        <Controls
-          isPlaying={state.isPlaying}
-          isMuted={state.isMuted}
-          isCaptionOn={state.isCaptionOn}
-          isFullScreen={state.isFullScreen}
-          currentTime={state.currentTime}
-          duration={state.duration}
-          buffered={state.buffered}
-          volume={state.volume}
-          playbackSpeed={state.playbackSpeed}
-          isAutoplayOn={state.isAutoplayOn}
-          onPlayPause={handlePlayPause}
-          onStop={handleStop}
-          onMute={handleMute}
-          onVolumeChange={handleVolumeChange}
-          onCaption={handleCaption}
-          onFullScreen={handleFullScreen}
-          onSkipForward={handleSkipForward}
-          onSkipBackward={handleSkipBackward}
-          onNextVideo={onNextVideo}
-          onPreviousVideo={onPreviousVideo}
-          onAutoplayToggle={handleAutoplayToggle}
-          onPlaybackSpeedChange={handlePlaybackSpeedChange}
-          onSeek={handleSeek}
-        />
-      </div>
+      <AnimatePresence>
+        {state.showControls && (
+          <motion.div
+            initial={{ y: 50 }}
+            animate={{ y: 0 }}
+            exit={{ y: 50 }}
+            transition={{ type: "tween", ease: "easeInOut" }}
+            className="controls-wrapper"
+          >
+            <Controls
+              isPlaying={state.isPlaying}
+              isMuted={state.isMuted}
+              isCaptionOn={state.isCaptionOn}
+              isFullScreen={state.isFullScreen}
+              currentTime={state.currentTime}
+              duration={state.duration}
+              buffered={state.buffered}
+              volume={state.volume}
+              playbackSpeed={state.playbackSpeed}
+              isAutoplayOn={state.isAutoplayOn}
+              onPlayPause={handlePlayPause}
+              onStop={handleStop}
+              onMute={handleMute}
+              onVolumeChange={handleVolumeChange}
+              onCaption={handleCaption}
+              onFullScreen={handleFullScreen}
+              onSkipForward={handleSkipForward}
+              onSkipBackward={handleSkipBackward}
+              onNextVideo={onNextVideo}
+              onPreviousVideo={onPreviousVideo}
+              onAutoplayToggle={handleAutoplayToggle}
+              onPlaybackSpeedChange={handlePlaybackSpeedChange}
+              onSeek={handleSeek}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
