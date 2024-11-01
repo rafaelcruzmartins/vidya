@@ -40,7 +40,7 @@ const syncdb = async () => {
 syncdb();
 const courseData = {
   courseTitle: "Complete Web Development Bootcamp 2024",
-  courseDuration: "32 hours",
+  courseDuration: "64 hours",
   instructor: "Sarah Johnson",
   sections: [
     {
@@ -136,8 +136,225 @@ const courseData = {
         },
       ],
     },
+    {
+      sectionId: 4,
+      title: "Advanced JavaScript Concepts",
+      duration: "8 hours",
+      lectures: [
+        {
+          lectureId: "4.1",
+          title: "Asynchronous JavaScript",
+          duration: "45:00",
+          videoUrl:
+            "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "4.2",
+          title: "ES6 and Beyond",
+          duration: "55:30",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "4.3",
+          title: "Functional Programming Principles",
+          duration: "50:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          isComplete: false,
+        },
+      ],
+    },
+    {
+      sectionId: 5,
+      title: "Responsive Web Design",
+      duration: "6 hours",
+      lectures: [
+        {
+          lectureId: "5.1",
+          title: "Media Queries and Breakpoints",
+          duration: "35:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "5.2",
+          title: "Mobile-First Approach",
+          duration: "45:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "5.3",
+          title: "Responsive Typography and Layouts",
+          duration: "40:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+          isComplete: false,
+        },
+      ],
+    },
+    {
+      sectionId: 6,
+      title: "Modern CSS Techniques",
+      duration: "6 hours",
+      lectures: [
+        {
+          lectureId: "6.1",
+          title: "CSS Variables and Theming",
+          duration: "38:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "6.2",
+          title: "CSS Preprocessors (Sass, Less)",
+          duration: "50:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "6.3",
+          title: "CSS Architectural Patterns",
+          duration: "45:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          isComplete: false,
+        },
+      ],
+    },
+    {
+      sectionId: 7,
+      title: "Introduction to React",
+      duration: "8 hours",
+      lectures: [
+        {
+          lectureId: "7.1",
+          title: "React Fundamentals",
+          duration: "55:00",
+          videoUrl:
+            "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "7.2",
+          title: "React Components and State",
+          duration: "60:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "7.3",
+          title: "React Hooks",
+          duration: "50:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          isComplete: false,
+        },
+      ],
+    },
+    {
+      sectionId: 8,
+      title: "Backend Development with Node.js",
+      duration: "8 hours",
+      lectures: [
+        {
+          lectureId: "8.1",
+          title: "Node.js Fundamentals",
+          duration: "45:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "8.2",
+          title: "Express.js for Web Servers",
+          duration: "55:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerFun.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "8.3",
+          title: "MongoDB and Mongoose",
+          duration: "50:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyrides.mp4",
+          isComplete: false,
+        },
+      ],
+    },
+    {
+      sectionId: 9,
+      title: "Full-Stack Development with MERN",
+      duration: "8 hours",
+      lectures: [
+        {
+          lectureId: "9.1",
+          title: "Integrating React with Node.js",
+          duration: "60:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerMeltdowns.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "9.2",
+          title: "Building a MERN Stack Application",
+          duration: "65:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "9.3",
+          title: "Deploying a MERN Stack Application",
+          duration: "55:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+          isComplete: false,
+        },
+      ],
+    },
+    {
+      sectionId: 10,
+      title: "Web Development Best Practices",
+      duration: "6 hours",
+      lectures: [
+        {
+          lectureId: "10.1",
+          title: "Accessibility and Inclusivity",
+          duration: "40:00",
+          videoUrl:
+            "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "10.2",
+          title: "Performance Optimization",
+          duration: "50:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+          isComplete: false,
+        },
+        {
+          lectureId: "10.3",
+          title: "Testing and Debugging",
+          duration: "45:00",
+          videoUrl:
+            "https://storage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+          isComplete: false,
+        },
+      ],
+    },
   ],
-  totalLectures: 9,
+  totalLectures: 27,
   lastUpdated: "2024-03-15",
   courseProgress: 0,
 };
