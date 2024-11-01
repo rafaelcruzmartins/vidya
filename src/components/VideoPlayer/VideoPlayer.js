@@ -31,6 +31,8 @@ const Controls = memo(
     onPreviousVideo,
     onAutoplayToggle,
     onPlaybackSpeedChange,
+    isPrevVideo,
+    isNextVideo,
     onSeek,
   }) => {
     const [isVolumeSliderVisible, setIsVolumeSliderVisible] = useState(false);
@@ -57,7 +59,11 @@ const Controls = memo(
         </div>
         <div className="controls-main">
           <div className="controls-left">
-            <div onClick={onPreviousVideo} className="control-button">
+            <div
+              onClick={onPreviousVideo}
+              style={{ opacity: isPrevVideo ? "" : "0.7" }}
+              className="control-button"
+            >
               <i className="bx bx-skip-previous"></i>
             </div>
             <div onClick={onSkipBackward} className="control-button">
@@ -69,7 +75,11 @@ const Controls = memo(
             <div onClick={onSkipForward} className="control-button">
               <i className="bx bx-fast-forward"></i>
             </div>
-            <div onClick={onNextVideo} className="control-button">
+            <div
+              onClick={isNextVideo ? onNextVideo : undefined}
+              style={{ opacity: isNextVideo ? "" : "0.7" }}
+              className="control-button"
+            >
               <i className="bx bx-skip-next"></i>
             </div>
             <div
@@ -157,6 +167,9 @@ const VideoPlayer = ({
   onPreviousVideo,
   onProgressUpdate,
   onPlayRequest,
+  isNextVideo,
+  isPrevVideo,
+  handleLectureCompleteOnVideoEnd,
 }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -180,15 +193,13 @@ const VideoPlayer = ({
     if (videoRef.current) {
       if (onPlayRequest) {
         videoRef.current.play();
-        console.log(state);
         setState((prev) => ({
           ...prev,
           isPlaying: true,
         }));
-        console.log(state);
       }
     }
-  }, [videoSource, onPlayRequest]);
+  }, [videoSource]);
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -340,11 +351,11 @@ const VideoPlayer = ({
 
   const handleVideoEnd = useCallback(() => {
     setState((prev) => ({ ...prev, isPlaying: false }));
-    if (state.isAutoplayOn && onNextVideo) {
-      onNextVideo();
+    handleLectureCompleteOnVideoEnd();
+    if (state.isAutoplayOn && onVideoEnd) {
+      onVideoEnd?.();
     }
-    onVideoEnd?.();
-  }, [state.isAutoplayOn, onNextVideo, onVideoEnd]);
+  }, [state.isAutoplayOn, onVideoEnd]);
 
   React.useEffect(() => {
     const video = videoRef.current;
@@ -391,9 +402,9 @@ const VideoPlayer = ({
       <AnimatePresence>
         {state.showControls && (
           <motion.div
-            initial={{ y: 50 }}
+            initial={{ y: 60 }}
             animate={{ y: 0 }}
-            exit={{ y: 50 }}
+            exit={{ y: 60 }}
             transition={{ type: "tween", ease: "easeInOut" }}
             className="controls-wrapper"
           >
@@ -408,6 +419,8 @@ const VideoPlayer = ({
               volume={state.volume}
               playbackSpeed={state.playbackSpeed}
               isAutoplayOn={state.isAutoplayOn}
+              isNextVideo={isNextVideo}
+              isPrevVideo={isPrevVideo}
               onPlayPause={handlePlayPause}
               onStop={handleStop}
               onMute={handleMute}
