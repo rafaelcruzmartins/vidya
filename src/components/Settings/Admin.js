@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import {
+  DotsVerticalRounded,
+  FolderMinusSolid,
+  FolderPlusSolid,
+  Plus,
+  Refresh,
+} from "../../assets";
 
 const Admin = () => {
   const [selectedUser, setSelectedUser] = useState(null);
@@ -177,33 +184,44 @@ const Admin = () => {
       <div className="folders-title">Folders</div>
       <div className="folder-div">
         <div className="folder-name-div">C:/Lectures/</div>
-        <i className="bx bxs-folder-minus"></i>
+
+        <FolderMinusSolid />
       </div>
       <div className="folders-action-group">
         <div>
-          Add Folder<i className="bx bxs-folder-plus"></i>
+          Add Folder{" "}
+          <div className="svg-div folder-plus">
+            <FolderPlusSolid />
+          </div>
         </div>
         <div>
-          Scan Folders<i className="bx bx-refresh"></i>
+          Scan Folders{" "}
+          <div className="svg-div folder-refresh">
+            <Refresh />
+          </div>
         </div>
       </div>
       <div className="users-title">
         Users
-        <i
+        <div
           title="Add User"
-          className="bx bx-plus"
           onClick={openAddUserModal}
-        ></i>
+          className="svg-div icon-plus"
+        >
+          <Plus />
+        </div>
       </div>
       <div className="user-list">
         {users.map((user) => (
           <div key={user.id} className="user-item">
             <div className="user-info">{user.name}</div>
-            <i
+            <div
+              className="svg-div"
               title="Edit User"
-              className="bx bx-dots-vertical-rounded"
               onClick={() => openModal(user)}
-            ></i>
+            >
+              <DotsVerticalRounded />
+            </div>
           </div>
         ))}
         {isModalOpen && (

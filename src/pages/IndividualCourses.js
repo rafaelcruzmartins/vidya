@@ -11,6 +11,13 @@ import {
   php,
   webdev,
   profile,
+  ChevronDownSolid,
+  ChevronRightSolid,
+  DotsVerticalRounded,
+  Plus,
+  TrashAltSolid,
+  PlusCircle,
+  X,
 } from "../assets";
 import { useRef, useState, useEffect } from "react";
 
@@ -72,9 +79,13 @@ const Section = ({ title, lectures }) => {
         <div className="section-info">
           <div className="section-icon">
             {isOpen ? (
-              <i className="bx bxs-chevron-down"></i>
+              <div className="svg-div">
+                <ChevronDownSolid />
+              </div>
             ) : (
-              <i className="bx bxs-chevron-right"></i>
+              <div className="svg-div">
+                <ChevronRightSolid />
+              </div>
             )}
           </div>
           <div className="section-duration">{totalDuration} min</div>
@@ -306,10 +317,14 @@ const IndividualCourses = () => {
                 <div className="course-instructor-title">
                   {course?.info || "Title Not Found"}
                   <div className="edit-information">
-                    <i
-                      className="bx bx-dots-vertical-rounded"
+                    <div
+                      title="Edit Instructor"
+                      style={{ cursor: "pointer" }}
+                      className="svg-div"
                       onClick={openModal}
-                    ></i>
+                    >
+                      <DotsVerticalRounded />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -375,21 +390,25 @@ const IndividualCourses = () => {
                       <div className="course-title-edit">
                         <div className="add-categories">
                           Category
-                          <i
+                          <div
                             title="Add Categories"
-                            className="bx bx-plus"
+                            className="svg-div icon-plus"
                             onClick={openAddCategoryModal}
-                          ></i>
+                          >
+                            <Plus />
+                          </div>
                         </div>
                         <div className="category-list">
                           {addCategory.map((e) => (
                             <div key={e.id} className="single-category">
                               {e.name}
-                              <i
-                                className="bx bxs-trash-alt"
+                              <div
+                                className="svg-div"
                                 onClick={() => handleRemoveCategory(e)}
                                 style={{ cursor: "pointer" }}
-                              ></i>
+                              >
+                                <TrashAltSolid />
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -397,11 +416,13 @@ const IndividualCourses = () => {
                       <div className="course-title-edit">
                         <div className="add-instructors">
                           Instructors
-                          <i
+                          <div
                             title="Add Instructors"
-                            className="bx bx-plus"
+                            className="svg-div icon-plus"
                             onClick={openAddInstructorModal}
-                          ></i>
+                          >
+                            <Plus />
+                          </div>
                         </div>
                         <div className="instructor-list">
                           {courseInstructors.map((instructor) => (
@@ -410,13 +431,15 @@ const IndividualCourses = () => {
                               className="single-instructor"
                             >
                               {instructor.name}
-                              <i
-                                className="bx bxs-trash-alt"
+                              <div
+                                className="svg-div"
                                 onClick={() =>
                                   handleRemoveInstructor(instructor)
                                 }
                                 style={{ cursor: "pointer" }}
-                              ></i>
+                              >
+                                <TrashAltSolid />
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -467,7 +490,9 @@ const IndividualCourses = () => {
                     style={{ cursor: "pointer" }}
                     className="close-button"
                   >
-                    <i className="bx bx-x"></i>
+                    <div className="svg-div">
+                      <X />
+                    </div>
                   </div>
                 </div>
                 <div className="add-category-instructor-input">
@@ -478,11 +503,13 @@ const IndividualCourses = () => {
                     onKeyDown={handleKeyDown}
                     placeholder="create new category"
                   />
-                  <i
-                    className="bx bx-plus-circle"
+                  <div
+                    className="svg-div "
                     style={{ cursor: "pointer" }}
                     onClick={addNewQuickCategory}
-                  ></i>
+                  >
+                    <PlusCircle />
+                  </div>
                 </div>
                 <div className="list-modal-wrap">
                   {categoriesList.map((e) => (
@@ -519,7 +546,9 @@ const IndividualCourses = () => {
                     style={{ cursor: "pointer" }}
                     className="close-button"
                   >
-                    <i className="bx bx-x"></i>
+                    <div className="svg-div">
+                      <X />
+                    </div>
                   </div>
                 </div>
                 <div className="add-category-instructor-input">
@@ -530,11 +559,13 @@ const IndividualCourses = () => {
                     onKeyDown={handleKeyDownInstructor}
                     placeholder="create new instructor"
                   />
-                  <i
-                    className="bx bx-plus-circle"
+                  <div
+                    className="svg-div"
                     style={{ cursor: "pointer" }}
                     onClick={addNewQuickInstructor}
-                  ></i>
+                  >
+                    <PlusCircle />
+                  </div>
                 </div>
                 <div className="list-modal-wrap">
                   {instructorList.map((instructor) => (

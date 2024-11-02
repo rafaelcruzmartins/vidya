@@ -10,6 +10,7 @@ import axios from "axios";
 import PreNav from "../components/Navbar/PreNav";
 import VideoPlayer from "../components/VideoPlayer/VideoPlayer";
 import { AnimatePresence, motion } from "framer-motion";
+import { CheckCircleSolid, ChevronRight, Circle } from "../assets";
 
 // Memoized components to prevent unnecessary re-renders
 const SectionHeader = memo(
@@ -30,7 +31,9 @@ const SectionHeader = memo(
       </span>
       {hasLectures && (
         <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
-          <i className="bx bx-chevron-right"></i>
+          <div className="svg-div">
+            <ChevronRight />
+          </div>
         </span>
       )}
     </div>
@@ -65,7 +68,9 @@ const LectureItem = memo(
           onToggle(lectureId);
         }}
       >
-        <i className={isCompleted ? "bx bxs-check-circle" : "bx bx-circle"}></i>
+        <div className="svg-div">
+          {isCompleted ? <CheckCircleSolid /> : <Circle />}
+        </div>
       </span>
       <span className="lecture-title">
         {lectureId}: {title}

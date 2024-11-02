@@ -187,6 +187,10 @@ body {
   border-radius: 0.5rem;
   display: flex;
   justify-content: end;
+  svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
 }
 
 .search-input {
@@ -207,38 +211,27 @@ body {
   top: 120%;
   background: radial-gradient(
     98.58% 260.42% at 0% 2.28%,
-    rgba(255, 255, 255, 0.098) 4.75%,
-    rgba(255, 255, 255, 0.014) 100%
+    rgba(255, 255, 255, 0.6) 4.75%,
+    rgba(255, 255, 255, 0.3) 100%
   );
   border: 1px solid #ffffff;
-  /* box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1); */
-  backdrop-filter: blur(10px);
+  box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px);
   border-radius: 0.5rem;
   z-index: 30;
   width: 100%;
-  animation: scale 0.5s ease-in;
-  transform: translateZ(61px);
 }
-@keyframes scale {
-  0% {
-    clip-path: circle(10% at top center);
-  }
-  100% {
-    clip-path: circle(100% at top center);
-  }
-}
+
 .search-results-list {
   margin: 1rem;
   padding: 0;
 }
 
 svg {
-  width: 1.2rem;
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-i {
-  font-size: 1.6rem;
-}
 .nav-bar {
   display: flex;
   justify-content: space-between;
@@ -535,11 +528,13 @@ img {
   border-radius: 0.5rem;
   cursor: pointer;
 }
-.lecture-categories > i {
+.lecture-categories svg {
   margin: 0 1rem;
+  fill: #0a2463;
 }
-.lecture-instructor > i {
+.lecture-instructor svg {
   margin: 0 1rem;
+  fill: #0a2463;
 }
 
 .overlay {
@@ -563,11 +558,13 @@ img {
   border-radius: 0.5rem;
   cursor: pointer;
 }
-.settings > i {
+.settings svg {
   margin: 0 1rem;
+  fill: #0a2463;
 }
-.log-out > i {
+.log-out svg {
   margin: 0 1rem;
+  fill: #0a2463;
 }
 
 .categories-container {
@@ -627,8 +624,9 @@ img {
   justify-content: center;
   align-items: center;
   transform: translateZ(20px);
-  i {
-    font-size: 2rem;
+  svg {
+    width: 2rem;
+    height: 2rem;
   }
 }
 .instructor-container {
@@ -806,9 +804,11 @@ select option {
   align-items: center;
   margin-right: 1rem;
   border-radius: 1rem;
-  i {
-    color: #e20044;
+  svg {
+    fill: #e20044;
     cursor: pointer;
+    width: 1.8rem;
+    height: 1.8rem;
   }
 }
 
@@ -832,12 +832,20 @@ select option {
   align-items: center;
 }
 
-.bxs-folder-plus {
-  color: #00a6a6;
+.folder-plus {
+  fill: #00a6a6;
+  svg {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
 }
 
-.bx-refresh {
-  color: rgb(10, 36, 99);
+.folder-refresh {
+  fill: rgb(10, 36, 99);
+  svg {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
 }
 
 .users-title {
@@ -846,11 +854,16 @@ select option {
   align-items: center;
 }
 
-.bx-plus {
+.icon-plus {
   background: rgba(255, 255, 255, 0.34);
   margin-left: 1rem;
   padding: 0.2rem;
   border-radius: 100%;
+  cursor: pointer;
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
 }
 
 .user-item {
@@ -868,9 +881,9 @@ select option {
   cursor: pointer;
 }
 
-.bx-dots-vertical-rounded {
+.user-item svg {
   cursor: pointer;
-  font-size: 20px;
+
   margin-left: 10px;
 }
 
@@ -1364,8 +1377,10 @@ input[type="file"]::file-selector-button:hover {
     font-size: 1rem;
   }
 
-  i {
+  svg {
     margin-right: 0.2rem;
+    width: 1.5rem;
+    height: 1.5rem;
   }
 }
 
@@ -1487,9 +1502,6 @@ input[type="file"]::file-selector-button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  i {
-    font-size: 1.8rem;
-  }
 }
 
 .controls-left,
@@ -1515,10 +1527,6 @@ input[type="file"]::file-selector-button:hover {
 .volume-container {
   display: flex;
   align-items: center;
-
-  i {
-    font-size: 1.3rem;
-  }
 }
 
 .volume-slider {
@@ -1655,7 +1663,7 @@ video::-moz-media-controls {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #e20044;
+  fill: #e20044;
   transition: all 0.2s;
   margin-left: 1rem;
 }
@@ -1673,4 +1681,10 @@ video::-moz-media-controls {
 
 .cool {
   width: 30px;
+}
+
+.svg-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

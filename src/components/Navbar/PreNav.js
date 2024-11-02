@@ -2,6 +2,17 @@ import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import Search from "../Search/Search";
+import {
+  ArrowBack,
+  CategoryAlt,
+  ChalkboardSolid,
+  Cog,
+  GraduationSolid,
+  HomeAlt2,
+  LogOutCircle,
+  Menu,
+  User,
+} from "../../assets";
 
 const PreNav = ({ name }) => {
   const location = useLocation();
@@ -53,7 +64,9 @@ const PreNav = ({ name }) => {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <i className="bx bx-arrow-back"></i>
+                  <div className="svg-div">
+                    <ArrowBack />
+                  </div>
                 </motion.div>
                 <motion.div
                   key="home-button"
@@ -64,7 +77,9 @@ const PreNav = ({ name }) => {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.4 }}
                 >
-                  <i className="bx bx-home-alt-2"></i>
+                  <div className="svg-div">
+                    <HomeAlt2 />
+                  </div>
                 </motion.div>
               </>
             )}
@@ -76,7 +91,9 @@ const PreNav = ({ name }) => {
             transition={{ duration: 0.5 }}
             onClick={toggleSidebar}
           >
-            <i className="bx bx-menu"></i>
+            <div className="svg-div">
+              <Menu />
+            </div>
           </motion.div>
           <motion.div
             className="pre-nav-name"
@@ -96,7 +113,9 @@ const PreNav = ({ name }) => {
           <Search />
         </motion.div>
         <div className="profile">
-          <i className="bx bx-user"></i>
+          <div className="svg-div">
+            <User />
+          </div>
         </div>
       </div>
 
@@ -134,7 +153,10 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleCourses}
           >
-            <i className="bx bxs-chalkboard"></i> All Courses
+            <div className="svg-div">
+              <ChalkboardSolid />
+            </div>
+            All Courses
           </motion.div>
           <motion.div
             className="lecture-categories"
@@ -143,7 +165,10 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleCategories}
           >
-            <i className="bx bx-category-alt"></i> Categories
+            <div className="svg-div">
+              <CategoryAlt />
+            </div>
+            Categories
           </motion.div>
           <motion.div
             className="lecture-instructor"
@@ -152,7 +177,9 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleInstructor}
           >
-            <i className="bx bxs-graduation"></i>
+            <div className="svg-div">
+              <GraduationSolid />
+            </div>
             Instructors
           </motion.div>
         </div>
@@ -165,7 +192,10 @@ const PreNav = ({ name }) => {
             style={{ color: "#0a2463" }}
             onClick={handleSettings}
           >
-            <i className="bx bx-cog"></i>Settings
+            <div className="svg-div">
+              <Cog />
+            </div>
+            Settings
           </motion.div>
           <motion.div
             className="log-out"
@@ -173,7 +203,10 @@ const PreNav = ({ name }) => {
             whileTap={{ scale: 0.95 }}
             style={{ color: "#0a2463" }}
           >
-            <i className="bx bx-log-out-circle"></i>Log Out
+            <div className="svg-div">
+              <LogOutCircle />
+            </div>
+            Log Out
           </motion.div>
         </div>
       </motion.div>

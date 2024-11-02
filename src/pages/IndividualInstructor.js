@@ -1,6 +1,6 @@
 import PreNav from "../components/Navbar/PreNav";
 import { useParams } from "react-router-dom";
-import { profile } from "../assets";
+import { DotsVerticalRounded, profile } from "../assets";
 import Cards from "../components/Cards/Cards";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -60,10 +60,13 @@ const IndividualInstrucor = () => {
                 <div className="course-instructor-title">
                   {user?.name || "Instructor Not Found"}
                   <div className="edit-information">
-                    <i
-                      className="bx bx-dots-vertical-rounded"
+                    <div
+                      style={{ cursor: "pointer" }}
+                      className="svg-div"
                       onClick={openModal}
-                    ></i>
+                    >
+                      <DotsVerticalRounded />
+                    </div>
                   </div>
                 </div>
               </div>

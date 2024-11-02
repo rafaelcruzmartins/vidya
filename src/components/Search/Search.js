@@ -1,3 +1,4 @@
+import { AnimatePresence, motion } from "framer-motion";
 import React, { useState } from "react";
 
 const Search = () => {
@@ -41,15 +42,27 @@ const Search = () => {
         value={searchTerm}
         onChange={handleSearch}
       />
-      {showResults && searchResults.length > 0 && (
-        <div className="search-results">
-          {searchResults.map((result, index) => (
-            <div key={index} className="search-results-list">
-              {result}
-            </div>
-          ))}
-        </div>
-      )}
+      <AnimatePresence>
+        {showResults && searchResults.length > 0 && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: 20, opacity: 0 }}
+            transition={{
+              type: "spring",
+              stiffness: 300,
+              damping: 20,
+            }}
+            className="search-results"
+          >
+            {searchResults.map((result, index) => (
+              <div key={index} className="search-results-list">
+                {result}
+              </div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <svg
         className="search-icon"
         viewBox="0 0 24 24"

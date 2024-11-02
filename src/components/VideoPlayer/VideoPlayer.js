@@ -3,12 +3,19 @@ import React, { useState, useRef, useCallback, memo, useEffect } from "react";
 import {
   Captions,
   ExitFullscreen,
+  FastForward,
   Fullscreen,
+  Pause,
+  Play,
   Rewind,
+  SkipNext,
   SkipPrevious,
   SolidCaptions,
   ToggleLeft,
   ToggleRight,
+  VolumeFullSolid,
+  VolumeLowSolid,
+  VolumeMuteSolid,
 } from "../../assets";
 
 const formatTime = (time) => {
@@ -80,17 +87,17 @@ const Controls = memo(
               <Rewind />
             </div>
             <div onClick={onPlayPause} className="control-button">
-              <i className={`bx ${isPlaying ? "bx-pause" : "bx-play"}`}></i>
+              {isPlaying ? <Pause /> : <Play />}
             </div>
             <div onClick={onSkipForward} className="control-button">
-              <i className="bx bx-fast-forward"></i>
+              <FastForward />
             </div>
             <div
               onClick={isNextVideo ? onNextVideo : undefined}
               style={{ opacity: isNextVideo ? "" : "0.7" }}
               className="control-button"
             >
-              <i className="bx bx-skip-next"></i>
+              <SkipNext />
             </div>
             <div
               className="volume-container"
@@ -98,17 +105,15 @@ const Controls = memo(
               onMouseLeave={() => setIsVolumeSliderVisible(false)}
             >
               <div onClick={onMute} className="control-button">
-                <i
-                  className={`bx ${
-                    isMuted
-                      ? "bxs-volume-mute"
-                      : volume === 0
-                      ? "bxs-volume-mute"
-                      : volume < 0.5
-                      ? "bxs-volume-low"
-                      : "bxs-volume-full"
-                  }`}
-                ></i>
+                {isMuted ? (
+                  <VolumeMuteSolid />
+                ) : volume === 0 ? (
+                  <VolumeMuteSolid />
+                ) : volume < 0.5 ? (
+                  <VolumeLowSolid />
+                ) : (
+                  <VolumeFullSolid />
+                )}
               </div>
               <AnimatePresence>
                 {isVolumeSliderVisible && (

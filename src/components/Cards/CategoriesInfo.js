@@ -10,7 +10,9 @@ const CategoriesInfo = ({ name, bxname, color, animation, delay }) => {
     >
       <Tilt className="categories">
         <div className="categories-icon-circle">
-          <i style={{ color: color }} className={bxname}></i>
+          <div className="svg-div" style={{ cursor: "pointer", fill: color }}>
+            {bxname}
+          </div>
         </div>
         {name}
       </Tilt>
