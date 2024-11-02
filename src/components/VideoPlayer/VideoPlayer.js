@@ -1,5 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState, useRef, useCallback, memo, useEffect } from "react";
+import {
+  Captions,
+  ExitFullscreen,
+  Fullscreen,
+  Rewind,
+  SkipPrevious,
+  SolidCaptions,
+  ToggleLeft,
+  ToggleRight,
+} from "../../assets";
 
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
@@ -64,10 +74,10 @@ const Controls = memo(
               style={{ opacity: isPrevVideo ? "" : "0.7" }}
               className="control-button"
             >
-              <i className="bx bx-skip-previous"></i>
+              <SkipPrevious />
             </div>
             <div onClick={onSkipBackward} className="control-button">
-              <i className="bx bx-rewind"></i>
+              <Rewind />
             </div>
             <div onClick={onPlayPause} className="control-button">
               <i className={`bx ${isPlaying ? "bx-pause" : "bx-play"}`}></i>
@@ -126,15 +136,10 @@ const Controls = memo(
           </div>
           <div className="controls-right">
             <div onClick={onAutoplayToggle} className="control-button">
-              <i
-                style={{ color: isAutoplayOn ? "#e20044" : "whitesmoke" }}
-                className="bx bx-repeat"
-              ></i>
+              {isAutoplayOn ? <ToggleLeft /> : <ToggleRight />}
             </div>
             <div onClick={onCaption} className="control-button">
-              <i
-                className={`bx ${isCaptionOn ? "bx-captions" : "bxs-captions"}`}
-              ></i>
+              {isCaptionOn ? <SolidCaptions /> : <Captions />}
             </div>
             <div
               onClick={() =>
@@ -147,11 +152,7 @@ const Controls = memo(
               {playbackSpeed} X
             </div>
             <div onClick={onFullScreen} className="control-button">
-              <i
-                className={`bx ${
-                  isFullScreen ? "bx-exit-fullscreen" : "bx-fullscreen"
-                }`}
-              ></i>
+              {isFullScreen ? <ExitFullscreen /> : <Fullscreen />}
             </div>
           </div>
         </div>
@@ -402,9 +403,9 @@ const VideoPlayer = ({
       <AnimatePresence>
         {state.showControls && (
           <motion.div
-            initial={{ y: 60 }}
+            initial={{ y: 90 }}
             animate={{ y: 0 }}
-            exit={{ y: 60 }}
+            exit={{ y: 90 }}
             transition={{ type: "tween", ease: "easeInOut" }}
             className="controls-wrapper"
           >

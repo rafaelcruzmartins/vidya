@@ -289,7 +289,7 @@ const Player = () => {
         clearTimeout(scrollTimeoutRef.current);
       }
     };
-  }, [nowPlaying, courseData, isLoading]);
+  }, [nowPlaying, courseData, isLoading, lectureDictionary]);
 
   if (error) {
     return <div className="error-message">Error loading course: {error}</div>;
