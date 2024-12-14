@@ -7,6 +7,7 @@ import Instructor from "./pages/Instructor";
 import Settings from "./pages/Settings";
 import IndividualInstrucor from "./pages/IndividualInstructor";
 import IndividualCourses from "./pages/IndividualCourses";
+import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import {
   python,
@@ -66,6 +67,7 @@ const AnimatedRoutes = () => {
         <Route path="/settings/*" element={<Settings />} />
         <Route path="/instructor/:id" element={<IndividualInstrucor />} />
         <Route path="/courses/:id" element={<IndividualCourses />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </AnimatePresence>
   );

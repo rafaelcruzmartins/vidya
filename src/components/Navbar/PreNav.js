@@ -7,6 +7,7 @@ import {
   CategoryAlt,
   ChalkboardSolid,
   Cog,
+  DashboardSolid,
   GraduationSolid,
   HomeAlt2,
   LogOutCircle,
@@ -25,6 +26,7 @@ const PreNav = ({ name }) => {
   const handleInstructor = () => navigate("/instructor");
   const handleCourses = () => navigate("/courses");
   const handleSettings = () => navigate("/settings");
+  const handleDashboard = () => navigate("/dashboard");
   const isRootPage = location.pathname === "/";
 
   // Toggle sidebar open/closed
@@ -185,6 +187,18 @@ const PreNav = ({ name }) => {
         </div>
         <div className="user">
           <div className="user-label">User</div>
+          <motion.div
+            className="dashboard-nav"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            style={{ color: "#0a2463" }}
+            onClick={handleDashboard}
+          >
+            <div className="svg-div">
+              <DashboardSolid />
+            </div>
+            Dashboard
+          </motion.div>
           <motion.div
             className="settings"
             whileHover={{ scale: 1.1 }}

@@ -47,6 +47,7 @@ const Background = () => {
       <div className="circle"></div>
       <div className="circle2"></div>
       <div className="circle3"></div>
+      <div className="circle8"></div>
       <motion.div
         animate={{ x: positions[0].x, y: positions[0].y }}
         transition={{ duration: 1, ease: "easeInOut" }}
