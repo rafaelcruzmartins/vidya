@@ -1,0 +1,18 @@
+.spinner-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner-circle {
+  position: relative;
+  aspect-ratio: 1;
+}
+
+.letter {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  font-weight: 600;
+}
