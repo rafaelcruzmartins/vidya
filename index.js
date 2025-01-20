@@ -17,7 +17,7 @@ const syncdb = async () => {
   await sequelize.sync({ force: true });
   console.log("Database & tables created!");
   await User.create({ userName: "hello", password: "gajab" });
-  await Server.create({ name: "VIDYA", isFirstStartUp: false });
+  await Server.create({ name: "VIDYA", isFirstStartUp: true });
   await Course.create({
     name: "CS 101",
     description: "CS 101 description",
@@ -365,6 +365,10 @@ app.get("/", async (req, res) => {
 app.get("/data", async (req, res) => {
   res.json(courseData);
 });
+
+// Drive Selector
+
+app.get("/drive", async (req, res) => {});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
