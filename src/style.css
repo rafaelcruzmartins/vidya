@@ -2030,10 +2030,6 @@ video::-moz-media-controls {
   flex-direction: column;
 }
 
-.welcome > svg {
-  width: 100%;
-  height: 5vh;
-}
 .drives {
   display: flex;
   gap: 1rem;
@@ -2069,20 +2065,20 @@ video::-moz-media-controls {
 }
 
 .drive-info {
-  /* Add these properties */
   flex: 1;
-  min-width: 0; /* This is crucial for flex items with text overflow */
+  min-width: 0;
 
   div {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%; /* Ensure the div takes full width of parent */
+    width: 100%;
   }
 }
 
 .drive-container {
-  height: 70%;
+  height: 90%;
+  overflow: hidden;
 }
 
 .drive-setup {
@@ -2092,4 +2088,223 @@ video::-moz-media-controls {
 .drive-title {
   font-weight: 500;
   font-size: 1.2rem;
+}
+
+.items {
+  display: flex;
+
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.5rem 0;
+}
+.item-size {
+  margin-left: auto;
+}
+.current-path {
+  margin: 1rem;
+}
+
+.items:hover {
+  background-color: rgba(255, 255, 255, 0.442);
+  border-radius: 0.5rem;
+}
+
+.folder-list {
+  height: 50%;
+  overflow-y: scroll;
+  margin: 1rem;
+}
+
+.parent-directory {
+  margin: 0 1rem;
+  cursor: pointer;
+}
+
+.setup-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+}
+
+.next-button {
+  margin-left: auto;
+  width: 5rem;
+  height: 2rem;
+  background-color: #e20044;
+  border-radius: 0.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  cursor: pointer;
+  svg {
+    fill: white;
+    transform: rotate(0.5turn);
+    width: 1.3rem;
+  }
+}
+
+.back-button {
+  width: 5rem;
+  height: 2rem;
+  background-color: #e20044;
+  border-radius: 0.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  cursor: pointer;
+  svg {
+    fill: white;
+    width: 1.3rem;
+  }
+}
+.select-folder {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  div {
+    width: 5rem;
+    height: 2rem;
+    background-color: #e20044;
+    border-radius: 0.5rem;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    cursor: pointer;
+  }
+}
+.intro-container {
+  display: flex;
+  height: 90%;
+  flex-direction: column;
+  align-items: center;
+}
+.welcome {
+  margin: 1.5rem;
+  svg {
+    width: 20rem;
+    height: auto;
+  }
+}
+.to {
+  svg {
+    width: 5rem;
+    height: auto;
+  }
+}
+
+.vidya {
+  font-size: 5rem;
+  font-weight: 500;
+  color: #e20044;
+}
+
+.server-tagline {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.server-description {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  font-style: italic;
+  width: 50%;
+  text-align: center;
+}
+
+.username-container {
+  height: 90%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.admin-setup {
+  margin: 1rem;
+  font-size: 1.3rem;
+  font-weight: 500;
+}
+
+.username-input,
+.password-input {
+  background: radial-gradient(
+    98.58% 260.42% at 0% 2.28%,
+    rgba(255, 255, 255, 0.098) 4.75%,
+    rgba(255, 255, 255, 0.014) 100%
+  );
+  border: 1px solid #ffffff;
+  box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  margin: 1rem;
+  width: 100%;
+
+  input {
+    padding: 0 1rem;
+    background: none;
+    border: none;
+    border-radius: 0;
+    outline: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    font-size: 1rem;
+    height: 2rem;
+  }
+}
+
+.selected-folders-container {
+  height: 90%;
+}
+
+.folders-setup {
+  margin: 1rem;
+  div {
+    font-size: 1.2rem;
+    font-weight: 500;
+  }
+}
+
+.selected-folder {
+  display: flex;
+  gap: 1rem;
+  margin: 0.5rem;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.442);
+  border-radius: 0.5rem;
+}
+
+.remove-folder {
+  margin-left: auto;
+  cursor: pointer;
+  svg {
+    fill: #e20044;
+  }
+}
+
+.add-folder-button {
+  margin-left: auto;
+  width: 7.5rem;
+  height: 1.7rem;
+  margin: auto;
+  background-color: #00a6a6;
+  border-radius: 0.5rem;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  cursor: pointer;
+  svg {
+    fill: white;
+    transform: rotate(0.5turn);
+    width: 1.3rem;
+  }
+}
+
+.folders-list {
+  margin-bottom: 1rem;
 }
