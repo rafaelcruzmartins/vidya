@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import axios from "axios";
 import {
   ArrowBack,
   FileBlank,
@@ -94,9 +95,11 @@ const SelectedFolders = ({ selectedFolders, onAddFolder, onRemoveFolder }) => (
         </div>
       ))}
     </div>
-    <div onClick={onAddFolder} className="add-folder-button">
-      <Plus />
-      Add Folder
+    <div className="add-folder-button-wrap">
+      <div onClick={onAddFolder} className="add-folder-button">
+        <Plus />
+        Add Folder
+      </div>
     </div>
   </motion.div>
 );
@@ -111,7 +114,9 @@ const FileBrowser = ({ onSelect }) => {
   const fetchDrives = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://192.168.1.25:3001/api/drives");
+      const response = await fetch("http://localhost:5000/api/drive/drives", {
+        credentials: "include",
+      });
       if (!response.ok) throw new Error("Failed to fetch drives");
       const data = await response.json();
       setDrives(data);
@@ -133,7 +138,9 @@ const FileBrowser = ({ onSelect }) => {
       setLoading(true);
       setError(null);
       const response = await fetch(
-        `http://192.168.1.25:3001/api/browse?path=${encodeURIComponent(path)}`
+        `http://localhost:5000/api/drive/browse?path=${encodeURIComponent(
+          path
+        )}`
       );
       if (!response.ok) throw new Error("Failed to fetch directory contents");
       const data = await response.json();
@@ -238,6 +245,8 @@ const FirstStartUp = () => {
   const [passwordInput, setPasswordInput] = useState("");
   const [selectedFolders, setSelectedFolders] = useState([]);
   const [isChoosingFolder, setIsChoosingFolder] = useState(false);
+  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const tabs = [
     { title: "Welcome" },
@@ -247,6 +256,7 @@ const FirstStartUp = () => {
 
   const handleNext = () => {
     if (currentTab < tabs.length - 1) setCurrentTab(currentTab + 1);
+    if (currentTab === 1) setDirection(-1);
   };
 
   const handleBack = () => {
@@ -255,6 +265,8 @@ const FirstStartUp = () => {
     } else if (currentTab > 0) {
       setCurrentTab(currentTab - 1);
     }
+
+    if (currentTab === 2) setDirection(1);
   };
 
   const handleAddFolder = () => {
@@ -273,13 +285,30 @@ const FirstStartUp = () => {
   const handleRemoveFolder = (index) => {
     setSelectedFolders(selectedFolders.filter((_, i) => i !== index));
   };
-
-  const ModifiedFileBrowser = () => (
-    <FileBrowser onSelect={handleFolderSelected} />
-  );
+  const handleKey = () => {
+    if (currentTab === 0) {
+      return 1;
+    } else if (currentTab === 1) {
+      return 1;
+    } else {
+      return 2;
+    }
+  };
 
   const handleFinish = () => {
-    console.log(selectedFolders, usernameInput, passwordInput);
+    setIsSubmitting(true);
+    setTimeout(async () => {
+      try {
+        console.log(selectedFolders, usernameInput, passwordInput);
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/register",
+          { username: usernameInput, password: passwordInput },
+          { withCredentials: true }
+        );
+      } finally {
+        setIsSubmitting(false);
+      }
+    }, 1000);
   };
 
   return (
@@ -307,7 +336,7 @@ const FirstStartUp = () => {
                 )}
               </>
             ) : (
-              <ModifiedFileBrowser />
+              <FileBrowser onSelect={handleFolderSelected} />
             )}
           </AnimatePresence>
           <div className="setup-buttons">
@@ -316,16 +345,63 @@ const FirstStartUp = () => {
                 <ArrowBack /> Back
               </div>
             )}
-            {!isChoosingFolder &&
-              (currentTab === 2 ? (
-                <div className="next-button" onClick={handleFinish}>
-                  Finish <ArrowBack />
-                </div>
-              ) : (
-                <div className="next-button" onClick={handleNext}>
-                  Next <ArrowBack />
-                </div>
-              ))}
+
+            {!isChoosingFolder && (
+              <motion.div
+                className={`${
+                  currentTab === 2 ? "finish-button" : "next-button"
+                }`}
+                onClick={currentTab === 2 ? handleFinish : handleNext}
+              >
+                <AnimatePresence mode="wait">
+                  {isSubmitting ? (
+                    // Spinner animation
+                    <motion.svg
+                      key="spinner"
+                      initial={{ rotate: 0 }}
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                      viewBox="0 0 50 50"
+                      style={{ width: 24, height: 24 }}
+                      className="spinny"
+                    >
+                      <circle
+                        cx="25"
+                        cy="25"
+                        r="20"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        strokeLinecap="round"
+                        strokeDasharray="1, 60"
+                      />
+                    </motion.svg>
+                  ) : (
+                    <motion.span
+                      key={handleKey()}
+                      initial={{ x: direction * 20, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      exit={{ x: -direction * 20, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
+                      {currentTab === 2 ? "Finish" : "Next"}
+                      <ArrowBack
+                        style={{
+                          transform:
+                            currentTab === 2 ? "none" : "rotate(180deg)",
+                          marginLeft: 8,
+                        }}
+                      />
+                    </motion.span>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            )}
           </div>
         </div>
       </div>
