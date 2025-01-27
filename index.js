@@ -1,6 +1,11 @@
-import express, { json } from "express";
+import express from "express";
 import sequelize from "./config/database.js";
+import crypto from "crypto";
 import cors from "cors";
+import passport from "passport";
+import { Strategy as LocalStrategy } from "passport-local";
+import session from "express-session";
+import sessionConnect from "connect-session-sequelize";
 import {
   User,
   Course,
@@ -9,35 +14,21 @@ import {
   Lecture,
   Progress,
 } from "./models/index.js";
+import authRoutes from "./routes/auth.js";
+import adminRoutes from "./routes/admin.js";
+import driveRoutes from "./routes/drive.js";
+const SequelizeStore = sessionConnect(session.Store);
 const app = express();
-app.use(cors());
-app.use(json());
+
 // Sync all models with database
 const syncdb = async () => {
-  await sequelize.sync({ force: true });
+  await sequelize.sync({ force: true, logging: false });
   console.log("Database & tables created!");
-  await User.create({ userName: "hello", password: "gajab" });
+
   await Server.create({ name: "VIDYA", isFirstStartUp: true });
-  await Course.create({
-    name: "CS 101",
-    description: "CS 101 description",
-    category: "Computer Science",
-    instructorName: "Gajab",
-    photo:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-    folder: "/cs101/introduction/",
-    hasCompleted: false,
-  });
-  await Section.create({ name: "Section 1", hasCompleted: false });
-  await Lecture.create({
-    name: "Lecture 1",
-    url: "video.mp4",
-    contentName: "notes.pdf",
-    contentUrl: "notes.pdf",
-    hasCompleted: false,
-  });
 };
 syncdb();
+
 const courseData = {
   courseTitle: "Complete Web Development Bootcamp 2024",
   courseDuration: "64 hours",
@@ -358,6 +349,75 @@ const courseData = {
   lastUpdated: "2024-03-15",
   courseProgress: 0,
 };
+// Passport configuration
+passport.use(
+  new LocalStrategy(async (username, password, done) => {
+    try {
+      const user = await User.findOne({ where: { username } });
+      if (!user) {
+        const dummySalt = crypto.randomBytes(16).toString("hex");
+        crypto.pbkdf2Sync("dummypassword", dummySalt, 1000, 64, "sha512");
+        return done(null, false, { message: "Invalid credentials" });
+      }
+
+      let isPasswordValid;
+      try {
+        const inputHash = crypto
+          .pbkdf2Sync(password, user.salt, 1000, 64, "sha512")
+          .toString("hex");
+
+        isPasswordValid = crypto.timingSafeEqual(
+          Buffer.from(inputHash),
+          Buffer.from(user.password)
+        );
+      } catch (err) {
+        return done(err);
+      }
+
+      if (!isPasswordValid) {
+        return done(null, false, { message: "Invalid credentials" });
+      }
+      return done(null, user);
+    } catch (error) {
+      return done(error);
+    }
+  })
+);
+
+passport.serializeUser((user, done) => done(null, user.id));
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findByPk(id);
+    done(null, user);
+  } catch (error) {
+    done(error);
+  }
+});
+
+// Middleware
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  })
+);
+app.use(express.json());
+app.use(
+  session({
+    secret: "your-secret-key",
+    store: new SequelizeStore({ db: sequelize }),
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 7 * 24 * 60 * 60 * 1000 },
+  })
+);
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/drive", driveRoutes);
 app.get("/", async (req, res) => {
   const server = await Server.findAll();
   res.json(server);
@@ -366,9 +426,6 @@ app.get("/data", async (req, res) => {
   res.json(courseData);
 });
 
-// Drive Selector
-
-app.get("/drive", async (req, res) => {});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
