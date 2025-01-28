@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import axios from "axios";
+import Toast from "../components/Toast/Toast";
 import {
   ArrowBack,
   FileBlank,
@@ -11,7 +12,6 @@ import {
   Plus,
   FolderMinusSolid,
 } from "../assets";
-
 const Welcome = () => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
@@ -114,11 +114,12 @@ const FileBrowser = ({ onSelect }) => {
   const fetchDrives = async () => {
     try {
       setLoading(true);
-      const response = await fetch("http://localhost:5000/api/drive/drives", {
-        credentials: "include",
-      });
-      if (!response.ok) throw new Error("Failed to fetch drives");
-      const data = await response.json();
+
+      const response = await axios.get(
+        "http://localhost:5000/api/drive/drives"
+      );
+      if (!response.status === 200) throw new Error("Failed to fetch drives");
+      const { data } = response;
       setDrives(data);
       if (!currentPath && data.length > 0) {
         const firstAccessibleDrive = data.find((drive) => drive.accessible);
@@ -137,13 +138,16 @@ const FileBrowser = ({ onSelect }) => {
     try {
       setLoading(true);
       setError(null);
-      const response = await fetch(
+      const response = await axios.get(
         `http://localhost:5000/api/drive/browse?path=${encodeURIComponent(
           path
         )}`
       );
-      if (!response.ok) throw new Error("Failed to fetch directory contents");
-      const data = await response.json();
+
+      if (!response.status === 200)
+        throw new Error("Failed to fetch directory contents");
+
+      const { data } = response;
       setItems(data.items);
       setCurrentPath(data.currentPath);
       setParentDirectory(data.parentDirectory);
@@ -245,15 +249,18 @@ const FirstStartUp = () => {
   const [passwordInput, setPasswordInput] = useState("");
   const [selectedFolders, setSelectedFolders] = useState([]);
   const [isChoosingFolder, setIsChoosingFolder] = useState(false);
-  const [direction, setDirection] = useState(1); // 1 = forward, -1 = back
+  const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const [showToast, setShowToast] = useState(false);
   const tabs = [
     { title: "Welcome" },
     { title: "Username" },
     { title: "Selected Folders" },
   ];
-
+  const handleHome = () => {
+    window.location.href = "/";
+    window.location.reload(true);
+  };
   const handleNext = () => {
     if (currentTab < tabs.length - 1) setCurrentTab(currentTab + 1);
     if (currentTab === 1) setDirection(-1);
@@ -305,14 +312,26 @@ const FirstStartUp = () => {
           { username: usernameInput, password: passwordInput },
           { withCredentials: true }
         );
-      } finally {
-        setIsSubmitting(false);
+        if (response.status === 200) {
+          setIsSubmitting(false);
+          handleHome();
+        }
+      } catch (error) {
+        console.error("Error during registration:", error);
       }
     }, 1000);
   };
 
   return (
     <div>
+      {showToast && (
+        <Toast
+          message="Operation completed successfully!"
+          type="success"
+          duration={300000}
+          onClose={() => setShowToast(false)}
+        />
+      )}
       <div className="startup-wrap">
         <div className="first-startup-container">
           <AnimatePresence mode="wait">
@@ -345,7 +364,7 @@ const FirstStartUp = () => {
                 <ArrowBack /> Back
               </div>
             )}
-
+            <button onClick={() => setShowToast(true)}>toast</button>
             {!isChoosingFolder && (
               <motion.div
                 className={`${
