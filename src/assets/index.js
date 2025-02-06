@@ -343,6 +343,16 @@ const ToLogo = () => (
     </g>
   </svg>
 );
+const XCircleSolid = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm4.207 12.793-1.414 1.414L12 13.414l-2.793 2.793-1.414-1.414L10.586 12 7.793 9.207l1.414-1.414L12 10.586l2.793-2.793 1.414 1.414L13.414 12l2.793 2.793z"></path>
+  </svg>
+);
+const ErrorCircleSolid = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M12.884 2.532c-.346-.654-1.422-.654-1.768 0l-9 17A.999.999 0 0 0 3 21h18a.998.998 0 0 0 .883-1.467L12.884 2.532zM13 18h-2v-2h2v2zm-2-4V9h2l.001 5H11z"></path>
+  </svg>
+);
 export {
   python,
   rails,
@@ -405,4 +415,6 @@ export {
   FileBlank,
   WelcomeLogo,
   ToLogo,
+  XCircleSolid,
+  ErrorCircleSolid,
 };

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import "./Toast.css";
+import { CheckCircleSolid, ErrorCircleSolid, XCircleSolid } from "../../assets";
 
 const Toast = ({ message, type = "success", duration = 3000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
+  const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -18,11 +20,23 @@ const Toast = ({ message, type = "success", duration = 3000, onClose }) => {
   };
 
   return isVisible ? (
-    <div className={`toast ${type} animate-in`}>
+    <div
+      onMouseEnter={() => setShowButton(true)}
+      onMouseLeave={() => setShowButton(false)}
+      className={`toast animate-in`}
+    >
+      <span className={`toast-icon ${type}`}>
+        {type === "success" && <CheckCircleSolid />}
+        {type === "warning" && <ErrorCircleSolid />}
+        {type === "error" && <XCircleSolid />}
+      </span>
       <span>{message}</span>
-      <button onClick={handleClose} className="close-btn">
-        ×
-      </button>
+
+      {showButton && (
+        <button onClick={handleClose} className="close-btn">
+          ×
+        </button>
+      )}
     </div>
   ) : null;
 };

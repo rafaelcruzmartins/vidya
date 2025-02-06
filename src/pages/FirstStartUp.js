@@ -14,9 +14,9 @@ import {
 } from "../assets";
 const Welcome = () => (
   <motion.div
-    initial={{ opacity: 0, x: -20 }}
+    initial={{ opacity: 0, x: 20 }}
     animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -20 }}
+    exit={{ opacity: 0, x: 20 }}
     transition={{ duration: 0.3 }}
     className="intro-container"
   >
@@ -43,9 +43,9 @@ const Username = ({
   setPasswordInput,
 }) => (
   <motion.div
-    initial={{ opacity: 0, x: -20 }}
+    initial={{ opacity: 0, x: 20 }}
     animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -20 }}
+    exit={{ opacity: 0, x: 20 }}
     transition={{ duration: 0.3 }}
     className="username-container"
   >
@@ -76,9 +76,9 @@ const Username = ({
 );
 const SelectedFolders = ({ selectedFolders, onAddFolder, onRemoveFolder }) => (
   <motion.div
-    initial={{ opacity: 0, x: -20 }}
+    initial={{ opacity: 0, x: 20 }}
     animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, y: -20 }}
+    exit={{ opacity: 0, y: 20 }}
     transition={{ duration: 0.3 }}
     className="selected-folders-container"
   >
@@ -252,6 +252,8 @@ const FirstStartUp = () => {
   const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastType, setToastType] = useState("success");
   const tabs = [
     { title: "Welcome" },
     { title: "Username" },
@@ -302,33 +304,44 @@ const FirstStartUp = () => {
     }
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     setIsSubmitting(true);
-    setTimeout(async () => {
-      try {
-        console.log(selectedFolders, usernameInput, passwordInput);
-        const response = await axios.post(
-          "http://localhost:5000/api/auth/register",
-          { username: usernameInput, password: passwordInput },
-          { withCredentials: true }
-        );
-        if (response.status === 200) {
-          setIsSubmitting(false);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/admin/register",
+        {
+          username: usernameInput,
+          password: passwordInput,
+          folders: selectedFolders,
+        },
+        { withCredentials: true }
+      );
+
+      if (response.status === 200) {
+        setIsSubmitting(false);
+        setShowToast(true);
+        setTimeout(() => {
           handleHome();
-        }
-      } catch (error) {
-        console.error("Error during registration:", error);
+        }, 2000);
       }
-    }, 1000);
+    } catch (error) {
+      setIsSubmitting(false);
+      error.status === 400
+        ? setToastMessage("cridentials can't be empty")
+        : setToastMessage("error registering");
+      setToastType("error");
+      setShowToast(true);
+    }
   };
 
   return (
     <div>
       {showToast && (
         <Toast
-          message="Operation completed successfully!"
-          type="success"
-          duration={300000}
+          message={toastMessage}
+          type={toastType}
+          duration={3000}
           onClose={() => setShowToast(false)}
         />
       )}
@@ -364,7 +377,7 @@ const FirstStartUp = () => {
                 <ArrowBack /> Back
               </div>
             )}
-            <button onClick={() => setShowToast(true)}>toast</button>
+
             {!isChoosingFolder && (
               <motion.div
                 className={`${

@@ -1,10 +1,9 @@
 .toast {
   position: fixed;
   top: 4%;
-  left: 40%;
+  left: 45%;
   padding: 15px 25px;
-  border-radius: 4px;
-  color: rgb(6, 6, 6);
+  border-radius: 1rem;
   display: flex;
   align-items: center;
   gap: 15px;
@@ -18,19 +17,24 @@
   backdrop-filter: blur(50px);
   border: 1px solid white;
 }
-
-.toast.error {
-  background-color: #f44336;
+.toast-icon {
+  display: flex;
+  justify-content: center;
+}
+.toast-icon.success svg {
+  fill: rgb(0, 166, 166);
+}
+.toast-icon.error svg {
+  fill: rgb(251, 54, 64);
 }
 
-.toast.warning {
-  background-color: #ff9800;
+.toast-icon.warning svg {
+  fill: #ff9800;
 }
 
 .close-btn {
   background: none;
   border: none;
-  color: white;
   cursor: pointer;
   font-size: 1.2rem;
   padding: 0;

@@ -14,6 +14,7 @@ import {
   Menu,
   User,
 } from "../../assets";
+import { useAuth } from "../../context/AuthContext";
 
 const PreNav = ({ name }) => {
   const location = useLocation();
@@ -27,6 +28,10 @@ const PreNav = ({ name }) => {
   const handleCourses = () => navigate("/courses");
   const handleSettings = () => navigate("/settings");
   const handleDashboard = () => navigate("/dashboard");
+  const { logout } = useAuth();
+  const handleLogOut = async () => {
+    logout();
+  };
   const isRootPage = location.pathname === "/";
 
   // Toggle sidebar open/closed
@@ -47,8 +52,6 @@ const PreNav = ({ name }) => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-
-  // Search bar Functions
 
   return (
     <>
@@ -216,6 +219,7 @@ const PreNav = ({ name }) => {
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             style={{ color: "#0a2463" }}
+            onClick={handleLogOut}
           >
             <div className="svg-div">
               <LogOutCircle />

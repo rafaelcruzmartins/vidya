@@ -9,6 +9,8 @@ import IndividualInstrucor from "./pages/IndividualInstructor";
 import IndividualCourses from "./pages/IndividualCourses";
 import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
+import LogIn from "./pages/LogIn";
+import ProtectedRoute from "./components/ProtectedRoute";
 import {
   python,
   rails,
@@ -36,38 +38,41 @@ const AnimatedRoutes = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Home />} />
-        <Route
-          path="/courses"
-          element={<CourseCategories name={"COURSES"} cardData={cardData} />}
-        />
-        <Route
-          path="/web"
-          element={<CourseCategories name={"WEB"} cardData={cardData} />}
-        />
-        <Route
-          path="/mobile"
-          element={<CourseCategories name={"MOBILE"} cardData={cardData} />}
-        />
-        <Route
-          path="/finance"
-          element={<CourseCategories name={"FINANCE"} cardData={cardData} />}
-        />
-        <Route
-          path="/health"
-          element={<CourseCategories name={"HEALTH"} cardData={cardData} />}
-        />
-        <Route
-          path="/business"
-          element={<CourseCategories name={"BUSINESS"} cardData={cardData} />}
-        />
-        <Route path="/player" element={<Player />} />
-        <Route path="/categories" element={<Categories />} />
-        <Route path="/instructor" element={<Instructor />} />
-        <Route path="/settings/*" element={<Settings />} />
-        <Route path="/instructor/:id" element={<IndividualInstrucor />} />
-        <Route path="/courses/:id" element={<IndividualCourses />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/login" element={<LogIn />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Home />} />
+          <Route
+            path="/courses"
+            element={<CourseCategories name={"COURSES"} cardData={cardData} />}
+          />
+          <Route
+            path="/web"
+            element={<CourseCategories name={"WEB"} cardData={cardData} />}
+          />
+          <Route
+            path="/mobile"
+            element={<CourseCategories name={"MOBILE"} cardData={cardData} />}
+          />
+          <Route
+            path="/finance"
+            element={<CourseCategories name={"FINANCE"} cardData={cardData} />}
+          />
+          <Route
+            path="/health"
+            element={<CourseCategories name={"HEALTH"} cardData={cardData} />}
+          />
+          <Route
+            path="/business"
+            element={<CourseCategories name={"BUSINESS"} cardData={cardData} />}
+          />
+          <Route path="/player" element={<Player />} />
+          <Route path="/categories" element={<Categories />} />
+          <Route path="/instructor" element={<Instructor />} />
+          <Route path="/settings/*" element={<Settings />} />
+          <Route path="/instructor/:id" element={<IndividualInstrucor />} />
+          <Route path="/courses/:id" element={<IndividualCourses />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </AnimatePresence>
   );
