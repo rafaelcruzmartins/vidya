@@ -12,7 +12,7 @@ import {
   Server,
   Section,
   Lecture,
-  Progress,
+  LectureProgress,
 } from "./models/index.js";
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
@@ -25,7 +25,10 @@ const syncdb = async () => {
   await sequelize.sync({ force: true, logging: false });
   console.log("Database & tables created!");
 
-  await Server.create({ name: "VIDYA", isFirstStartUp: true });
+  await Server.findOrCreate({
+    where: { name: "VIDYA" },
+    defaults: { name: "VIDYA" },
+  });
 };
 syncdb();
 
@@ -420,7 +423,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/drive", driveRoutes);
 app.get("/", async (req, res) => {
   const server = await Server.findAll();
-  res.json(server);
+  res.json(server[0].isFirstStartUp);
 });
 app.get("/data", async (req, res) => {
   res.json(courseData);

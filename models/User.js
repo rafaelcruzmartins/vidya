@@ -7,6 +7,11 @@ const User = sequelize.define("User", {
     type: DataTypes.STRING,
     unique: true,
     allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: "username can't be empty",
+      },
+    },
   },
   password: {
     type: DataTypes.STRING(1024),
@@ -19,6 +24,11 @@ const User = sequelize.define("User", {
 
       this.setDataValue("salt", salt);
       this.setDataValue("password", hash);
+    },
+    validate: {
+      notEmpty: {
+        msg: "password can't be empty",
+      },
     },
   },
   salt: {

@@ -2,11 +2,13 @@ import { DataTypes } from "sequelize";
 import sequelize from "../config/database.js";
 
 const Lecture = sequelize.define("Lecture", {
-  name: DataTypes.STRING,
-  url: DataTypes.STRING,
-  contentName: DataTypes.STRING,
-  contentUrl: DataTypes.STRING,
-  hasCompleted: DataTypes.BOOLEAN,
+  originalName: DataTypes.STRING,
+  cleanedName: DataTypes.STRING,
+  order: DataTypes.FLOAT,
+  type: DataTypes.STRING,
+  path: DataTypes.STRING,
+  content: DataTypes.JSON,
+  subtitles: DataTypes.JSON,
 });
 
 export default Lecture;

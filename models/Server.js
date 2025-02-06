@@ -6,7 +6,7 @@ const Server = sequelize.define("Server", {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  isFirstStartUp: DataTypes.BOOLEAN,
+  isFirstStartUp: { type: DataTypes.BOOLEAN, defaultValue: true },
 });
 
 export default Server;

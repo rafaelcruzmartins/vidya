@@ -8,14 +8,16 @@ const isAdmin = (req, res, next) => {
   if (req.user.role === "admin") return next();
   res.status(403).json({ error: "Admin access required" });
 };
-const isAlreadyAdmin = async (req, res, next) => {
-  const result = await User.findOne({
-    where: {
-      role: "admin",
-    },
-  });
-  if (!result) return next();
-  res.status(403).json({ error: "Already a admin" });
+const isAdminOrFirstStartUp = async (req, res, next) => {
+  try {
+    const result = await Server.findAll();
+    if (result[0].isFirstStartUp || req.user.role === "admin") {
+      return next();
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(403).json({ error: "Admin access required" });
+  }
 };
 
 const isOwnerOrAdmin = (model) => async (req, res, next) => {
@@ -30,4 +32,4 @@ const isOwnerOrAdmin = (model) => async (req, res, next) => {
   }
 };
 
-export { isAdmin, isAuthenticated, isOwnerOrAdmin, isAlreadyAdmin };
+export { isAdmin, isAuthenticated, isOwnerOrAdmin, isAdminOrFirstStartUp };
