@@ -5,14 +5,14 @@ import Background from "./components/Background/Background";
 import AnimatedRoutes from "./AnimatedRoutes";
 import { AuthProvider } from "./context/AuthContext";
 import "./style.css";
-import axios from "axios";
+import axios from "./api/axiosInstance.js";
 import { BrowserRouter as Router } from "react-router-dom";
 
 const App = () => {
   const [data, setData] = useState(null);
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000");
+      const res = await axios.get("/");
       setData(res.data);
     } catch (error) {
       console.error("Error fetching data:", error);

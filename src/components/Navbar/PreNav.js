@@ -34,12 +34,10 @@ const PreNav = ({ name }) => {
   };
   const isRootPage = location.pathname === "/";
 
-  // Toggle sidebar open/closed
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
-  // Close sidebar when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
@@ -124,7 +122,6 @@ const PreNav = ({ name }) => {
         </div>
       </div>
 
-      {/* Overlay */}
       <AnimatePresence>
         {isSidebarOpen && (
           <motion.div
@@ -137,7 +134,7 @@ const PreNav = ({ name }) => {
           />
         )}
       </AnimatePresence>
-      {/* Sidebar */}
+
       <motion.div
         ref={sidebarRef}
         className="sidebar"

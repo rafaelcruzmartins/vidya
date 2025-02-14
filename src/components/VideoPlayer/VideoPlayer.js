@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import React, { useState, useRef, useCallback, memo, useEffect } from "react";
+import axios from "../../api/axiosInstance";
 import {
   Captions,
   ExitFullscreen,
@@ -17,7 +18,6 @@ import {
   VolumeLowSolid,
   VolumeMuteSolid,
 } from "../../assets";
-
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60);
@@ -37,7 +37,6 @@ const Controls = memo(
     playbackSpeed,
     isAutoplayOn,
     onPlayPause,
-    onStop,
     onMute,
     onVolumeChange,
     onCaption,
@@ -171,16 +170,21 @@ const VideoPlayer = ({
   onVideoEnd,
   onNextVideo,
   onPreviousVideo,
-  onProgressUpdate,
+
   onPlayRequest,
   isNextVideo,
   isPrevVideo,
   handleLectureCompleteOnVideoEnd,
+  LectureId,
+  CourseId,
+  initialVideoProgress,
 }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const controlsTimeoutRef = useRef(null);
-
+  const previousTimeRef = useRef(0);
+  const accumulatorRef = useRef(0);
+  const seekThreshold = 1;
   const [state, setState] = useState({
     isPlaying: false,
     currentTime: 0,
@@ -206,6 +210,24 @@ const VideoPlayer = ({
       }
     }
   }, [videoSource]);
+  useEffect(() => {
+    if (initialVideoProgress) {
+      if (videoRef.current) {
+        videoRef.current.currentTime = initialVideoProgress;
+      }
+    }
+  }, [initialVideoProgress]);
+  const updateWatchTime = async (seconds, lectureId, courseId, progress) => {
+    try {
+      await axios.post(
+        "/api/course/progress/watchtime",
+        { seconds, lectureId, courseId, progress },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -213,20 +235,45 @@ const VideoPlayer = ({
       ...prev,
       currentTime: video.currentTime,
     }));
-    onProgressUpdate?.(
-      video.currentTime,
-      (video.currentTime / video.duration) * 100
-    );
-  }, [onProgressUpdate]);
+    const currentTime = video.currentTime;
+    const delta = currentTime - previousTimeRef.current;
+
+    if (delta < 0) {
+      previousTimeRef.current = currentTime;
+      accumulatorRef.current = 0;
+      return;
+    }
+
+    if (delta > seekThreshold) {
+      previousTimeRef.current = currentTime;
+      return;
+    }
+
+    accumulatorRef.current += delta;
+    previousTimeRef.current = currentTime;
+
+    if (accumulatorRef.current >= 5) {
+      const currentPosition = currentTime;
+      const watchedSeconds = 5;
+
+      updateWatchTime(watchedSeconds, LectureId, CourseId, currentPosition);
+      accumulatorRef.current %= 5;
+    }
+  }, [LectureId]);
 
   const handleProgress = useCallback(() => {
     const video = videoRef.current;
     if (!video || !video.buffered.length) return;
-    const bufferedEnd = video.buffered.end(video.buffered.length - 1);
+
+    let maxBufferedEnd = 0;
+    for (let i = 0; i < video.buffered.length; i++) {
+      maxBufferedEnd = Math.max(maxBufferedEnd, video.buffered.end(i));
+    }
+
     const duration = video.duration;
     setState((prev) => ({
       ...prev,
-      buffered: (bufferedEnd / duration) * 100,
+      buffered: (maxBufferedEnd / duration) * 100,
     }));
   }, []);
 
@@ -267,18 +314,6 @@ const VideoPlayer = ({
       clearTimeout(controlsTimeoutRef.current);
     }
     setState((prev) => ({ ...prev, showControls: false }));
-  }, []);
-
-  const handleStop = useCallback(() => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.pause();
-    video.currentTime = 0;
-    setState((prev) => ({
-      ...prev,
-      isPlaying: false,
-      currentTime: 0,
-    }));
   }, []);
 
   const handleSkipForward = useCallback(() => {
@@ -363,7 +398,7 @@ const VideoPlayer = ({
     }
   }, [state.isAutoplayOn, onVideoEnd]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
@@ -384,7 +419,7 @@ const VideoPlayer = ({
     };
   }, [handleTimeUpdate, handleProgress, handleVideoEnd]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
@@ -428,7 +463,6 @@ const VideoPlayer = ({
               isNextVideo={isNextVideo}
               isPrevVideo={isPrevVideo}
               onPlayPause={handlePlayPause}
-              onStop={handleStop}
               onMute={handleMute}
               onVolumeChange={handleVolumeChange}
               onCaption={handleCaption}

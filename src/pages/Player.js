@@ -6,16 +6,20 @@ import React, {
   useRef,
   useLayoutEffect,
 } from "react";
-import axios from "axios";
+import axios from "../api/axiosInstance.js";
 import PreNav from "../components/Navbar/PreNav";
 import VideoPlayer from "../components/VideoPlayer/VideoPlayer";
 import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircleSolid, ChevronRight, Circle } from "../assets";
-
-// Memoized components to prevent unnecessary re-renders
+import {
+  CheckCircleSolid,
+  ChevronRight,
+  Circle,
+  SkeletonLoader,
+} from "../assets";
+import { useParams } from "react-router-dom";
 const SectionHeader = memo(
   ({
-    sectionId,
+    sectionOrder,
     title,
     hasLectures,
     isExpanded,
@@ -27,7 +31,7 @@ const SectionHeader = memo(
       className={`section-header ${isSectionCompleted ? "green" : ""}`}
     >
       <span className="playlist-section-title">
-        {sectionId}: {title}
+        {sectionOrder}: {title}
       </span>
       {hasLectures && (
         <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
@@ -48,7 +52,9 @@ const LectureItem = memo(
     onToggle,
     handleNowPlaying,
     lectureRef,
+    lectureOrder,
     nowPlaying,
+    sectionOrder,
   }) => (
     <div
       ref={(el) => (lectureRef.current[lectureId] = el)}
@@ -73,24 +79,21 @@ const LectureItem = memo(
         </div>
       </span>
       <span className="lecture-title">
-        {lectureId}: {title}
+        {sectionOrder}.{lectureOrder}: {title}
       </span>
     </div>
   )
 );
 
 const Player = () => {
-  // State management with proper initialization
   const [currentVideo, setCurrentVideo] = useState(null);
-  const [nowPlaying, setNowPlaying] = useState("7.3");
-  const [lectureDictionary, setLectureDictionary] = useState({});
-  const [videoProgress, setVideoProgress] = useState({});
+  const [nowPlaying, setNowPlaying] = useState(null);
+  const [lectureDictionary, setLectureDictionary] = useState(null);
+  const [initialVideoProgress, setInitialVideoProgress] = useState(0);
   const [playRequest, setPlayRequest] = useState(false);
   const [courseData, setCourseData] = useState(null);
   const [expandedSections, setExpandedSections] = useState(new Set([0]));
-  const [completedLectures, setCompletedLectures] = useState(
-    new Set(["1.1", "7.1"])
-  );
+  const [completedLectures, setCompletedLectures] = useState(new Set([]));
   const [completedSections, setCompletedSections] = useState(new Set([]));
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -98,32 +101,14 @@ const Player = () => {
   const [isPrevVideo, setIsPrevVideo] = useState(null);
   const lectureRef = useRef({});
   const scrollTimeoutRef = useRef(null);
+  const { id } = useParams();
 
-  // Debounced progress update to reduce state updates
-  const handleProgressUpdate = useCallback(
-    (currentTime, progressPercentage) => {
-      const timeoutId = setTimeout(() => {
-        setVideoProgress((prev) => ({
-          ...prev,
-          [currentVideo]: { currentTime, progressPercentage },
-        }));
-      }, 1000); // Update progress every second instead of continuously
-
-      return () => clearTimeout(timeoutId);
-    },
-    [currentVideo]
-  );
-
-  // Memoized video selection handler
-  const handleVideoSelect = useCallback((videoPath) => {
-    setCurrentVideo(videoPath);
-    setPlayRequest(true);
-  }, []);
   const handleNowPlaying = (lectureId) => {
     setNowPlaying(lectureId);
+
     setPlayRequest(true);
   };
-  // Optimized section toggle using Set
+
   const toggleSection = useCallback((sectionId) => {
     setExpandedSections((prev) => {
       const newSet = new Set(prev);
@@ -135,93 +120,134 @@ const Player = () => {
       return newSet;
     });
   }, []);
+
   const areAllLecturesCompleted = useCallback(
     (sectionId) => {
       if (!courseData) return false;
-
       const section = courseData.sections.find(
-        (section) => section.sectionId === sectionId
+        (section) => section.id === sectionId
       );
-
       if (!section) return false;
-
       return section.lectures.every((lecture) =>
-        completedLectures.has(lecture.lectureId)
+        completedLectures.has(lecture.id)
       );
     },
     [courseData, completedLectures]
   );
 
-  // Update section completion states when lectures change
   useEffect(() => {
     if (!courseData) return;
-
     const newCompletedSections = new Set();
-
     courseData.sections.forEach((section) => {
-      if (areAllLecturesCompleted(section.sectionId)) {
-        newCompletedSections.add(section.sectionId);
+      if (areAllLecturesCompleted(section.id)) {
+        newCompletedSections.add(section.id);
       }
     });
-
     setCompletedSections(newCompletedSections);
   }, [completedLectures, courseData, areAllLecturesCompleted]);
+  const handleToggleLectureBackendComplete = async (lectureId) => {
+    try {
+      await axios.post(
+        "/api/course/progress/lecturetogglecomplete",
 
-  // Optimized lecture toggle using Set
+        {
+          LectureId: lectureId,
+          CourseId: id,
+        },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  const handleToggleLectureBackendNotComplete = async (lectureId) => {
+    try {
+      await axios.post(
+        "/api/course/progress/lecturetogglenotcomplete",
+
+        {
+          LectureId: lectureId,
+          CourseId: id,
+        },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const toggleLecture = useCallback((lectureId) => {
     setCompletedLectures((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(lectureId)) {
+        handleToggleLectureBackendNotComplete(lectureId);
         newSet.delete(lectureId);
       } else {
+        handleToggleLectureBackendComplete(lectureId);
         newSet.add(lectureId);
       }
       return newSet;
     });
   }, []);
-  // Function to make lecture dictionary from fetched coursedata
 
   const createLectureDictionary = (data) => {
     const lectureDict = {};
     let prevLectureId = null;
+    const completedLectureIds = new Set();
 
     data.sections.forEach((section, sectionIndex) => {
       section.lectures.forEach((lecture, lectureIndex) => {
-        const currentLectureId = lecture.lectureId;
+        const currentLectureId = lecture.id;
         const isLastLectureInCourse =
           sectionIndex === data.sections.length - 1 &&
           lectureIndex === section.lectures.length - 1;
         const isFirstLectureInCourse = sectionIndex === 0 && lectureIndex === 0;
 
-        // Determine the next lecture ID
         const nextLectureId = isLastLectureInCourse
-          ? null // Only the last lecture in the last section should have null as next
-          : section.lectures[lectureIndex + 1]?.lectureId ||
-            data.sections[sectionIndex + 1]?.lectures[0]?.lectureId;
+          ? null
+          : section.lectures[lectureIndex + 1]?.id ||
+            data.sections[sectionIndex + 1]?.lectures[0]?.id;
 
-        // Add current lecture to the dictionary with URLs and navigation pointers
+        const isCompleted = lecture.lectureprogresses?.some(
+          (progress) => progress.hasCompleted
+        );
+
+        if (isCompleted) {
+          completedLectureIds.add(currentLectureId);
+        }
+
         lectureDict[currentLectureId] = {
-          url: lecture.videoUrl,
+          url: `${process.env.REACT_APP_API}/api/course/stream/${lecture.id}`,
           next: nextLectureId,
           prev: isFirstLectureInCourse ? null : prevLectureId,
+          content: lecture.content || [],
+          progress: lecture.lectureprogresses || [],
+          type: lecture.type,
+          order: lecture.order,
+          name: lecture.cleanedName,
+          isCompleted,
         };
 
-        // Update prevLectureId for the next iteration
         prevLectureId = currentLectureId;
       });
     });
 
+    setCompletedLectures(completedLectureIds);
+
     return lectureDict;
   };
-  // Fetch data with proper error handling and loading states
   useEffect(() => {
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get("http://localhost:5000/data");
-        setCourseData(res.data);
+        const newData = await axios.post(
+          "/api/course/individual",
+          { CourseId: id },
+          { withCredentials: true }
+        );
+        setCourseData(newData.data);
         setError(null);
-        setLectureDictionary(createLectureDictionary(res.data));
+        setLectureDictionary(createLectureDictionary(newData.data));
       } catch (err) {
         setError(err.message);
         console.error("Error fetching course data:", err);
@@ -229,9 +255,20 @@ const Player = () => {
         setIsLoading(false);
       }
     };
-
     fetchData();
-  }, []); // Empty dependency array since we only want to fetch once
+  }, [id]);
+  useEffect(() => {
+    const initialload = () => {
+      if (lectureDictionary && courseData.userlastwatcheds[0]) {
+        const initiallecture = courseData.userlastwatcheds[0].LectureId;
+        setNowPlaying(initiallecture);
+        setInitialVideoProgress(
+          lectureDictionary[initiallecture].progress[0].progress
+        );
+      }
+    };
+    initialload();
+  }, [lectureDictionary]);
   const handleVideoEnd = () => {
     const next = lectureDictionary[nowPlaying].next;
     handleNowPlaying(next);
@@ -240,14 +277,14 @@ const Player = () => {
   const handleLectureCompleteOnVideoEnd = () => {
     setCompletedLectures((prev) => {
       const newSet = new Set(prev);
-      if (newSet.has(nowPlaying)) {
-        return newSet;
-      } else {
+      if (!newSet.has(nowPlaying)) {
+        handleToggleLectureBackendComplete(nowPlaying);
         newSet.add(nowPlaying);
       }
       return newSet;
     });
   };
+
   const handleVideoNext = () => {
     const next = lectureDictionary[nowPlaying].next;
     handleNowPlaying(next);
@@ -257,29 +294,26 @@ const Player = () => {
     const prev = lectureDictionary[nowPlaying].prev;
     handleNowPlaying(prev);
   };
+
   useLayoutEffect(() => {
     if (!courseData || isLoading || !nowPlaying) return;
 
-    const currentSectionId = parseInt(nowPlaying.split(".")[0]);
+    const currentSection = courseData.sections.find((section) =>
+      section.lectures.some((lecture) => lecture.id === nowPlaying)
+    );
 
-    // First, ensure the section is expanded
-    setExpandedSections((prev) => new Set([...prev, currentSectionId]));
+    if (currentSection) {
+      setExpandedSections((prev) => new Set([...prev, currentSection.id]));
+    }
+
     setCurrentVideo(lectureDictionary[nowPlaying].url);
-    // Set is Previuos video and next video button to be disabled on not
-    lectureDictionary[nowPlaying].prev
-      ? setIsPrevVideo(true)
-      : setIsPrevVideo(false);
+    setIsPrevVideo(!!lectureDictionary[nowPlaying].prev);
+    setIsNextVideo(!!lectureDictionary[nowPlaying].next);
 
-    lectureDictionary[nowPlaying].next
-      ? setIsNextVideo(true)
-      : setIsNextVideo(false);
-
-    // Clear any existing timeout
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
 
-    // Wait for the animation to complete before scrolling
     scrollTimeoutRef.current = setTimeout(() => {
       if (lectureRef.current[nowPlaying]) {
         lectureRef.current[nowPlaying].scrollIntoView({
@@ -287,7 +321,7 @@ const Player = () => {
           block: "center",
         });
       }
-    }, 300); // Adjust timing based on your animation duration
+    }, 300);
 
     return () => {
       if (scrollTimeoutRef.current) {
@@ -301,18 +335,21 @@ const Player = () => {
   }
 
   if (isLoading) {
-    return <div className="loading">Loading course content...</div>;
+    return (
+      <div className="loading">
+        <SkeletonLoader />
+      </div>
+    );
   }
 
   return (
     <div className="main">
       <div className="container">
-        <PreNav name="Building Scalable Web Apps With Ruby On Rails" />
+        <PreNav name={courseData?.cleanedName} />
         <div className="player-container">
           <VideoPlayer
             videoSource={currentVideo}
-            onProgressUpdate={handleProgressUpdate}
-            initialProgress={videoProgress[currentVideo]?.currentTime || 0}
+            initialVideoProgress={initialVideoProgress}
             onPlayRequest={playRequest}
             onVideoEnd={handleVideoEnd}
             onNextVideo={handleVideoNext}
@@ -320,21 +357,23 @@ const Player = () => {
             isNextVideo={isNextVideo}
             isPrevVideo={isPrevVideo}
             handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
+            LectureId={nowPlaying}
+            CourseId={id}
           />
 
           <div className="playlist-container">
             {courseData?.sections.map((section) => (
-              <div key={section.sectionId} className="section-item">
+              <div key={section.id} className="section-item">
                 <SectionHeader
-                  sectionId={section.sectionId}
-                  title={section.title}
+                  sectionOrder={section.order}
+                  title={section.cleanedName}
                   hasLectures={section.lectures.length > 0}
-                  isSectionCompleted={completedSections.has(section.sectionId)}
-                  isExpanded={expandedSections.has(section.sectionId)}
-                  onToggle={() => toggleSection(section.sectionId)}
+                  isSectionCompleted={completedSections.has(section.id)}
+                  isExpanded={expandedSections.has(section.id)}
+                  onToggle={() => toggleSection(section.id)}
                 />
                 <AnimatePresence>
-                  {expandedSections.has(section.sectionId) &&
+                  {expandedSections.has(section.id) &&
                     section.lectures.length > 0 && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
@@ -344,17 +383,16 @@ const Player = () => {
                       >
                         {section.lectures.map((lecture) => (
                           <LectureItem
-                            key={lecture.lectureId}
-                            lectureId={lecture.lectureId}
-                            title={lecture.title}
-                            isCompleted={completedLectures.has(
-                              lecture.lectureId
-                            )}
+                            key={lecture.id}
+                            lectureId={lecture.id}
+                            lectureOrder={lecture.order}
+                            sectionOrder={section.order}
+                            title={lecture.cleanedName}
+                            isCompleted={completedLectures.has(lecture.id)}
                             nowPlaying={nowPlaying}
                             handleNowPlaying={handleNowPlaying}
                             videoUrl={lecture.videoUrl}
                             onToggle={toggleLecture}
-                            onVideoSelect={handleVideoSelect}
                             lectureRef={lectureRef}
                           />
                         ))}

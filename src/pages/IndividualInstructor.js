@@ -38,14 +38,12 @@ const instructorsData = [
 const IndividualInstrucor = () => {
   const { id } = useParams();
   const user = instructorsData.find((user) => user.id === parseInt(id));
-  // State for modals
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  // State for Instructor input fields
   const [instructorTitle, setInstructorTitle] = useState(user.name);
   const [instructorDescription, setInstructorDescription] = useState(
     "Lorem ipsum dolor sit amet consectetur, adipisicing elit. Fuga ipsam corporis natus explicabo magnam voluptatem libero quos provident ad fugiat, autem quasi, nemo ut beatae. Eius cumque repudiandae quos quo."
   );
-  // Modal handlers
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 

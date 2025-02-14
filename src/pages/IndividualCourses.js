@@ -2,114 +2,84 @@ import React from "react";
 import PreNav from "../components/Navbar/PreNav";
 import { useParams, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import axios from "../api/axiosInstance.js";
 import {
-  python,
-  rails,
-  javascript,
-  node,
-  mongodb,
-  php,
-  webdev,
-  profile,
-  ChevronDownSolid,
-  ChevronRightSolid,
   DotsVerticalRounded,
   Plus,
   TrashAltSolid,
   PlusCircle,
   X,
+  ChevronRight,
 } from "../assets";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, memo, useCallback } from "react";
 
-const cardData = [
-  { imgsrc: python, info: "Master Python in 30 Days", id: 1 },
-  {
-    imgsrc: rails,
-    info: "Building Scalable Web Apps with Ruby on Rails",
-    id: 2,
-  },
-  { imgsrc: node, info: "Node For Beginners", id: 3 },
-  { imgsrc: php, info: "PHP Fundamentals: Web Development with PHP", id: 4 },
-  { imgsrc: javascript, info: "JavaScript: From Basics to Advanced", id: 5 },
-  { imgsrc: mongodb, info: "Mastering MongoDB for Developers", id: 6 },
-  { imgsrc: webdev, info: "Mastering MongoDB for Developers", id: 7 },
-];
-
-const sampleData = [
-  {
-    id: 1,
-    title: "Section 1",
-    lectures: [
-      { title: "Lecture 1.1", duration: 15 },
-      { title: "Lecture 1.2", duration: 20 },
-      { title: "Lecture 1.3", duration: 25 },
-    ],
-  },
-  {
-    id: 2,
-    title: "Section 2",
-    lectures: [
-      { title: "Lecture 2.1", duration: 30 },
-      { title: "Lecture 2.2", duration: 35 },
-      { title: "Lecture 2.3", duration: 20 },
-    ],
-  },
-  {
-    id: 3,
-    title: "Section 3",
-    lectures: [
-      { title: "Lecture 3.1", duration: 25 },
-      { title: "Lecture 3.2", duration: 30 },
-      { title: "Lecture 3.3", duration: 35 },
-    ],
-  },
-];
-
-const Section = ({ title, lectures }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const totalDuration = lectures.reduce(
-    (sum, lecture) => sum + lecture.duration,
-    0
-  );
-
-  return (
-    <div className="section">
-      <div className="section-title" onClick={() => setIsOpen(!isOpen)}>
-        {title}
-        <div className="section-info">
-          <div className="section-icon">
-            {isOpen ? (
-              <div className="svg-div">
-                <ChevronDownSolid />
-              </div>
-            ) : (
-              <div className="svg-div">
-                <ChevronRightSolid />
-              </div>
-            )}
+const SectionHeader = memo(
+  ({ sectionOrder, title, hasLectures, isExpanded, onToggle }) => (
+    <div onClick={onToggle} className={`section-header `}>
+      <span className="playlist-section-title">
+        {sectionOrder}: {title}
+      </span>
+      {hasLectures && (
+        <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
+          <div className="svg-div">
+            <ChevronRight />
           </div>
-          <div className="section-duration">{totalDuration} min</div>
-        </div>
-      </div>
-      <div className={`section-content ${isOpen ? "open" : ""}`}>
-        <div className="lecture-list">
-          {lectures.map((lecture, index) => (
-            <div key={index} className="lecture-item">
-              <span>{lecture.title}</span>
-              <span className="lecture-duration">{lecture.duration} min</span>
-            </div>
-          ))}
-        </div>
-      </div>
+        </span>
+      )}
     </div>
-  );
-};
+  )
+);
+
+const LectureItem = memo(
+  ({
+    lectureId,
+    title,
+
+    onToggle,
+
+    lectureOrder,
+
+    sectionOrder,
+  }) => (
+    <div className={`playlist-lecture-item`}>
+      <span
+        className="checkbox"
+        onClick={(e) => {
+          e.stopPropagation();
+          onToggle(lectureId);
+        }}
+      >
+        <div className="svg-div"></div>
+      </span>
+      <span className="lecture-title">
+        {sectionOrder}.{lectureOrder}: {title}
+      </span>
+    </div>
+  )
+);
 
 const IndividualCourses = () => {
   const navigate = useNavigate();
   const { id } = useParams();
-  const course = cardData.find((course) => course.id === parseInt(id));
-
+  const [course, setCourse] = useState(null);
+  const [courseTitle, setCourseTitle] = useState(course?.cleanedName);
+  const [expandedSections, setExpandedSections] = useState(new Set([0]));
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.post(
+          "/api/course/individual",
+          { CourseId: id },
+          { withCredentials: true }
+        );
+        setCourse(data);
+        setCourseTitle(data.cleanedName);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
   // State for categories
   const [addCategory, setAddCategory] = useState([
     {
@@ -159,7 +129,6 @@ const IndividualCourses = () => {
     },
   ]);
 
-  // State for Instructor list
   const [instructorList, setInstructorList] = useState([
     { name: "Alex Bataliga", id: 1, Courses: 5 },
     { name: "Sam Pitroda", id: 2, Courses: 7 },
@@ -167,28 +136,21 @@ const IndividualCourses = () => {
     { name: "Sumit Singh", id: 4, Courses: 2 },
     { name: "Danish Kaneria", id: 5, Courses: 1 },
   ]);
-  // State for input of quick new categories
   const [newCategoryInput, setnewCategoryInput] = useState("");
 
-  // State for input of new instructor
   const [newInstructorInput, setnewInstructorInput] = useState("");
-  // New state for instructors
   const [courseInstructors, setCourseInstructors] = useState([
     { name: "Alex Bataliga", id: 1, Courses: 5 },
   ]);
 
-  // State for modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [isAddInstructorModalOpen, setIsAddInstructorModalOpen] =
     useState(false);
-  const [courseTitle, setCourseTitle] = useState(course?.info);
 
-  // Refs for click outside handling
   const addCategoryRef = useRef(null);
   const addInstructorRef = useRef(null);
 
-  // Category handlers
   const handleRemoveCategory = (e) => {
     setAddCategory(addCategory.filter((a) => a.id !== e.id));
   };
@@ -201,7 +163,6 @@ const IndividualCourses = () => {
     closeAddCategoryModal();
   };
 
-  // New instructor handlers
   const handleRemoveInstructor = (instructor) => {
     setCourseInstructors(
       courseInstructors.filter((i) => i.id !== instructor.id)
@@ -215,8 +176,6 @@ const IndividualCourses = () => {
     }
     closeAddInstructorModal();
   };
-
-  // New quick category handlers
 
   const addNewQuickCategory = () => {
     if (newCategoryInput.trim()) {
@@ -246,7 +205,6 @@ const IndividualCourses = () => {
     }
   };
 
-  // New Quick instructor handler
   const addNewQuickInstructor = () => {
     if (newInstructorInput.trim()) {
       const newInstructor = {
@@ -274,7 +232,6 @@ const IndividualCourses = () => {
       setnewInstructorInput("");
     }
   };
-  // Modal handlers
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const openAddCategoryModal = () => {
@@ -285,7 +242,6 @@ const IndividualCourses = () => {
   const openAddInstructorModal = () => setIsAddInstructorModalOpen(true);
   const closeAddInstructorModal = () => setIsAddInstructorModalOpen(false);
 
-  // Click outside handlers
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -305,17 +261,27 @@ const IndividualCourses = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
+  const toggleSection = useCallback((sectionId) => {
+    setExpandedSections((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(sectionId)) {
+        newSet.delete(sectionId);
+      } else {
+        newSet.add(sectionId);
+      }
+      return newSet;
+    });
+  }, []);
   return (
     <div className="main">
       <div className="container">
-        <PreNav name={course?.info} />
+        <PreNav name={course?.cleanedName} />
         <div className="course-instructor-info">
           <div className="course-instructor-info-container">
             <div className="top">
               <div className="top-container">
                 <div className="course-instructor-title">
-                  {course?.info || "Title Not Found"}
+                  {course?.cleanedName || "Title Not Found"}
                   <div className="edit-information">
                     <div
                       title="Edit Instructor"
@@ -344,7 +310,7 @@ const IndividualCourses = () => {
                 </div>
                 <div className="description">
                   <span className="drop-cap">Description : </span>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                  {course?.description}
                 </div>
                 <div>Course Duration : 20Hr</div>
                 <div>Watched : 10Hr , 50% of 20Hr</div>
@@ -356,7 +322,6 @@ const IndividualCourses = () => {
           </div>
         </div>
 
-        {/* Edit Course Modal */}
         <AnimatePresence>
           {isModalOpen && (
             <div className="modal-overlay">
@@ -470,7 +435,7 @@ const IndividualCourses = () => {
             </div>
           )}
         </AnimatePresence>
-        {/* Add Category Modal */}
+
         <AnimatePresence>
           {isAddCategoryModalOpen && (
             <div className="modal-overlay add-category-overlay">
@@ -526,7 +491,7 @@ const IndividualCourses = () => {
             </div>
           )}
         </AnimatePresence>
-        {/* Add Instructor Modal */}
+
         <AnimatePresence>
           {isAddInstructorModalOpen && (
             <div className="modal-overlay add-instructor-overlay">
@@ -582,17 +547,43 @@ const IndividualCourses = () => {
             </div>
           )}
         </AnimatePresence>
-        {/* Course Content Section */}
+
         <div className="content-heading">Course Content</div>
         <div className="course-content">
           <div className="course-section">
             <div className="section-list">
-              {sampleData.map((section) => (
-                <Section
-                  key={section.id}
-                  title={section.title}
-                  lectures={section.lectures}
-                />
+              {" "}
+              {course?.sections.map((section) => (
+                <div key={section.id} className="section-item-course">
+                  <SectionHeader
+                    sectionOrder={section.order}
+                    title={section.cleanedName}
+                    hasLectures={section.lectures.length > 0}
+                    isExpanded={expandedSections.has(section.id)}
+                    onToggle={() => toggleSection(section.id)}
+                  />
+                  <AnimatePresence>
+                    {expandedSections.has(section.id) &&
+                      section.lectures.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="lectures-container"
+                        >
+                          {section.lectures.map((lecture) => (
+                            <LectureItem
+                              key={lecture.id}
+                              lectureId={lecture.id}
+                              lectureOrder={lecture.order}
+                              sectionOrder={section.order}
+                              title={lecture.cleanedName}
+                            />
+                          ))}
+                        </motion.div>
+                      )}
+                  </AnimatePresence>
+                </div>
               ))}
             </div>
           </div>

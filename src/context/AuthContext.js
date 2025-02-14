@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios from "../api/axiosInstance.js";
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -19,11 +19,10 @@ export const AuthProvider = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/auth/user", {
+      const response = await axios.get("/api/auth/user", {
         withCredentials: true,
       });
       setUser(response.data);
-      console.log(user);
     } catch (error) {
       setUser(null);
     } finally {
@@ -34,11 +33,9 @@ export const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       setIsSubmitting(true);
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
-        credentials,
-        { withCredentials: true }
-      );
+      const response = await axios.post("/api/auth/login", credentials, {
+        withCredentials: true,
+      });
       if (response.status === 200) {
         setUser(response.data.user);
         setIsSubmitting(false);
@@ -62,7 +59,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await axios.post("http://localhost:5000/api/auth/logout", {
+    await axios.post("/api/auth/logout", {
       withCredentials: true,
     });
     setUser(null);

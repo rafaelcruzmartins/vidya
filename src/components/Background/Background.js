@@ -4,14 +4,13 @@ import { motion } from "framer-motion";
 const Background = () => {
   const location = useLocation();
   const [positions, setPositions] = useState([
-    { x: 0, y: 0 }, // Initial positions for each circle
+    { x: 0, y: 0 },
     { x: 0, y: 0 },
     { x: 0, y: 0 },
     { x: 0, y: 0 },
   ]);
 
   useEffect(() => {
-    // Whenever the route changes, update the positions randomly
     const newPositions = [
       {
         x:

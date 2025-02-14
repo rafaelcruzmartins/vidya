@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import axios from "axios";
+import axios from "../api/axiosInstance.js";
 import Toast from "../components/Toast/Toast";
 import {
   ArrowBack,
@@ -115,9 +115,7 @@ const FileBrowser = ({ onSelect }) => {
     try {
       setLoading(true);
 
-      const response = await axios.get(
-        "http://localhost:5000/api/drive/drives"
-      );
+      const response = await axios.get("/api/drive/drives");
       if (!response.status === 200) throw new Error("Failed to fetch drives");
       const { data } = response;
       setDrives(data);
@@ -139,9 +137,7 @@ const FileBrowser = ({ onSelect }) => {
       setLoading(true);
       setError(null);
       const response = await axios.get(
-        `http://localhost:5000/api/drive/browse?path=${encodeURIComponent(
-          path
-        )}`
+        `/api/drive/browse?path=${encodeURIComponent(path)}`
       );
 
       if (!response.status === 200)
@@ -309,7 +305,7 @@ const FirstStartUp = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/admin/register",
+        "/api/admin/register",
         {
           username: usernameInput,
           password: passwordInput,

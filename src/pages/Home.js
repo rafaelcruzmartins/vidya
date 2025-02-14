@@ -14,10 +14,35 @@ import Cards from "../components/Cards/Cards";
 import Tilt from "react-parallax-tilt";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import axios from "../api/axiosInstance.js";
+import { useEffect, useState } from "react";
+import ContinueWatching from "../components/Cards/ContinueWatching.js";
 
 const Home = () => {
+  const [homeData, setHomeData] = useState(null);
   const navigate = useNavigate();
-  const handlePlayer = () => navigate("/player");
+  const handlePlayer = () =>
+    navigate(
+      `/course/play/${
+        homeData?.featuredCourse
+          ? homeData.featuredCourse.id
+          : homeData.latestCourse[1].id
+      }`
+    );
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/api/home/", {
+          withCredentials: true,
+        });
+        setHomeData(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
+  }, []);
+
   return (
     <div className="main">
       <div className="container">
@@ -37,7 +62,12 @@ const Home = () => {
                 </div>
                 <div className="featured-info">
                   <div className="featured-info-details">
-                    <div className="info-title">Master Python in 30 Days</div>
+                    <div className="info-title">
+                      {homeData &&
+                        (!homeData.featuredCourse === null
+                          ? homeData.featuredCourse.cleanedName
+                          : homeData.latestCourse[1].cleanedName)}
+                    </div>
                     <div className="instructor-name">by Andre Sivan</div>
                     <div className="play-button" onClick={handlePlayer}>
                       Play Now
@@ -75,37 +105,29 @@ const Home = () => {
           <div className="continue">
             <p className="pinned-title">CONTINUE LEARNING</p>
             <div className="card-divs">
-              <Cards
-                imgsrc={rails}
-                info={"Building Scalable Web Apps with Ruby on Rails"}
-                courseId={2}
-              />
-              <Cards imgsrc={node} info={"Node For Beginners"} courseId={3} />
-              <Cards
-                imgsrc={php}
-                info={"PHP Fundamentals: Web Development with PHP"}
-                courseId={4}
-              />
+              {homeData &&
+                homeData.continueWatching.map((item, index) => (
+                  <ContinueWatching
+                    key={index}
+                    imgsrc={webdev}
+                    info={item.lecture.cleanedName}
+                    courseId={item.course.id}
+                  />
+                ))}
             </div>
           </div>
           <div className="latest-courses">
             <p className="pinned-title">LATEST COURSES</p>
             <div className="card-divs">
-              <Cards
-                imgsrc={javascript}
-                info={"JavaScript: From Basics to Advanced"}
-                courseId={5}
-              />
-              <Cards
-                imgsrc={mongodb}
-                info={"Mastering MongoDB for Developers"}
-                courseId={6}
-              />
-              <Cards
-                imgsrc={webdev}
-                info={"Mastering MongoDB for Developers"}
-                courseId={7}
-              />
+              {homeData &&
+                homeData.latestCourse.map((item, index) => (
+                  <Cards
+                    key={index}
+                    imgsrc={webdev}
+                    info={item.cleanedName}
+                    courseId={item.id}
+                  />
+                ))}
             </div>
           </div>
         </motion.div>

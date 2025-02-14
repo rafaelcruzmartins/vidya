@@ -65,7 +65,7 @@ const AnimatedRoutes = () => {
             path="/business"
             element={<CourseCategories name={"BUSINESS"} cardData={cardData} />}
           />
-          <Route path="/player" element={<Player />} />
+          <Route path="/course/play/:id" element={<Player />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/instructor" element={<Instructor />} />
           <Route path="/settings/*" element={<Settings />} />
