@@ -98,18 +98,15 @@ const groupFiles = (files) => {
 
 const syncCourseDirectory = async (coursedirectory) => {
   const directory = normalizePath(coursedirectory);
-  // First check if course directory exists
   if (!fs.existsSync(directory)) {
     const course = await Course.findOne({ where: { directory } });
     if (course) {
-      // Delete all related data using cascade
       await course.destroy();
       console.log(`Deleted course: ${course.cleanedName}`);
     }
     return null;
   }
 
-  // Get or create course
   let course = await Course.findOne({ where: { directory } });
   if (!course) {
     course = await Course.create({
@@ -120,7 +117,6 @@ const syncCourseDirectory = async (coursedirectory) => {
     console.log("new course created");
   }
 
-  // Get all section directories
   const currentSectionDirs = new Set(
     naturalSort(
       fs
@@ -129,13 +125,11 @@ const syncCourseDirectory = async (coursedirectory) => {
     )
   );
 
-  // Get existing sections from database
   const existingSections = await Section.findAll({
     where: { CourseId: course.id },
     include: [{ model: Lecture, as: "lectures" }],
   });
 
-  // Remove sections that no longer exist in filesystem
   for (const section of existingSections) {
     const sectionPath = path.join(directory, section.originalName);
     if (!currentSectionDirs.has(section.originalName)) {
@@ -144,7 +138,6 @@ const syncCourseDirectory = async (coursedirectory) => {
       continue;
     }
 
-    // Check lectures in existing sections
     const files = naturalSort(fs.readdirSync(sectionPath));
     const fileGroups = groupFiles(files);
     const validLectureFiles = new Set(
@@ -153,7 +146,6 @@ const syncCourseDirectory = async (coursedirectory) => {
         .map((group) => group.main)
     );
 
-    // Remove lectures that no longer exist
     for (const lecture of section.lectures) {
       const lectureName = path.basename(lecture.path);
       if (!validLectureFiles.has(lectureName)) {
@@ -163,11 +155,9 @@ const syncCourseDirectory = async (coursedirectory) => {
     }
   }
 
-  // Process all current sections
   for (const sectionDir of currentSectionDirs) {
     const sectionPath = path.join(directory, sectionDir);
 
-    // Get or create section
     let section = await Section.findOne({
       where: {
         CourseId: course.id,
@@ -184,7 +174,6 @@ const syncCourseDirectory = async (coursedirectory) => {
       });
     }
 
-    // Process files in section
     const files = naturalSort(fs.readdirSync(sectionPath));
     const fileGroups = groupFiles(files);
 
@@ -203,7 +192,6 @@ const syncCourseDirectory = async (coursedirectory) => {
         ? "video"
         : path.extname(mainFile).replace(".", "");
 
-      // Get or create lecture
       let lecture = await Lecture.findOne({
         where: {
           SectionId: section.id,
@@ -222,7 +210,6 @@ const syncCourseDirectory = async (coursedirectory) => {
         });
       }
 
-      // Update lecture content and subtitles
       const content = group.contents.map((f) => ({
         type: path.extname(f).replace(".", ""),
         path: path.join(sectionPath, f),
@@ -248,7 +235,6 @@ const syncCourseDirectory = async (coursedirectory) => {
       });
     }
 
-    // Update section order if needed
     const newOrder = parseBaseNumber(sectionDir) || 0;
     if (section.order !== newOrder) {
       await section.update({ order: newOrder });

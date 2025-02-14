@@ -15,11 +15,9 @@ const normalizePath = (inputPath) => {
   if (!inputPath) return isWindows ? "C:\\" : "/";
 
   if (isWindows) {
-    // Handle drive letter paths
     if (inputPath.match(/^[A-Za-z]:$/)) {
       return `${inputPath}\\`;
     }
-    // Normalize Windows path and ensure proper trailing slash
     const normalized = path.normalize(inputPath);
     return normalized.endsWith("\\") ? normalized : `${normalized}\\`;
   }
@@ -31,7 +29,6 @@ const getParentDirectory = (currentPath) => {
   if (!currentPath) return null;
 
   if (isWindows) {
-    // Handle root of drive (e.g., "C:\")
     if (currentPath.match(/^[A-Za-z]:\\$/)) {
       return null;
     }
@@ -45,23 +42,18 @@ const getParentDirectory = (currentPath) => {
 
 const isValidPath = (basePath, targetPath) => {
   if (isWindows) {
-    // For Windows, compare drive letters and paths separately
     const normalizedBase = path.resolve(basePath).toLowerCase();
     const normalizedTarget = path.resolve(targetPath).toLowerCase();
 
-    // Get drive letters
     const baseDrive = normalizedBase.split(":")[0];
     const targetDrive = normalizedTarget.split(":")[0];
 
-    // If on different drives, it's okay
     if (baseDrive !== targetDrive) {
       return true;
     }
 
-    // If on same drive, check if target is under base
     return normalizedTarget.startsWith(normalizedBase);
   } else {
-    // Unix-like systems
     return path.resolve(targetPath).startsWith(path.resolve(basePath));
   }
 };
@@ -164,9 +156,7 @@ router.get("/browse", isAdminOrFirstStartUp, async (req, res) => {
   try {
     let directoryPath = normalizePath(req.query.path);
 
-    // For Windows, check if we're at drive root level
     if (isWindows && directoryPath.match(/^[A-Za-z]:\\$/)) {
-      // Skip path validation for drive roots
     } else {
       if (!isValidPath(directoryPath, path.resolve(directoryPath))) {
         throw new Error("Invalid path");

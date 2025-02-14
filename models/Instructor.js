@@ -1,19 +1,16 @@
 import sequelize from "../config/database.js";
 import { DataTypes } from "sequelize";
 
-const Course = sequelize.define("Course", {
+const Instructor = sequelize.define("Instructor", {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true,
     allowNull: false,
   },
-  originalName: DataTypes.STRING,
-  cleanedName: DataTypes.STRING,
-  directory: DataTypes.STRING,
-  description: DataTypes.TEXT,
-  instructorName: DataTypes.STRING,
+  name: DataTypes.STRING,
   photo: DataTypes.STRING,
+  description: DataTypes.STRING,
 });
 
-export default Course;
+export default Instructor;

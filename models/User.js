@@ -3,6 +3,12 @@ import { DataTypes } from "sequelize";
 import crypto from "crypto";
 
 const User = sequelize.define("User", {
+  id: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true,
+    allowNull: false,
+  },
   username: {
     type: DataTypes.STRING,
     unique: true,
@@ -39,6 +45,7 @@ const User = sequelize.define("User", {
     type: DataTypes.ENUM("user", "admin"),
     defaultValue: "user",
   },
+  featuredCourse: DataTypes.STRING,
 });
 
 export default User;
