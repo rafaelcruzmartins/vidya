@@ -47,8 +47,8 @@ const getUserData = async (userId, featuredCourseId) => {
         !lastWatched || !watchTime || !featuredCourse || !latestCourse,
     };
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
-    throw new Error("Failed to fetch dashboard data");
+    console.error("Error fetching home data:", error);
+    throw new Error("Failed to fetch home data");
   }
 };
 router.get("/", isAuthenticated, async (req, res) => {

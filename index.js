@@ -88,6 +88,12 @@ app.use(
 );
 app.use(express.json());
 app.use(
+  "/assets",
+  express.static("assets", {
+    maxAge: "1y", // Sets Cache-Control: public, max-age=31536000
+  })
+);
+app.use(
   session({
     secret: "your-secret-key",
     store: new SequelizeStore({ db: sequelize }),

@@ -12,7 +12,7 @@ router.post("/logout", (req, res) => {
 
 router.get("/user", (req, res) => {
   req.user
-    ? res.json(req.user)
+    ? res.json({ id: req.user.id, username: req.user.username })
     : res.status(401).json({ error: "Not authenticated" });
 });
 

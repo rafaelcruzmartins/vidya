@@ -1,15 +1,16 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/owner.js";
 import {
+  Category,
   Course,
   Lecture,
   LectureProgress,
   Section,
   TrackingSystem,
   UserLastWatched,
+  Instructor,
 } from "../models/index.js";
 import fs from "fs";
-import { where } from "sequelize";
 const router = Router();
 
 router.get("/", isAuthenticated, async (req, res) => {
@@ -21,7 +22,7 @@ router.get("/", isAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/individual", isAuthenticated, async (req, res) => {
+router.post("/player", isAuthenticated, async (req, res) => {
   try {
     const { CourseId } = req.body;
     const UserId = req.user.id;
@@ -66,6 +67,59 @@ router.post("/individual", isAuthenticated, async (req, res) => {
     res.json(courseData);
   } catch (error) {
     console.error(error);
+  }
+});
+const getCourseData = async (CourseId) => {
+  try {
+    const [courseone, categories, instructor] = await Promise.all([
+      Course.findByPk(CourseId, {
+        include: [
+          {
+            model: Section,
+            as: "sections",
+            attributes: ["id", "cleanedName", "order"],
+            include: {
+              model: Lecture,
+              as: "lectures",
+              attributes: ["id", "type", "order", "cleanedName"],
+            },
+          },
+          { model: Category, as: "category" },
+          { model: Instructor, as: "instructors" },
+        ],
+        order: [
+          [{ model: Section, as: "sections" }, "order", "ASC"],
+          [
+            { model: Section, as: "sections" },
+            { model: Lecture, as: "lectures" },
+            "order",
+            "ASC",
+          ],
+        ],
+        attributes: ["id", "cleanedName", "description", "photo"],
+      }),
+      Category.findAll(),
+      Instructor.findAll(),
+    ]);
+
+    return {
+      course: courseone || {},
+      categories: categories || [],
+      instructors: instructor || [],
+    };
+  } catch (error) {
+    console.error(error);
+    throw new Error("Failed to fetch course data");
+  }
+};
+router.post("/individual", isAuthenticated, async (req, res) => {
+  try {
+    const { CourseId } = req.body;
+    const courseData = await getCourseData(CourseId);
+    res.json({ ...courseData, role: req.user.role });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Failed to fetch course data");
   }
 });
 router.post("/lectureprogress", isAuthenticated, async (req, res) => {

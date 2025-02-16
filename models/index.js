@@ -17,8 +17,15 @@ Section.hasMany(Lecture, { foreignKey: "SectionId", as: "lectures" });
 Lecture.belongsTo(Section, { foreignKey: "SectionId", as: "section" });
 Category.hasMany(Course, { foreignKey: "CategoryId", as: "courses" });
 Course.belongsTo(Category, { foreignKey: "CategoryId", as: "category" });
-Instructor.hasMany(Course, { foreignKey: "CourseId", as: "courses" });
-Course.belongsTo(Instructor, { foreignKey: "CourseId", as: "instructor" });
+const CourseIntructor = sequelize.define("CourseInstructor", {});
+Instructor.belongsToMany(Course, {
+  through: "CourseInstructor",
+  as: "courses",
+});
+Course.belongsToMany(Instructor, {
+  through: "CourseInstructor",
+  as: "instructors",
+});
 
 User.hasMany(UserLastWatched, { foreignKey: "UserId", as: "userlastwatcheds" });
 UserLastWatched.belongsTo(User, { foreignKey: "UserId", as: "user" });
@@ -161,7 +168,20 @@ const TrackingSystem = {
       group: ["Course.CategoryId", "Course.category.category"],
     });
   },
+  async getTotalWatchTime(userId) {
+    try {
+      const result = await DailyWatch.sum("watchTimeSeconds", {
+        where: {
+          UserId: userId,
+        },
+      });
 
+      return result || 0;
+    } catch (error) {
+      console.error("Error calculating total watch time:", error);
+      throw error;
+    }
+  },
   async getCourseProgress(userId, courseId) {
     const totalLectures = await Lecture.count({
       include: [
@@ -251,6 +271,7 @@ export {
   UserLastWatched,
   LectureProgress,
   Category,
+  Instructor,
   DailyWatch,
   TrackingSystem,
 };

@@ -5,8 +5,13 @@ const isAuthenticated = (req, res, next) => {
 };
 
 const isAdmin = (req, res, next) => {
-  if (req.user.role === "admin") return next();
-  res.status(403).json({ error: "Admin access required" });
+  try {
+    if (req.user.role === "admin") return next();
+    res.status(403).json({ error: "Admin access required" });
+  } catch (error) {
+    console.error(error);
+    res.status(403).json({ error: "Admin access required" });
+  }
 };
 const isAdminOrFirstStartUp = async (req, res, next) => {
   try {
