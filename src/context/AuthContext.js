@@ -77,6 +77,8 @@ export const AuthProvider = ({ children }) => {
     toastMessage,
     toastType,
     setShowToast,
+    setToastType,
+    setToastMessage,
   };
 
   return (

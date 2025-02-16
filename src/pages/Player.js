@@ -241,7 +241,7 @@ const Player = () => {
       try {
         setIsLoading(true);
         const newData = await axios.post(
-          "/api/course/individual",
+          "/api/course/player",
           { CourseId: id },
           { withCredentials: true }
         );

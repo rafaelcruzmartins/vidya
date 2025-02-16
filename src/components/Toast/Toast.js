@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import "./Toast.css";
-import { CheckCircleSolid, ErrorCircleSolid, XCircleSolid } from "../../assets";
+import {
+  CheckCircleSolid,
+  ErrorCircleSolid,
+  HourGlassSolid,
+  XCircleSolid,
+} from "../../assets";
 
 const Toast = ({ message, type = "success", duration = 3000, onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
@@ -29,6 +34,7 @@ const Toast = ({ message, type = "success", duration = 3000, onClose }) => {
         {type === "success" && <CheckCircleSolid />}
         {type === "warning" && <ErrorCircleSolid />}
         {type === "error" && <XCircleSolid />}
+        {type === "progress" && <HourGlassSolid />}
       </span>
       <span>{message}</span>
 

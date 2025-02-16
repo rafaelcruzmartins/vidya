@@ -29,6 +29,17 @@ const Home = () => {
           : homeData.latestCourse[1].id
       }`
     );
+
+  const handleCourse = () => {
+    navigate(
+      `/courses/${
+        homeData?.featuredCourse
+          ? homeData.featuredCourse.id
+          : homeData.latestCourse[1].id
+      }`
+    );
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -57,12 +68,12 @@ const Home = () => {
             <p className="pinned-title">FEATURED</p>
             <div className="feat-stats">
               <div className="featured-course">
-                <div className="featured-image">
+                <div className="featured-image" onClick={handleCourse}>
                   <img src={python} alt="" />
                 </div>
                 <div className="featured-info">
                   <div className="featured-info-details">
-                    <div className="info-title">
+                    <div className="info-title" onClick={handleCourse}>
                       {homeData &&
                         (!homeData.featuredCourse === null
                           ? homeData.featuredCourse.cleanedName
@@ -109,9 +120,10 @@ const Home = () => {
                 homeData.continueWatching.map((item, index) => (
                   <ContinueWatching
                     key={index}
-                    imgsrc={webdev}
-                    info={item.lecture.cleanedName}
+                    imgsrc={rails}
+                    lectureName={item.lecture.cleanedName}
                     courseId={item.course.id}
+                    courseName={item.course.cleanedName}
                   />
                 ))}
             </div>
@@ -123,7 +135,7 @@ const Home = () => {
                 homeData.latestCourse.map((item, index) => (
                   <Cards
                     key={index}
-                    imgsrc={webdev}
+                    imgsrc={javascript}
                     info={item.cleanedName}
                     courseId={item.id}
                   />
