@@ -1,30 +1,23 @@
 import PreNav from "../components/Navbar/PreNav";
 import CategoriesInfo from "../components/Cards/CategoriesInfo";
-
-const categoriesList = [
-  {
-    id: 1,
-    name: "Web",
-  },
-  {
-    id: 2,
-    name: "Mobile",
-  },
-  {
-    id: 3,
-    name: "Finance",
-  },
-  {
-    id: 4,
-    name: "Health",
-  },
-  {
-    id: 5,
-    name: "Business",
-  },
-];
+import { useEffect, useState } from "react";
+import axios from "../api/axiosInstance";
 
 const Categories = () => {
+  const [categoriesList, setCategoriesList] = useState([]);
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const { data } = await axios.get("/api/category", {
+          withCredentials: true,
+        });
+        setCategoriesList(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCategory();
+  });
   return (
     <div className="main">
       <div className="container">
@@ -32,7 +25,7 @@ const Categories = () => {
 
         <div className="categories-container">
           {categoriesList.map((e) => (
-            <CategoriesInfo name={e.name} />
+            <CategoriesInfo name={e.category} categoryId={e.id} />
           ))}
         </div>
       </div>

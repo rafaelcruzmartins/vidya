@@ -72,7 +72,7 @@ const IndividualCourses = () => {
 
   const [instructorList, setInstructorList] = useState([]);
   const [newCategoryInput, setnewCategoryInput] = useState("");
-
+  const [updateCounter, setUpdateCounter] = useState(0);
   const [newInstructorInput, setnewInstructorInput] = useState("");
   const [courseInstructors, setCourseInstructors] = useState([]);
   const [courseCategory, setCourseCategory] = useState([]);
@@ -114,7 +114,7 @@ const IndividualCourses = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [updateCounter]);
   const addCategoryBackend = async (category) => {
     try {
       const catogories = await axios.post("/api/admin/category", category, {
@@ -182,16 +182,13 @@ const IndividualCourses = () => {
     }
   };
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = async (e) => {
     if (e.key === "Enter" && newCategoryInput.trim()) {
       const newCategory = {
-        id: categoriesList.length - 1,
         name: newCategoryInput.trim(),
-        bxname: "bx bxs-file-js",
-        delay: "0",
-        color: "#FB3640",
       };
-      setCategoriesList([...categoriesList, newCategory]);
+      const category = await addCategoryBackend(newCategory);
+      setCategoriesList(category.data);
       setnewCategoryInput("");
     }
   };
@@ -207,19 +204,17 @@ const IndividualCourses = () => {
     }
   };
 
-  const handleKeyDownInstructor = (e) => {
+  const handleKeyDownInstructor = async (e) => {
     if (e.key === "Enter" && newInstructorInput.trim()) {
       const newInstructor = {
-        id: instructorList.length - 1,
         name: newInstructorInput.trim(),
-        bxname: "bx bxs-file-js",
-        delay: "0",
-        color: "#FB3640",
       };
-      setInstructorList([...instructorList, newInstructor]);
+      const instructor = await addInstructorBackend(newInstructor);
+      setInstructorList(instructor.data);
       setnewInstructorInput("");
     }
   };
+
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   const openAddCategoryModal = () => {
@@ -260,7 +255,18 @@ const IndividualCourses = () => {
       return newSet;
     });
   }, []);
-
+  const secondsToHoursRounded = (seconds) => {
+    if (typeof seconds !== "number" || isNaN(seconds)) {
+      return "Invalid input. Please provide a number for seconds.";
+    }
+    if (seconds < 0) {
+      return "Seconds cannot be negative.";
+    }
+    const hours = Math.floor(seconds / 3600);
+    const remainingSecondsAfterHours = seconds % 3600;
+    const minutes = Math.floor(remainingSecondsAfterHours / 60);
+    return `${hours} hours and ${minutes} minutes`;
+  };
   const handleUpload = async () => {
     const formData = new FormData();
     formData.append("CourseId", id);
@@ -278,22 +284,23 @@ const IndividualCourses = () => {
         setShowToast(true);
       }
 
-      const response = await axios.post("/api/admin/form/course", formData, {
+      await axios.post("/api/admin/form/course", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
       });
+      setUpdateCounter((prev) => prev + 1);
+
+      setToastType("success");
+      setToastMessage("updated course");
+      setShowToast(true);
+      setIsModalOpen(false);
     } catch (error) {
       console.error(error);
       setToastType("error");
       setToastMessage("error updating course");
       setShowToast(true);
-    } finally {
-      setToastType("success");
-      setToastMessage("updated course");
-      setShowToast(true);
-      setIsModalOpen(false);
     }
   };
   return (
@@ -347,7 +354,7 @@ const IndividualCourses = () => {
                     <span className="drop-cap">Description : </span>
                     {course?.description}
                   </div>
-                  <div>Course Duration : 20Hr</div>
+                  <div> {secondsToHoursRounded(course?.duration)}</div>
                   <div>Watched : 10Hr , 50% of 20Hr</div>
                 </div>
               </div>

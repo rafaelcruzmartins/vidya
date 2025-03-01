@@ -14,9 +14,27 @@ import {
   CheckCircleSolid,
   ChevronRight,
   Circle,
+  FileArchiveSolid,
+  FileBlankSolid,
+  FileHtmlSolid,
+  FilePdfSolid,
   SkeletonLoader,
+  VideoSolid,
+  World,
 } from "../assets";
 import { useParams } from "react-router-dom";
+import FileRenderer from "../components/FileRenderer/FileRenderer.js";
+const ICON_MAP = {
+  video: <VideoSolid />,
+  pdf: <FilePdfSolid />,
+  zip: <FileArchiveSolid />,
+  html: <FileHtmlSolid />,
+  url: <World />,
+};
+
+const LectureTypeIcon = memo(({ type }) => {
+  return ICON_MAP[type.toLowerCase()] || <FileBlankSolid />;
+});
 const SectionHeader = memo(
   ({
     sectionOrder,
@@ -55,6 +73,7 @@ const LectureItem = memo(
     lectureOrder,
     nowPlaying,
     sectionOrder,
+    type,
   }) => (
     <div
       ref={(el) => (lectureRef.current[lectureId] = el)}
@@ -76,6 +95,11 @@ const LectureItem = memo(
       >
         <div className="svg-div">
           {isCompleted ? <CheckCircleSolid /> : <Circle />}
+        </div>
+      </span>
+      <span className="type-icon">
+        <div className="svg-div">
+          <LectureTypeIcon type={type} />
         </div>
       </span>
       <span className="lecture-title">
@@ -106,7 +130,21 @@ const Player = () => {
   const handleNowPlaying = (lectureId) => {
     setNowPlaying(lectureId);
 
-    setPlayRequest(true);
+    if (lectureDictionary[lectureId].type === "video") {
+      setInitialVideoProgress(0);
+      setPlayRequest(false);
+      setTimeout(() => setPlayRequest(true), 0);
+    } else {
+      setPlayRequest(false);
+      setCompletedLectures((prev) => {
+        const newSet = new Set(prev);
+        if (!newSet.has(lectureId)) {
+          handleToggleLectureBackendComplete(lectureId);
+          newSet.add(lectureId);
+        }
+        return newSet;
+      });
+    }
   };
 
   const toggleSection = useCallback((sectionId) => {
@@ -217,7 +255,10 @@ const Player = () => {
         }
 
         lectureDict[currentLectureId] = {
-          url: `${process.env.REACT_APP_API}/api/course/stream/${lecture.id}`,
+          url:
+            lecture.type === "video"
+              ? `${process.env.REACT_APP_API}/api/course/stream/${lecture.id}`
+              : `${process.env.REACT_APP_API}/api/course/download/${lecture.id}`,
           next: nextLectureId,
           prev: isFirstLectureInCourse ? null : prevLectureId,
           content: lecture.content || [],
@@ -347,19 +388,28 @@ const Player = () => {
       <div className="container">
         <PreNav name={courseData?.cleanedName} />
         <div className="player-container">
-          <VideoPlayer
-            videoSource={currentVideo}
-            initialVideoProgress={initialVideoProgress}
-            onPlayRequest={playRequest}
-            onVideoEnd={handleVideoEnd}
-            onNextVideo={handleVideoNext}
-            onPreviousVideo={handleVideoPrev}
-            isNextVideo={isNextVideo}
-            isPrevVideo={isPrevVideo}
-            handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
-            LectureId={nowPlaying}
-            CourseId={id}
-          />
+          {lectureDictionary[nowPlaying]?.type &&
+          lectureDictionary[nowPlaying]?.type === "video" ? (
+            <VideoPlayer
+              videoSource={currentVideo}
+              initialVideoProgress={initialVideoProgress}
+              onPlayRequest={playRequest}
+              onVideoEnd={handleVideoEnd}
+              onNextVideo={handleVideoNext}
+              onPreviousVideo={handleVideoPrev}
+              isNextVideo={isNextVideo}
+              isPrevVideo={isPrevVideo}
+              handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
+              LectureId={nowPlaying}
+              CourseId={id}
+            />
+          ) : (
+            <FileRenderer
+              fileType={lectureDictionary?.[nowPlaying]?.type}
+              fileSrc={currentVideo}
+              fileName={lectureDictionary[nowPlaying]?.cleanedName}
+            />
+          )}
 
           <div className="playlist-container">
             {courseData?.sections.map((section) => (
@@ -391,9 +441,9 @@ const Player = () => {
                             isCompleted={completedLectures.has(lecture.id)}
                             nowPlaying={nowPlaying}
                             handleNowPlaying={handleNowPlaying}
-                            videoUrl={lecture.videoUrl}
                             onToggle={toggleLecture}
                             lectureRef={lectureRef}
+                            type={lecture.type}
                           />
                         ))}
                       </motion.div>

@@ -11,60 +11,19 @@ import Dashboard from "./pages/Dashboard";
 import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import ProtectedRoute from "./components/ProtectedRoute";
-import {
-  python,
-  rails,
-  javascript,
-  node,
-  mongodb,
-  php,
-  webdev,
-} from "./assets";
-const cardData = [
-  { imgsrc: python, info: "Master Python in 30 Days", id: 1 },
-  {
-    imgsrc: rails,
-    info: "Building Scalable Web Apps with Ruby on Rails",
-    id: 2,
-  },
-  { imgsrc: node, info: "Node For Beginners", id: 3 },
-  { imgsrc: php, info: "PHP Fundamentals: Web Development with PHP", id: 4 },
-  { imgsrc: javascript, info: "JavaScript: From Basics to Advanced", id: 5 },
-  { imgsrc: mongodb, info: "Mastering MongoDB for Developers", id: 6 },
-  { imgsrc: webdev, info: "Mastering MongoDB for Developers", id: 7 },
-];
+import Courses from "./pages/Courses";
+
 const AnimatedRoutes = () => {
   const location = useLocation();
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         <Route path="/login" element={<LogIn />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
-          <Route
-            path="/courses"
-            element={<CourseCategories name={"COURSES"} cardData={cardData} />}
-          />
-          <Route
-            path="/web"
-            element={<CourseCategories name={"WEB"} cardData={cardData} />}
-          />
-          <Route
-            path="/mobile"
-            element={<CourseCategories name={"MOBILE"} cardData={cardData} />}
-          />
-          <Route
-            path="/finance"
-            element={<CourseCategories name={"FINANCE"} cardData={cardData} />}
-          />
-          <Route
-            path="/health"
-            element={<CourseCategories name={"HEALTH"} cardData={cardData} />}
-          />
-          <Route
-            path="/business"
-            element={<CourseCategories name={"BUSINESS"} cardData={cardData} />}
-          />
+          <Route path="/courses" element={<Courses />} />
+          <Route path="/category/:id" element={<CourseCategories />} />
           <Route path="/course/play/:id" element={<Player />} />
           <Route path="/categories" element={<Categories />} />
           <Route path="/instructor" element={<Instructor />} />

@@ -1,20 +1,30 @@
 import PreNav from "../components/Navbar/PreNav";
 import InstructorInfo from "../components/Cards/InstructorInfo";
-const instructorsData = [
-  { name: "Alex Bataliga", id: 1, Courses: 5 },
-  { name: "Sam Pitroda", id: 2, Courses: 7 },
-  { name: "Ajay Kumar", id: 3, Courses: 6 },
-  { name: "Sumit Singh", id: 4, Courses: 2 },
-  { name: "Danish Kaneria", id: 5, Courses: 1 },
-];
+import { useEffect, useState } from "react";
+import axios from "../api/axiosInstance";
 const Instructor = () => {
+  const [instructors, setInstructors] = useState([]);
+
+  useEffect(() => {
+    const fetchInstructor = async () => {
+      try {
+        const { data } = await axios.get("/api/instructor", {
+          withCredentials: true,
+        });
+        setInstructors(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchInstructor();
+  }, []);
   return (
     <div>
       <div className="main">
         <div className="container">
           <PreNav name={"INSTRUCTOR"} />
           <div className="instructor-container">
-            {instructorsData.map((data) => (
+            {instructors.map((data) => (
               <InstructorInfo data={data} key={data.id} />
             ))}
           </div>

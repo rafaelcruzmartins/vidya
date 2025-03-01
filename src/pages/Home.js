@@ -1,12 +1,3 @@
-import {
-  python,
-  rails,
-  javascript,
-  node,
-  mongodb,
-  php,
-  webdev,
-} from "../assets";
 import Stats from "../components/Stats";
 import Navbar from "../components/Navbar/Navbar";
 import PreNav from "../components/Navbar/PreNav";
@@ -15,12 +6,15 @@ import Tilt from "react-parallax-tilt";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "../api/axiosInstance.js";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import ContinueWatching from "../components/Cards/ContinueWatching.js";
+import { ChevronRight } from "../assets/index.js";
 
 const Home = () => {
   const [homeData, setHomeData] = useState(null);
   const navigate = useNavigate();
+  const continueRef = useRef(null);
+  const latestRef = useRef(null);
   const handlePlayer = () =>
     navigate(
       `/course/play/${
@@ -39,11 +33,32 @@ const Home = () => {
       }`
     );
   };
+  const scrollLeft = () => {
+    if (latestRef.current) {
+      latestRef.current.scrollBy({ left: -300, behavior: "smooth" }); // Adjust scroll distance as needed
+    }
+  };
 
+  const scrollRight = () => {
+    if (latestRef.current) {
+      latestRef.current.scrollBy({ left: 300, behavior: "smooth" }); // Adjust scroll distance as needed
+    }
+  };
+  const scrollLeftContinue = () => {
+    if (continueRef.current) {
+      continueRef.current.scrollBy({ left: -300, behavior: "smooth" }); // Adjust scroll distance as needed
+    }
+  };
+
+  const scrollRightContinue = () => {
+    if (continueRef.current) {
+      continueRef.current.scrollBy({ left: 300, behavior: "smooth" }); // Adjust scroll distance as needed
+    }
+  };
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("/api/home/", {
+        const response = await axios.get("/api/home", {
           withCredentials: true,
         });
         setHomeData(response.data);
@@ -58,18 +73,27 @@ const Home = () => {
     <div className="main">
       <div className="container">
         <PreNav name={"VIDYA"} />
-        <Navbar />
+        <Navbar navItem={homeData && homeData.category} />
         <motion.div
           initial={{ opacity: 0, x: -200 }}
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 200 }}
         >
           <div className="featured">
-            <p className="pinned-title">FEATURED</p>
+            <p className="pinned-title featured-title">FEATURED</p>
             <div className="feat-stats">
               <div className="featured-course">
                 <div className="featured-image" onClick={handleCourse}>
-                  <img src={python} alt="" />
+                  <img
+                    src={
+                      homeData &&
+                      process.env.REACT_APP_API +
+                        (!homeData.featuredCourse === null
+                          ? homeData.featuredCourse.photo
+                          : homeData.latestCourse[1].photo)
+                    }
+                    alt=""
+                  />
                 </div>
                 <div className="featured-info">
                   <div className="featured-info-details">
@@ -114,13 +138,23 @@ const Home = () => {
           </div>
 
           <div className="continue">
-            <p className="pinned-title">CONTINUE LEARNING</p>
-            <div className="card-divs">
+            <div className="title-scroll-buttons">
+              <p className="pinned-title">CONTINUE LEARNING</p>
+              <div className="scroll-button">
+                <button className=" left-scroll" onClick={scrollLeftContinue}>
+                  <ChevronRight />
+                </button>
+                <button className=" right-scroll" onClick={scrollRightContinue}>
+                  <ChevronRight />
+                </button>
+              </div>
+            </div>
+            <div className="card-divs home-card-divs" ref={continueRef}>
               {homeData &&
                 homeData.continueWatching.map((item, index) => (
                   <ContinueWatching
                     key={index}
-                    imgsrc={rails}
+                    imgsrc={item.course.photo}
                     lectureName={item.lecture.cleanedName}
                     courseId={item.course.id}
                     courseName={item.course.cleanedName}
@@ -129,13 +163,24 @@ const Home = () => {
             </div>
           </div>
           <div className="latest-courses">
-            <p className="pinned-title">LATEST COURSES</p>
-            <div className="card-divs">
+            <div className="title-scroll-buttons">
+              <p className="pinned-title">LATEST COURSES</p>
+              <div className="scroll-button">
+                <button className=" left-scroll" onClick={scrollLeft}>
+                  <ChevronRight />
+                </button>
+                <button className=" right-scroll" onClick={scrollRight}>
+                  <ChevronRight />
+                </button>
+              </div>
+            </div>
+
+            <div className="card-divs home-card-divs" ref={latestRef}>
               {homeData &&
                 homeData.latestCourse.map((item, index) => (
                   <Cards
                     key={index}
-                    imgsrc={javascript}
+                    imgsrc={item.photo}
                     info={item.cleanedName}
                     courseId={item.id}
                   />

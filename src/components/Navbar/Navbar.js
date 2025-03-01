@@ -1,68 +1,43 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
-const Navbar = () => {
+import { motion } from "framer-motion";
+const Navbar = ({ navItem }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const handleYourCourses = () => navigate("/courses");
-  const handleWeb = () => navigate("/web");
-  const handleMobile = () => navigate("/mobile");
-  const handleFinance = () => navigate("/finance");
-  const handleHealth = () => navigate("/health");
-  const handleBusiness = () => navigate("/business");
+
+  const handleYourCourses = (id) => {
+    if (location.pathname !== `/category/${id}`) {
+      navigate(`/category/${id}`);
+    }
+  };
+
+  const currentPathId = location.pathname.startsWith("/category/")
+    ? location.pathname.split("/category/")[1]
+    : null;
 
   return (
     <>
-      <div className="nav-bar">
-        <div
-          className={
-            location.pathname === "/courses" ? "active nav-item" : "nav-item"
-          }
-          onClick={handleYourCourses}
-        >
-          Your Courses
-        </div>
-
-        <div
-          className={
-            location.pathname === "/web" ? "active nav-item" : "nav-item"
-          }
-          onClick={handleWeb}
-        >
-          Web
-        </div>
-        <div
-          className={
-            location.pathname === "/mobile" ? "active nav-item" : "nav-item"
-          }
-          onClick={handleMobile}
-        >
-          Mobile
-        </div>
-        <div
-          className={
-            location.pathname === "/finance" ? "active nav-item" : "nav-item"
-          }
-          onClick={handleFinance}
-        >
-          Finance
-        </div>
-        <div
-          className={
-            location.pathname === "/health" ? "active nav-item" : "nav-item"
-          }
-          onClick={handleHealth}
-        >
-          Health
-        </div>
-        <div
-          className={
-            location.pathname === "/business" ? "active nav-item" : "nav-item"
-          }
-          onClick={handleBusiness}
-        >
-          Business
-        </div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3, ease: "easeInOut" }}
+        className="nav-bar"
+      >
+        {navItem &&
+          navItem.map((cat) => (
+            <div
+              key={cat.id}
+              className={
+                currentPathId === cat.id.toString()
+                  ? "active nav-item"
+                  : "nav-item"
+              }
+              onClick={() => handleYourCourses(cat.id)}
+            >
+              <span className="nav-item-name">{cat.category}</span>
+            </div>
+          ))}
+      </motion.div>
     </>
   );
 };

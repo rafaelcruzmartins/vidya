@@ -170,7 +170,6 @@ const VideoPlayer = ({
   onVideoEnd,
   onNextVideo,
   onPreviousVideo,
-
   onPlayRequest,
   isNextVideo,
   isPrevVideo,
@@ -200,16 +199,30 @@ const VideoPlayer = ({
   });
 
   useEffect(() => {
-    if (videoRef.current) {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleCanPlay = async () => {
       if (onPlayRequest) {
-        videoRef.current.play();
-        setState((prev) => ({
-          ...prev,
-          isPlaying: true,
-        }));
+        try {
+          await video.play();
+          setState((prev) => ({ ...prev, isPlaying: true }));
+        } catch (error) {
+          console.log("Play failed:", error);
+        }
       }
+    };
+
+    video.addEventListener("canplay", handleCanPlay);
+
+    if (video.readyState >= 3 && onPlayRequest) {
+      handleCanPlay();
     }
-  }, [videoSource]);
+
+    return () => {
+      video.removeEventListener("canplay", handleCanPlay);
+    };
+  }, [onPlayRequest, videoSource]);
   useEffect(() => {
     if (initialVideoProgress) {
       if (videoRef.current) {
@@ -365,15 +378,12 @@ const VideoPlayer = ({
   const handlePlaybackSpeedChange = useCallback((speed) => {
     const video = videoRef.current;
     if (!video) return;
+    video.playbackRate = speed;
 
     setState((prev) => ({
       ...prev,
       playbackSpeed: speed,
     }));
-
-    if (state.isPlaying) {
-      video.playbackRate = state.playbackSpeed;
-    }
   }, []);
 
   const handleAutoplayToggle = useCallback(() => {

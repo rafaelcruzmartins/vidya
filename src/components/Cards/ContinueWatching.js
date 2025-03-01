@@ -13,7 +13,7 @@ const ContinueWatching = ({ imgsrc, lectureName, courseName, courseId }) => {
     <>
       <div className="cards">
         <div className="card-image" onClick={handlePlayer}>
-          <img src={imgsrc} alt="" />
+          <img src={process.env.REACT_APP_API + imgsrc} alt="" />
           <div className="overlay-card">
             <div className="play-button-card">
               <Play />

@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import FirstStartUp from "./pages/FirstStartUp";
-import Spinner from "./components/Spinner/Spinner";
 import Background from "./components/Background/Background";
 import AnimatedRoutes from "./AnimatedRoutes";
 import { AuthProvider } from "./context/AuthContext";
 import "./style.css";
 import axios from "./api/axiosInstance.js";
 import { BrowserRouter as Router } from "react-router-dom";
+import { SkeletonLoader } from "./assets/index.js";
 
 const App = () => {
   const [data, setData] = useState(null);
@@ -27,7 +27,7 @@ const App = () => {
     return (
       <Router>
         <Background />
-        <Spinner />
+        <SkeletonLoader />
       </Router>
     );
   }

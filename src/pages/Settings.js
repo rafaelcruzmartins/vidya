@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { motion, LayoutGroup } from "framer-motion";
+import { motion, LayoutGroup, AnimatePresence } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
 import PreNav from "../components/Navbar/PreNav";
-import { profile } from "../assets";
 import Admin from "../components/Settings/Admin";
 
 const tabs = [
@@ -16,21 +15,13 @@ const Settings = () => {
   const location = useLocation();
   const path = location.pathname.split("/").pop();
   const validTab = tabs.find((tab) => tab.id === path);
-  var statetab = null;
-  if (validTab) {
-    statetab = validTab.id;
-  } else {
-    navigate(`/settings/${tabs[0].id}`);
-  }
-  const [activeTab, setActiveTab] = useState(statetab);
+  const [activeTab, setActiveTab] = useState(validTab?.id || tabs[0].id);
 
   useEffect(() => {
-    if (validTab) {
-      setActiveTab(validTab.id);
-    } else {
-      navigate(`/settings/${tabs[0].id}`);
+    if (!validTab) {
+      navigate(`/settings/${tabs[0].id}`, { replace: true });
     }
-  }, [location.pathname, navigate]);
+  }, [location.pathname, navigate, validTab]);
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
@@ -47,22 +38,41 @@ const Settings = () => {
               {tabs.map((tab) => (
                 <motion.div
                   key={tab.id}
-                  className={`sidebar-tab ${
-                    activeTab === tab.id ? "active-settings" : ""
-                  }`}
+                  className="sidebar-tab"
                   onClick={() => handleTabChange(tab.id)}
                   layout
                 >
                   {tab.label}
+                  {activeTab === tab.id && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="active-indicator"
+                      transition={{
+                        type: "spring",
+                        bounce: 0.2,
+                        duration: 0.6,
+                      }}
+                    />
+                  )}
                 </motion.div>
               ))}
             </div>
           </LayoutGroup>
 
           <div className="settings-sidebar-info">
-            {activeTab === "profile" && <ProfileSettings />}
-            {activeTab === "display" && <DisplaySettings />}
-            {activeTab === "admin" && <Admin />}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTab}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.2 }}
+              >
+                {activeTab === "profile" && <ProfileSettings />}
+                {activeTab === "display" && <DisplaySettings />}
+                {activeTab === "admin" && <Admin />}
+              </motion.div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -71,23 +81,17 @@ const Settings = () => {
 };
 
 const ProfileSettings = () => (
-  <div
-    initial={{ opacity: 0, y: 40 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -40 }}
-    transition={{ duration: 0.2 }}
-    className="settings-content"
-  >
+  <div className="settings-content">
     <div className="settings-title">Profile Settings</div>
     <div className="img-container">
-      <img src={profile} alt="profile picture" />
+      <img alt="profile" />
     </div>
     <div className="password-form">
-      <label htmlFor="">Old Password</label>
+      <label>Old Password</label>
       <input type="password" className="password" />
-      <label htmlFor="">New Password</label>
+      <label>New Password</label>
       <input type="password" className="password" />
-      <label htmlFor="">Confirm New Password</label>
+      <label>Confirm New Password</label>
       <input type="password" className="password" />
       <div className="change-password-button">Change Password</div>
     </div>
@@ -95,13 +99,7 @@ const ProfileSettings = () => (
 );
 
 const DisplaySettings = () => (
-  <div
-    initial={{ opacity: 0, y: -40 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: 40 }}
-    transition={{ duration: 0.2 }}
-    className="settings-content"
-  >
+  <div className="settings-content">
     <div className="settings-title">Display Settings</div>
     <div className="theme-label">Theme</div>
     <select name="languages" id="lang">

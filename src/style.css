@@ -125,7 +125,7 @@ body {
   );
   border: 1px solid #ffffff;
   border-radius: 1rem;
-
+  min-height: 30vh;
   margin-top: 1rem;
 }
 
@@ -276,7 +276,14 @@ svg {
   color: #45312d;
   cursor: pointer;
 }
+.nav-item-name {
+  width: 85%;
 
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
+}
 .active {
   background: radial-gradient(
     96.47% 100% at 3.53% 0%,
@@ -295,10 +302,13 @@ svg {
 
 .pinned-title {
   color: #454545;
-  margin: 1rem 1rem;
+  margin: 0rem 2rem;
   font-weight: 400;
   font-size: 1rem;
   letter-spacing: 0.1rem;
+}
+.featured-title {
+  margin: 1rem 0rem;
 }
 
 .feat-stats {
@@ -317,7 +327,6 @@ svg {
   flex-direction: row;
   border: 1px solid #ffffff;
   box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
-  /* backdrop-filter: blur(0.8rem); */
   border-radius: 2rem;
   width: 63%;
 }
@@ -474,18 +483,47 @@ img {
   background-color: #e9a7ff;
 }
 
-.continue {
-  margin: 2rem;
-}
-
 .card-divs {
-  height: 40vh;
+  max-height: 40vh;
   display: flex;
-
   align-items: center;
   gap: 5%;
 }
-
+.home-card-divs {
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 1.5rem 2rem;
+}
+.title-scroll-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.scroll-button {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-right: 1rem;
+}
+.left-scroll,
+.right-scroll {
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+.left-scroll {
+  svg {
+    transform: rotate(180deg);
+  }
+}
 .cards {
   width: 30%;
   height: 40vh;
@@ -495,9 +533,9 @@ img {
     rgba(255, 255, 255, 0.014) 100%
   );
   border: 1px solid #ffffff;
-  box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
-  /* backdrop-filter: blur(0.8rem); */
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
   border-radius: 2rem;
+  flex-shrink: 0;
 }
 
 .card-image {
@@ -588,9 +626,6 @@ img {
 }
 .card-info-course-title {
   font-weight: 500;
-}
-.latest-courses {
-  margin: 2rem;
 }
 
 .card-divs-wrap {
@@ -785,6 +820,13 @@ img {
 
   margin: 1rem;
 }
+.img-container-instructor {
+  width: 7rem;
+  height: 7rem;
+  margin: 1rem;
+  border-radius: 100%;
+  overflow: hidden;
+}
 
 .instructor-title {
   font-weight: 600;
@@ -810,6 +852,7 @@ img {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
 }
 
 .settings-sidebar-info {
@@ -822,11 +865,14 @@ img {
   );
   border: 1px solid #ffffff;
   border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .sidebar-tab {
   width: 80%;
   display: flex;
+  position: relative;
   justify-content: center;
   align-items: center;
   cursor: pointer;
@@ -846,12 +892,17 @@ img {
   font-weight: bold;
   margin-bottom: 1rem;
 }
-
-.active-settings {
+.active-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background: rgba(255, 255, 255, 0.34);
   border: 1px solid #ffffff;
+  z-index: -1;
+  border-radius: 0.5rem;
 }
-
 .settings-content > .img-container {
   width: 10%;
 }
@@ -1204,7 +1255,8 @@ select option {
   left: 20%;
   top: 38%;
   transform: translate(-50%, -50%);
-  width: 16%;
+  width: 15rem;
+  height: 15rem;
 }
 
 .top-container {
@@ -1515,6 +1567,7 @@ input[type="file"]::file-selector-button:hover {
     flex-grow: 1;
     text-indent: 1rem;
     font-size: 1rem;
+    width: 100%;
   }
 
   svg {
@@ -1602,14 +1655,8 @@ input[type="file"]::file-selector-button:hover {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(
-    100% 195.79% at 0% 0%,
-    rgba(255, 255, 255, 0.28) 1.29%,
-    rgba(255, 255, 255, 0.04) 100%
-  );
-  border: 1px solid #ffffff32;
+  background: #343434;
   border-radius: 1rem;
-  backdrop-filter: blur(20px);
   margin: 1rem;
 }
 
@@ -1821,7 +1868,9 @@ video::-moz-media-controls {
   transition: all 0.2s;
   margin-left: 1rem;
 }
-
+.type-icon {
+  fill: #e20044;
+}
 .lecture-title {
   margin: 0.6rem 0;
 }
@@ -2590,8 +2639,4 @@ video::-moz-media-controls {
 .skeleton-loader {
   width: 100%;
   height: 100%;
-}
-
-.loading {
-  margin: 2rem 0rem 0rem 6rem;
 }
