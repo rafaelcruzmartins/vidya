@@ -1,6 +1,8 @@
 import path from "path";
 import os from "os";
 import fs, { promises as fsp } from "fs";
+import { exec } from "child_process";
+import { v4 as uuidv4 } from "uuid";
 import {
   Server,
   User,
@@ -8,27 +10,75 @@ import {
   Lecture,
   Section,
   Course,
-  Category,
-  Instructor,
+  PathFile,
 } from "../models/index.js";
 
 const isWindows = os.platform() === "win32";
+
+const pathCache = {
+  entries: new Map(),
+  reset() {
+    this.entries = new Map();
+  },
+  getPathId(filePath) {
+    if (this.entries.has(filePath)) {
+      return this.entries.get(filePath);
+    }
+    const newId = uuidv4();
+    this.entries.set(filePath, newId);
+    return newId;
+  },
+  getAllEntries() {
+    return Array.from(this.entries.entries()).map(([path, id]) => ({
+      id: id,
+      path: path,
+    }));
+  },
+};
+
+const durationCache = {
+  cache: new Map(),
+  async initialize() {
+    this.cache = new Map();
+  },
+  get(filePath) {
+    if (!this.cache.has(filePath) || !fs.existsSync(filePath)) {
+      return null;
+    }
+
+    const stats = fs.statSync(filePath);
+    const cached = this.cache.get(filePath);
+
+    if (cached.size === stats.size && cached.mtime === stats.mtime.getTime()) {
+      return cached.duration;
+    }
+
+    return null;
+  },
+  set(filePath, duration) {
+    if (!fs.existsSync(filePath)) return;
+
+    const stats = fs.statSync(filePath);
+    this.cache.set(filePath, {
+      size: stats.size,
+      mtime: stats.mtime.getTime(),
+      duration,
+    });
+  },
+  async save() {},
+};
+
 const normalizePath = (inputPath) => {
   if (!inputPath) return isWindows ? "C:\\" : "/";
-
   if (isWindows) {
     if (inputPath.match(/^[A-Za-z]:$/)) {
       return `${inputPath}\\`;
     }
-
     const normalized = path.normalize(inputPath);
     return normalized.endsWith("\\") ? normalized : `${normalized}\\`;
   }
-
   return path.normalize(inputPath);
 };
-
-// Directory Parsing Logic
 
 const VIDEO_EXT = new Set([".mp4", ".mkv", ".avi", ".mov"]);
 const CONTENT_EXT = new Set([".html", ".txt", ".pdf", ".zip", ".md"]);
@@ -51,6 +101,7 @@ const cleanNameCourse = (filename) => {
     .replace(/\s*\[[^\]]+\]\s*$/, "")
     .trim();
 };
+
 const cleanName = (filename) => {
   return filename
     .replace(/^\d+[\d.-]*\s*[-.]?\s*/, "")
@@ -65,11 +116,9 @@ const parseBaseNumber = (filename) => {
 
 const groupFiles = (files) => {
   const groups = new Map();
-
   files.forEach((file) => {
     const base = parseBaseNumber(file);
     if (base === null) return;
-
     if (!groups.has(base)) {
       groups.set(base, {
         main: null,
@@ -77,10 +126,8 @@ const groupFiles = (files) => {
         subtitles: [],
       });
     }
-
     const ext = path.extname(file).toLowerCase();
     const group = groups.get(base);
-
     if (VIDEO_EXT.has(ext)) {
       group.main = file;
     } else if (SUB_EXT.has(ext)) {
@@ -91,12 +138,124 @@ const groupFiles = (files) => {
       group.contents.push(file);
     }
   });
-
   return groups;
 };
 
+const getVideoDurations = async (filePaths) => {
+  const existingFiles = filePaths.filter((fp) => fs.existsSync(fp));
+
+  const results = {};
+  const filesToProcess = [];
+
+  for (const filePath of existingFiles) {
+    const cachedDuration = durationCache.get(filePath);
+    if (cachedDuration !== null) {
+      results[filePath] = cachedDuration;
+    } else {
+      filesToProcess.push(filePath);
+    }
+  }
+
+  const concurrencyLimit = 10;
+
+  for (let i = 0; i < filesToProcess.length; i += concurrencyLimit) {
+    const chunk = filesToProcess.slice(i, i + concurrencyLimit);
+    const promises = chunk.map((filePath) => {
+      return new Promise((resolve) => {
+        exec(
+          `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`,
+          (error, stdout) => {
+            if (error) {
+              console.error(`Error getting duration for ${filePath}:`, error);
+              results[filePath] = 0;
+            } else {
+              const duration = parseFloat(stdout.trim()) || 0;
+              results[filePath] = duration;
+              durationCache.set(filePath, duration);
+            }
+            resolve();
+          }
+        );
+      });
+    });
+
+    await Promise.all(promises);
+  }
+
+  await durationCache.save();
+
+  return results;
+};
+
+const updateSectionDuration = async (sectionId) => {
+  const lectures = await Lecture.findAll({
+    where: { SectionId: sectionId },
+  });
+
+  const totalDuration = lectures.reduce(
+    (sum, lecture) => sum + (lecture.duration || 0),
+    0
+  );
+
+  await Section.update(
+    { duration: totalDuration },
+    { where: { id: sectionId } }
+  );
+
+  return totalDuration;
+};
+
+const updateCourseDuration = async (courseId) => {
+  const sections = await Section.findAll({
+    where: { CourseId: courseId },
+  });
+
+  const totalDuration = sections.reduce(
+    (sum, section) => sum + (section.duration || 0),
+    0
+  );
+
+  await Course.update({ duration: totalDuration }, { where: { id: courseId } });
+
+  return totalDuration;
+};
+
+const collectPathIdsForLecture = (lecture) => {
+  const pathIds = new Set();
+
+  if (lecture.content && Array.isArray(lecture.content)) {
+    lecture.content.forEach((item) => {
+      if (item.pathId) pathIds.add(item.pathId);
+    });
+  }
+
+  if (lecture.subtitles && Array.isArray(lecture.subtitles)) {
+    lecture.subtitles.forEach((item) => {
+      if (item.pathId) pathIds.add(item.pathId);
+    });
+  }
+
+  return Array.from(pathIds);
+};
+
+const collectPathIdsForSection = async (sectionId) => {
+  const lectures = await Lecture.findAll({ where: { SectionId: sectionId } });
+
+  const pathIds = new Set();
+  lectures.forEach((lecture) => {
+    collectPathIdsForLecture(lecture).forEach((id) => pathIds.add(id));
+  });
+
+  return Array.from(pathIds);
+};
+
 const syncCourseDirectory = async (coursedirectory) => {
+  pathCache.reset();
+  await durationCache.initialize();
+
+  const usedPathIds = new Set();
   const directory = normalizePath(coursedirectory);
+
   if (!fs.existsSync(directory)) {
     const course = await Course.findOne({ where: { directory } });
     if (course) {
@@ -112,6 +271,7 @@ const syncCourseDirectory = async (coursedirectory) => {
       originalName: path.basename(directory),
       cleanedName: cleanNameCourse(path.basename(directory)),
       directory,
+      duration: 0,
     });
     console.log("new course created");
   }
@@ -132,8 +292,15 @@ const syncCourseDirectory = async (coursedirectory) => {
   for (const section of existingSections) {
     const sectionPath = path.join(directory, section.originalName);
     if (!currentSectionDirs.has(section.originalName)) {
+      const pathIdsToDelete = await collectPathIdsForSection(section.id);
+
       await section.destroy();
       console.log(`Deleted section: ${section.cleanedName}`);
+
+      for (const pathId of pathIdsToDelete) {
+        usedPathIds.add(pathId);
+      }
+
       continue;
     }
 
@@ -146,17 +313,28 @@ const syncCourseDirectory = async (coursedirectory) => {
     );
 
     for (const lecture of section.lectures) {
-      const lectureName = path.basename(lecture.path);
+      const lectureName = path.basename(lecture.path || "");
       if (!validLectureFiles.has(lectureName)) {
+        const pathIdsToDelete = collectPathIdsForLecture(lecture);
+
         await lecture.destroy();
         console.log(`Deleted lecture: ${lecture.cleanedName}`);
+
+        for (const pathId of pathIdsToDelete) {
+          usedPathIds.add(pathId);
+        }
       }
     }
+
+    await updateSectionDuration(section.id);
   }
+
+  const videoFilesToProcess = [];
+  const lecturesToCreate = [];
+  const lectureUpdates = [];
 
   for (const sectionDir of currentSectionDirs) {
     const sectionPath = path.join(directory, sectionDir);
-
     let section = await Section.findOne({
       where: {
         CourseId: course.id,
@@ -170,6 +348,7 @@ const syncCourseDirectory = async (coursedirectory) => {
         cleanedName: cleanName(sectionDir),
         order: parseBaseNumber(sectionDir) || 0,
         CourseId: course.id,
+        duration: 0,
       });
     }
 
@@ -190,6 +369,7 @@ const syncCourseDirectory = async (coursedirectory) => {
       const lectureType = isVideo
         ? "video"
         : path.extname(mainFile).replace(".", "");
+      const filePath = path.join(sectionPath, mainFile);
 
       let lecture = await Lecture.findOne({
         where: {
@@ -198,40 +378,66 @@ const syncCourseDirectory = async (coursedirectory) => {
         },
       });
 
-      if (!lecture) {
-        lecture = await Lecture.create({
-          originalName: mainFile,
-          cleanedName: cleanName(mainFile),
-          order: base,
-          type: lectureType,
-          path: path.join(sectionPath, mainFile),
-          SectionId: section.id,
-        });
-      }
-
-      const content = group.contents.map((f) => ({
-        type: path.extname(f).replace(".", ""),
-        path: path.join(sectionPath, f),
-        originalName: f,
-        cleanedName: cleanName(f),
-      }));
+      const content = group.contents.map((f) => {
+        const contentPath = path.join(sectionPath, f);
+        const contentPathId = pathCache.getPathId(contentPath);
+        return {
+          type: path.extname(f).replace(".", ""),
+          pathId: contentPathId,
+          originalName: f,
+          cleanedName: cleanName(f),
+        };
+      });
 
       const subtitles = group.subtitles.map((f) => {
+        const subtitlePath = path.join(sectionPath, f);
+        const subtitlePathId = pathCache.getPathId(subtitlePath);
         const langMatch = f.match(/\.([a-z]{2})\./i);
         return {
           language: langMatch ? langMatch[1] : "en",
-          path: path.join(sectionPath, f),
+          pathId: subtitlePathId,
           type: path.extname(f).replace(".", ""),
           originalName: f,
           cleanedName: cleanName(f),
         };
       });
 
-      await lecture.update({
-        content,
-        subtitles,
-        order: base,
-      });
+      if (isVideo) {
+        videoFilesToProcess.push({
+          sectionId: section.id,
+          sectionPath,
+          filePath,
+          mainFile,
+          base,
+          lectureType,
+          content,
+          subtitles,
+          lecture,
+        });
+      } else {
+        if (!lecture) {
+          lecturesToCreate.push({
+            originalName: mainFile,
+            cleanedName: cleanName(mainFile),
+            order: base,
+            type: lectureType,
+            path: filePath,
+            content: content,
+            subtitles: subtitles,
+            SectionId: section.id,
+            duration: 0,
+          });
+        } else {
+          lectureUpdates.push({
+            id: lecture.id,
+            order: base,
+            duration: 0,
+            path: filePath,
+            content: content,
+            subtitles: subtitles,
+          });
+        }
+      }
     }
 
     const newOrder = parseBaseNumber(sectionDir) || 0;
@@ -240,8 +446,97 @@ const syncCourseDirectory = async (coursedirectory) => {
     }
   }
 
+  if (videoFilesToProcess.length > 0) {
+    const videoFilePaths = videoFilesToProcess.map((v) => v.filePath);
+    const durationResults = await getVideoDurations(videoFilePaths);
+
+    for (const videoInfo of videoFilesToProcess) {
+      const {
+        sectionId,
+        filePath,
+        mainFile,
+        base,
+        lectureType,
+        content,
+        subtitles,
+        lecture,
+      } = videoInfo;
+      const duration = durationResults[filePath] || 0;
+
+      if (!lecture) {
+        lecturesToCreate.push({
+          originalName: mainFile,
+          cleanedName: cleanName(mainFile),
+          order: base,
+          type: lectureType,
+          path: filePath,
+          content: content,
+          subtitles: subtitles,
+          SectionId: sectionId,
+          duration,
+        });
+      } else {
+        lectureUpdates.push({
+          id: lecture.id,
+          order: base,
+          duration,
+          path: filePath,
+          content: content,
+          subtitles: subtitles,
+        });
+      }
+    }
+  }
+
+  if (lecturesToCreate.length > 0) {
+    await Lecture.bulkCreate(lecturesToCreate);
+  }
+
+  if (lectureUpdates.length > 0) {
+    for (const update of lectureUpdates) {
+      await Lecture.update(
+        {
+          order: update.order,
+          duration: update.duration,
+          path: update.path,
+          content: update.content,
+          subtitles: update.subtitles,
+        },
+        { where: { id: update.id } }
+      );
+    }
+  }
+
+  const pathEntries = pathCache.getAllEntries();
+
+  if (pathEntries.length > 0) {
+    await PathFile.bulkCreate(pathEntries, {
+      updateOnDuplicate: ["path"],
+      ignoreDuplicates: true,
+    });
+  }
+
+  if (usedPathIds.size > 0) {
+    await PathFile.destroy({
+      where: {
+        id: Array.from(usedPathIds),
+      },
+    });
+  }
+
+  const sections = await Section.findAll({
+    where: { CourseId: course.id },
+  });
+
+  for (const section of sections) {
+    await updateSectionDuration(section.id);
+  }
+
+  await updateCourseDuration(course.id);
+
   return course;
 };
+
 const scanForDirectory = async (directory) =>
   new Set(
     naturalSort(
@@ -259,6 +554,7 @@ const register = async (req, res) => {
       password: req.body.password,
       role: "admin",
     });
+
     const folders = await Promise.all(
       req.body.folders.map(async (folder) => {
         const stats = await fsp.stat(folder);
@@ -269,14 +565,17 @@ const register = async (req, res) => {
         };
       })
     );
+
     const coursefolder = await CourseFolder.bulkCreate(folders);
     const savedfolders = coursefolder.map((folder) => folder.directory);
+
     for (const folder of savedfolders) {
       const individualCourseDirectory = await scanForDirectory(folder);
       for (const individualCourse of individualCourseDirectory) {
         await syncCourseDirectory(normalizePath(individualCourse));
       }
     }
+
     const server = await Server.findAll();
     await server[0].update({ isFirstStartUp: false });
 
@@ -289,13 +588,14 @@ const register = async (req, res) => {
     res.status(400).json({ error: error });
   }
 };
+
 const scan = async (req, res) => {
   try {
     const coursefolder = await CourseFolder.findAll();
     const savedfolders = coursefolder.map((folder) => folder.directory);
+
     for (const folder of savedfolders) {
       const individualCourseDirectory = await scanForDirectory(folder);
-
       for (const individualCourse of individualCourseDirectory) {
         await syncCourseDirectory(normalizePath(individualCourse));
       }
@@ -304,6 +604,7 @@ const scan = async (req, res) => {
     res.status(500).send("Error updating the course");
     console.error(error);
   }
-  res.status(201).send("succesfully updated the course");
+  res.status(201).send("successfully updated the course");
 };
+
 export { register, scan };

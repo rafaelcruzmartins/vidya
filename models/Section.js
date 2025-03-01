@@ -11,6 +11,7 @@ const Section = sequelize.define("Section", {
   originalName: DataTypes.STRING,
   cleanedName: DataTypes.STRING,
   order: DataTypes.FLOAT,
+  duration: DataTypes.FLOAT,
 });
 
 export default Section;

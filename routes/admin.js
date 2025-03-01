@@ -5,9 +5,10 @@ import {
   uploadImageCourse,
   scan,
   register,
-  category,
+  createCategory,
   user,
-  instructor,
+  createInstructor,
+  uploadImageInstructor,
 } from "../controllers/index.js";
 const router = Router();
 
@@ -15,8 +16,14 @@ router.post("/register", isAdminOrFirstStartUp, register);
 
 router.post("/scan", isAdmin, scan);
 router.post("/users", isAdmin, user);
-router.post("/category", isAdmin, category);
-router.post("/instructor", isAdmin, instructor);
+router.post("/category", isAdmin, createCategory);
+router.post("/instructor", isAdmin, createInstructor);
 router.post("/form/course", isAdmin, upload.single("file"), uploadImageCourse);
+router.post(
+  "/form/instructor",
+  isAdmin,
+  upload.single("file"),
+  uploadImageInstructor
+);
 
 export default router;

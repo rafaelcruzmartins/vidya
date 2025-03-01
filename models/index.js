@@ -9,6 +9,7 @@ import UserLastWatched from "./UserLastWatched.js";
 import Category from "./Category.js";
 import DailyWatch from "./DailyWatch.js";
 import Instructor from "./Instructor.js";
+import PathFile from "./PathFile.js";
 import sequelize from "../config/database.js";
 
 Course.hasMany(Section, { foreignKey: "CourseId", as: "sections" });
@@ -273,5 +274,6 @@ export {
   Category,
   Instructor,
   DailyWatch,
+  PathFile,
   TrackingSystem,
 };

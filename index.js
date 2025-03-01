@@ -19,6 +19,8 @@ import adminRoutes from "./routes/admin.js";
 import driveRoutes from "./routes/drive.js";
 import homeRoutes from "./routes/home.js";
 import courseRoutes from "./routes/course.js";
+import categoryRoutes from "./routes/category.js";
+import instructorRoutes from "./routes/instructor.js";
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
@@ -90,7 +92,7 @@ app.use(express.json());
 app.use(
   "/assets",
   express.static("assets", {
-    maxAge: "1y", // Sets Cache-Control: public, max-age=31536000
+    maxAge: "1y",
   })
 );
 app.use(
@@ -111,12 +113,11 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/drive", driveRoutes);
 app.use("/api/home", homeRoutes);
 app.use("/api/course", courseRoutes);
+app.use("/api/category", categoryRoutes);
+app.use("/api/instructor", instructorRoutes);
 app.get("/", async (req, res) => {
   const server = await Server.findAll();
-  res.json(server[0].isFirstStartUp);
-});
-app.get("/data", async (req, res) => {
-  res.json(courseData);
+  res.status(200).json(server[0].isFirstStartUp);
 });
 
 const PORT = process.env.PORT || 5000;

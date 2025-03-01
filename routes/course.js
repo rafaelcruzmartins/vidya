@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/owner.js";
+import cache from "../cache/nodecache.js";
 import {
   Category,
   Course,
@@ -11,14 +12,15 @@ import {
   Instructor,
 } from "../models/index.js";
 import fs from "fs";
+import path from "path";
 const router = Router();
-
 router.get("/", isAuthenticated, async (req, res) => {
   try {
     const course = await Course.findAll();
-    res.json(course);
+    res.status(200).json(course);
   } catch (error) {
     console.error(error);
+    res.status(500).send("Internal Server Error");
   }
 });
 
@@ -31,11 +33,19 @@ router.post("/player", isAuthenticated, async (req, res) => {
         {
           model: Section,
           as: "sections",
-          attributes: ["id", "cleanedName", "order"],
+          attributes: ["id", "cleanedName", "order", "duration"],
           include: {
             model: Lecture,
             as: "lectures",
-            attributes: ["id", "content", "type", "order", "cleanedName"],
+            attributes: [
+              "id",
+              "content",
+              "type",
+              "order",
+              "cleanedName",
+              "subtitles",
+              "duration",
+            ],
             include: {
               model: LectureProgress,
               as: "lectureprogresses",
@@ -77,11 +87,11 @@ const getCourseData = async (CourseId) => {
           {
             model: Section,
             as: "sections",
-            attributes: ["id", "cleanedName", "order"],
+            attributes: ["id", "cleanedName", "order", "duration"],
             include: {
               model: Lecture,
               as: "lectures",
-              attributes: ["id", "type", "order", "cleanedName"],
+              attributes: ["id", "type", "order", "cleanedName", "duration"],
             },
           },
           { model: Category, as: "category" },
@@ -96,7 +106,7 @@ const getCourseData = async (CourseId) => {
             "ASC",
           ],
         ],
-        attributes: ["id", "cleanedName", "description", "photo"],
+        attributes: ["id", "cleanedName", "description", "photo", "duration"],
       }),
       Category.findAll(),
       Instructor.findAll(),
@@ -115,8 +125,14 @@ const getCourseData = async (CourseId) => {
 router.post("/individual", isAuthenticated, async (req, res) => {
   try {
     const { CourseId } = req.body;
-    const courseData = await getCourseData(CourseId);
-    res.json({ ...courseData, role: req.user.role });
+    const cachedCourse = cache.get(CourseId);
+    if (cachedCourse) {
+      res.json({ ...cachedCourse, role: req.user.role });
+    } else {
+      const courseData = await getCourseData(CourseId);
+      cache.set(CourseId, courseData);
+      res.json({ ...courseData, role: req.user.role });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).send("Failed to fetch course data");
@@ -179,7 +195,49 @@ router.get("/stream/:LectureId", isAuthenticated, async (req, res) => {
     fs.createReadStream(videoPath).pipe(res);
   }
 });
+router.get("/download/:LectureId", isAuthenticated, async (req, res) => {
+  try {
+    const { LectureId } = req.params;
+    const lecture = await Lecture.findByPk(LectureId);
 
+    if (!lecture || !lecture.path) {
+      return res.status(404).send("File not found");
+    }
+    const filePath = lecture.path;
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send("File not found");
+    }
+
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const fileName = path.basename(filePath);
+    const fileExtension = path.extname(filePath).toLowerCase();
+
+    res.setHeader("Content-Length", fileSize);
+
+    if (fileExtension === ".pdf") {
+      res.setHeader("Content-Type", "application/pdf");
+    } else {
+      res.setHeader("Content-Type", "application/octet-stream");
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${fileName}"`
+      );
+    }
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    fileStream.on("error", (error) => {
+      console.error("Error streaming file:", error);
+      res.status(500).end();
+    });
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    res.status(500).send("Internal server error");
+  }
+});
 router.post(
   "/progress/lecturetogglecomplete",
   isAuthenticated,
@@ -234,4 +292,5 @@ router.post("/progress/watchtime", isAuthenticated, async (req, res) => {
     res.status(500);
   }
 });
+
 export default router;

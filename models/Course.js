@@ -14,6 +14,7 @@ const Course = sequelize.define("Course", {
   description: DataTypes.TEXT,
   instructorName: DataTypes.STRING,
   photo: DataTypes.STRING,
+  duration: DataTypes.FLOAT,
 });
 
 export default Course;

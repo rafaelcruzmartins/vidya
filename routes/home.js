@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/owner.js";
 import {
+  Category,
   Course,
   Lecture,
   TrackingSystem,
@@ -9,7 +10,7 @@ import {
 const router = Router();
 const getUserData = async (userId, featuredCourseId) => {
   try {
-    const [lastWatched, watchTime, featuredCourse, latestCourse] =
+    const [lastWatched, watchTime, featuredCourse, latestCourse, category] =
       await Promise.all([
         UserLastWatched.findAll({
           where: { UserId: userId },
@@ -22,19 +23,20 @@ const getUserData = async (userId, featuredCourseId) => {
             {
               model: Course,
               as: "course",
-              attributes: ["cleanedName", "id"],
+              attributes: ["cleanedName", "id", "photo"],
             },
           ],
         }),
         TrackingSystem.getCategoryWatchTime(userId),
         Course.findByPk(featuredCourseId, {
-          attributes: ["id", "title", "description"],
+          attributes: ["id", "title", "photo"],
         }),
         Course.findAll({
           order: [["createdAt", "DESC"]],
-          limit: 3,
-          attributes: ["id", "cleanedName", "instructorName"],
+          limit: 10,
+          attributes: ["id", "cleanedName", "photo"],
         }),
+        Category.findAll({ limit: 6 }),
       ]);
 
     return {
@@ -42,6 +44,7 @@ const getUserData = async (userId, featuredCourseId) => {
       categoryWatchTime: watchTime || {},
       featuredCourse: featuredCourse || null,
       latestCourse: latestCourse || [],
+      category: category || [],
 
       hasIncompleteData:
         !lastWatched || !watchTime || !featuredCourse || !latestCourse,

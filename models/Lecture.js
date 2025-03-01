@@ -15,6 +15,7 @@ const Lecture = sequelize.define("Lecture", {
   path: DataTypes.STRING,
   content: DataTypes.JSON,
   subtitles: DataTypes.JSON,
+  duration: DataTypes.FLOAT,
 });
 
 export default Lecture;
