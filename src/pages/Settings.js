@@ -29,54 +29,52 @@ const Settings = () => {
   };
 
   return (
-    <div className="main">
-      <div className="container">
-        <PreNav name="SETTINGS" />
-        <div className="settings-container">
-          <LayoutGroup>
-            <div className="settings-sidebar">
-              {tabs.map((tab) => (
-                <motion.div
-                  key={tab.id}
-                  className="sidebar-tab"
-                  onClick={() => handleTabChange(tab.id)}
-                  layout
-                >
-                  {tab.label}
-                  {activeTab === tab.id && (
-                    <motion.div
-                      layoutId="activeTab"
-                      className="active-indicator"
-                      transition={{
-                        type: "spring",
-                        bounce: 0.2,
-                        duration: 0.6,
-                      }}
-                    />
-                  )}
-                </motion.div>
-              ))}
-            </div>
-          </LayoutGroup>
-
-          <div className="settings-sidebar-info">
-            <AnimatePresence mode="wait">
+    <>
+      <PreNav name="SETTINGS" />
+      <div className="settings-container">
+        <LayoutGroup>
+          <div className="settings-sidebar">
+            {tabs.map((tab) => (
               <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.2 }}
+                key={tab.id}
+                className="sidebar-tab"
+                onClick={() => handleTabChange(tab.id)}
+                layout
               >
-                {activeTab === "profile" && <ProfileSettings />}
-                {activeTab === "display" && <DisplaySettings />}
-                {activeTab === "admin" && <Admin />}
+                {tab.label}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="activeTab"
+                    className="active-indicator"
+                    transition={{
+                      type: "spring",
+                      bounce: 0.2,
+                      duration: 0.6,
+                    }}
+                  />
+                )}
               </motion.div>
-            </AnimatePresence>
+            ))}
           </div>
+        </LayoutGroup>
+
+        <div className="settings-sidebar-info">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+            >
+              {activeTab === "profile" && <ProfileSettings />}
+              {activeTab === "display" && <DisplaySettings />}
+              {activeTab === "admin" && <Admin />}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

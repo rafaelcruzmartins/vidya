@@ -20,15 +20,11 @@ const Instructor = () => {
   }, []);
   return (
     <div>
-      <div className="main">
-        <div className="container">
-          <PreNav name={"INSTRUCTOR"} />
-          <div className="instructor-container">
-            {instructors.map((data) => (
-              <InstructorInfo data={data} key={data.id} />
-            ))}
-          </div>
-        </div>
+      <PreNav name={"INSTRUCTOR"} />
+      <div className="instructor-container">
+        {instructors.map((data) => (
+          <InstructorInfo data={data} key={data.id} />
+        ))}
       </div>
     </div>
   );

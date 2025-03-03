@@ -8,7 +8,7 @@ const Categories = () => {
   useEffect(() => {
     const fetchCategory = async () => {
       try {
-        const { data } = await axios.get("/api/category", {
+        const { data } = await axios.get("/api/category/-1", {
           withCredentials: true,
         });
         setCategoriesList(data);
@@ -17,19 +17,17 @@ const Categories = () => {
       }
     };
     fetchCategory();
-  });
+  }, []);
   return (
-    <div className="main">
-      <div className="container">
-        <PreNav name={"Categories"} />
+    <>
+      <PreNav name={"Categories"} />
 
-        <div className="categories-container">
-          {categoriesList.map((e) => (
-            <CategoriesInfo name={e.category} categoryId={e.id} />
-          ))}
-        </div>
+      <div className="categories-container">
+        {categoriesList.map((e) => (
+          <CategoriesInfo name={e.category} categoryId={e.id} />
+        ))}
       </div>
-    </div>
+    </>
   );
 };
 

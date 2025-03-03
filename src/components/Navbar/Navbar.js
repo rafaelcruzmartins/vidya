@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import React from "react";
 const Navbar = ({ navItem }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -16,13 +16,7 @@ const Navbar = ({ navItem }) => {
 
   return (
     <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3, ease: "easeInOut" }}
-        className="nav-bar"
-      >
+      <div className="nav-bar">
         {navItem &&
           navItem.map((cat) => (
             <div
@@ -37,9 +31,9 @@ const Navbar = ({ navItem }) => {
               <span className="nav-item-name">{cat.category}</span>
             </div>
           ))}
-      </motion.div>
+      </div>
     </>
   );
 };
 
-export default Navbar;
+export default React.memo(Navbar);

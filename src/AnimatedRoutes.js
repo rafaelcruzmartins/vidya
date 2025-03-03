@@ -12,28 +12,49 @@ import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Courses from "./pages/Courses";
+import { useState, useEffect } from "react";
+import axios from "./api/axiosInstance";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const [category, setCategory] = useState([]);
 
+  useEffect(() => {
+    const fetchCategory = async () => {
+      const { data } = await axios.get(
+        "/api/category/6",
+
+        { withCredentials: true }
+      );
+      setCategory(data);
+    };
+    fetchCategory();
+  }, []);
   return (
-    <AnimatePresence mode="wait">
-      <Routes location={location} key={location.pathname}>
-        <Route path="/login" element={<LogIn />} />
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/courses" element={<Courses />} />
-          <Route path="/category/:id" element={<CourseCategories />} />
-          <Route path="/course/play/:id" element={<Player />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/instructor" element={<Instructor />} />
-          <Route path="/settings/*" element={<Settings />} />
-          <Route path="/instructor/:id" element={<IndividualInstrucor />} />
-          <Route path="/courses/:id" element={<IndividualCourses />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-        </Route>
-      </Routes>
-    </AnimatePresence>
+    <div className="main">
+      <div className="container">
+        <AnimatePresence mode="wait">
+          <Routes location={location} key={location.pathname}>
+            <Route path="/login" element={<LogIn />} />
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<Home category={category} />} />
+              <Route path="/courses" element={<Courses />} />
+              <Route
+                path="/category/:id"
+                element={<CourseCategories category={category} />}
+              />
+              <Route path="/course/play/:id" element={<Player />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/instructor" element={<Instructor />} />
+              <Route path="/settings/*" element={<Settings />} />
+              <Route path="/instructor/:id" element={<IndividualInstrucor />} />
+              <Route path="/courses/:id" element={<IndividualCourses />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Route>
+          </Routes>
+        </AnimatePresence>
+      </div>
+    </div>
   );
 };
 

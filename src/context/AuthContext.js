@@ -1,6 +1,6 @@
 import axios from "../api/axiosInstance.js";
 import { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const AuthContext = createContext();
 
@@ -13,6 +13,10 @@ export const AuthProvider = ({ children }) => {
   const [toastType, setToastType] = useState("success");
 
   const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    setShowToast(false);
+  }, [location]);
   useEffect(() => {
     checkAuthStatus();
   }, []);

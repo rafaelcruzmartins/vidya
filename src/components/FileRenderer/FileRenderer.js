@@ -5,7 +5,7 @@ import "./FileRenderer.css";
 import {
   FileArchiveSolid,
   FileBlankSolid,
-  FileHtmlSolid,
+  Html,
   FilePdfSolid,
   World,
 } from "../../assets";
@@ -129,7 +129,7 @@ const FileRenderer = ({ fileType, fileSrc, fileName }) => {
             <div className="file-container">
               <div className="html-file-container">
                 <p className="file-container-html-warning">
-                  <FileHtmlSolid />
+                  <Html />
                   HTML File Preview:
                 </p>
 

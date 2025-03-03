@@ -58,63 +58,37 @@ const PreNav = ({ name }) => {
           <AnimatePresence>
             {!isRootPage && (
               <>
-                <motion.div
+                <div
                   key="back-button"
                   className="navbar-btn"
                   onClick={handleBack}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
                 >
                   <div className="svg-div">
                     <ArrowBack />
                   </div>
-                </motion.div>
-                <motion.div
+                </div>
+                <div
                   key="home-button"
                   className="navbar-btn"
                   onClick={handleHome}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.4 }}
                 >
                   <div className="svg-div">
                     <HomeAlt2 />
                   </div>
-                </motion.div>
+                </div>
               </>
             )}
           </AnimatePresence>
-          <motion.div
-            className="menu-bar navbar-btn"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-            onClick={toggleSidebar}
-          >
+          <div className="menu-bar navbar-btn" onClick={toggleSidebar}>
             <div className="svg-div">
               <Menu />
             </div>
-          </motion.div>
-          <motion.div
-            className="pre-nav-name"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            {name}
-          </motion.div>
+          </div>
+          <div className="pre-nav-name">{name}</div>
         </div>
-        <motion.div
-          className="search-bar"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
+        <div className="search-bar">
           <Search />
-        </motion.div>
+        </div>
         <div className="profile">
           <div className="svg-div">
             <User />

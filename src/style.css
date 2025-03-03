@@ -125,7 +125,7 @@ body {
   );
   border: 1px solid #ffffff;
   border-radius: 1rem;
-  min-height: 30vh;
+  min-height: 70vh;
   margin-top: 1rem;
 }
 
@@ -259,7 +259,7 @@ svg {
 
 .nav-bar {
   display: flex;
-  justify-content: space-between;
+  gap: 5%;
   margin: 2rem;
 }
 
@@ -491,6 +491,7 @@ img {
 }
 .home-card-divs {
   overflow-x: auto;
+  overflow-y: hidden;
   white-space: nowrap;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -630,9 +631,9 @@ img {
 
 .card-divs-wrap {
   display: flex;
-  justify-content: space-between;
-  margin: 1rem;
   flex-wrap: wrap;
+  gap: 1%;
+  margin: 1rem;
 }
 
 .card-divs-wrap .cards {
@@ -1873,12 +1874,52 @@ video::-moz-media-controls {
 }
 .lecture-title {
   margin: 0.6rem 0;
+  flex-grow: 1;
+}
+.lecture-content-time {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lecture-time {
+  opacity: 0.68;
+  font-size: 0.9rem;
+}
+.lecture-content {
+  margin-right: 1rem;
+}
+.content-button {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: rgb(0 0 0 / 10%);
+  color: inherit;
+  outline: none;
+  border: none;
+  border-radius: 0.5rem;
+  width: 5rem;
+  height: 2rem;
+  cursor: pointer;
+}
+.content-button:hover {
+  background: rgb(0 0 0 / 20%);
 }
 
-.lectures-container {
-  overflow: hidden;
+.content-dropdown {
+  position: absolute;
+  margin-top: 0.5rem;
+  background-color: white;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  right: 0%;
+  display: flex;
+  align-items: center;
+  gap: 5%;
 }
-
+.content-arrow {
+  width: 1rem;
+  height: 1rem;
+}
 .green {
   background: rgba(0, 166, 166, 0.4);
 }
@@ -2576,6 +2617,7 @@ video::-moz-media-controls {
   border: 1px solid #ffffff;
   border-radius: 1rem;
   padding: 1rem 3rem 1rem 2rem;
+  margin-bottom: 5rem;
 }
 
 .glass-button {

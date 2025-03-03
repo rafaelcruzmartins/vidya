@@ -27,32 +27,28 @@ const Courses = () => {
   }, []);
   return (
     <>
-      <div className="main">
-        <div className="container">
-          <PreNav name={"COURSES"} />
-          <AnimatePresence mode="wait">
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              className="card-divs-wrap"
-            >
-              {loading && <SkeletonLoader />}
-              {!loading &&
-                courses &&
-                courses.map((item, index) => (
-                  <Cards
-                    key={index}
-                    imgsrc={item?.photo}
-                    info={item.cleanedName}
-                    courseId={item.id}
-                  />
-                ))}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-      </div>
+      <PreNav name={"COURSES"} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: 20 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
+          className="card-divs-wrap"
+        >
+          {loading && <SkeletonLoader />}
+          {!loading &&
+            courses &&
+            courses.map((item, index) => (
+              <Cards
+                key={index}
+                imgsrc={item?.photo}
+                info={item.cleanedName}
+                courseId={item.id}
+              />
+            ))}
+        </motion.div>
+      </AnimatePresence>
     </>
   );
 };

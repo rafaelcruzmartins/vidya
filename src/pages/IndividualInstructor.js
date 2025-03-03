@@ -93,135 +93,130 @@ const IndividualInstrucor = () => {
           onClose={() => setShowToast(false)}
         />
       )}
-      <div className="main">
-        <div className="container">
-          <PreNav name={instructorsData?.name} />
-          <div className="course-instructor-info">
-            <div className="course-instructor-info-container">
-              <div className="top">
-                <div className="top-container">
-                  <div className="course-instructor-title">
-                    {instructorsData?.name}
-                    <div className="edit-information">
-                      {role && role === "admin" && (
-                        <div
-                          style={{ cursor: "pointer" }}
-                          className="svg-div"
-                          onClick={openModal}
-                        >
-                          <DotsVerticalRounded />
-                        </div>
-                      )}
+
+      <PreNav name={instructorsData?.name} />
+      <div className="course-instructor-info">
+        <div className="course-instructor-info-container">
+          <div className="top">
+            <div className="top-container">
+              <div className="course-instructor-title">
+                {instructorsData?.name}
+                <div className="edit-information">
+                  {role && role === "admin" && (
+                    <div
+                      style={{ cursor: "pointer" }}
+                      className="svg-div"
+                      onClick={openModal}
+                    >
+                      <DotsVerticalRounded />
                     </div>
-                  </div>
+                  )}
                 </div>
-              </div>
-              <div className="bottom">
-                <div className="bottom-container">
-                  <div>Courses : {instructorsData?.courses?.length}</div>
-                  <div className="description">
-                    <span class="drop-cap">Description : </span>
-                    {instructorsData?.description}
-                  </div>
-                  <div>Total Hours : 20Hr</div>
-                </div>
-              </div>
-              <div className="img-container instructor-info-image">
-                <img
-                  src={process.env.REACT_APP_API + instructorsData?.photo}
-                  alt=""
-                />
               </div>
             </div>
           </div>
-          <AnimatePresence>
-            {isModalOpen && (
-              <div className="modal-overlay">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  className="modal big-modal"
-                >
-                  <div className="edit-course-modal">
-                    <div className="edit-course-modal-inner">
-                      <div className="modal-heading">Edit Instructor</div>
-                      <div className="edit-course-form">
-                        <div className="course-title-edit">
-                          <div>Edit Title</div>
-                          <div className="modal-input-course-edit">
-                            <input
-                              onChange={(e) =>
-                                setInstructorTitle(e.target.value)
-                              }
-                              className="input"
-                              value={instructorTitle}
-                              type="text"
-                            />
-                          </div>
-                        </div>
-                        <div className="course-title-edit">
-                          <div>Edit Image</div>
-                          <div className="modal-input-course-edit">
-                            <input
-                              className="input"
-                              accept="image/*"
-                              type="file"
-                              onChange={handleFileChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="course-title-edit">
-                          <div>Edit Description</div>
-                          <div className="modal-input-description-edit">
-                            <textarea
-                              onChange={(e) =>
-                                setInstructorDescription(e.target.value)
-                              }
-                              value={instructorDescription}
-                            ></textarea>
-                          </div>
-                        </div>
+          <div className="bottom">
+            <div className="bottom-container">
+              <div>Courses : {instructorsData?.courses?.length}</div>
+              <div className="description">
+                <span class="drop-cap">Description : </span>
+                {instructorsData?.description}
+              </div>
+              <div>Total Hours : 20Hr</div>
+            </div>
+          </div>
+          <div className="img-container instructor-info-image">
+            <img
+              src={process.env.REACT_APP_API + instructorsData?.photo}
+              alt=""
+            />
+          </div>
+        </div>
+      </div>
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              className="modal big-modal"
+            >
+              <div className="edit-course-modal">
+                <div className="edit-course-modal-inner">
+                  <div className="modal-heading">Edit Instructor</div>
+                  <div className="edit-course-form">
+                    <div className="course-title-edit">
+                      <div>Edit Title</div>
+                      <div className="modal-input-course-edit">
+                        <input
+                          onChange={(e) => setInstructorTitle(e.target.value)}
+                          className="input"
+                          value={instructorTitle}
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div className="course-title-edit">
+                      <div>Edit Image</div>
+                      <div className="modal-input-course-edit">
+                        <input
+                          className="input"
+                          accept="image/*"
+                          type="file"
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="course-title-edit">
+                      <div>Edit Description</div>
+                      <div className="modal-input-description-edit">
+                        <textarea
+                          onChange={(e) =>
+                            setInstructorDescription(e.target.value)
+                          }
+                          value={instructorDescription}
+                        ></textarea>
                       </div>
                     </div>
                   </div>
-                  <div className="modal-buttons-group-user modal-buttons-group-edit-course">
-                    <motion.div
-                      className="modal-buttons"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{ color: "#00a6a6" }}
-                      onClick={handleUpload}
-                    >
-                      Save
-                    </motion.div>
-                    <motion.div
-                      className="modal-buttons"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{ color: "#45312d" }}
-                      onClick={closeModal}
-                    >
-                      Cancel
-                    </motion.div>
-                  </div>
+                </div>
+              </div>
+              <div className="modal-buttons-group-user modal-buttons-group-edit-course">
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#00a6a6" }}
+                  onClick={handleUpload}
+                >
+                  Save
+                </motion.div>
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#45312d" }}
+                  onClick={closeModal}
+                >
+                  Cancel
                 </motion.div>
               </div>
-            )}
-          </AnimatePresence>
-          <div className="courses">Courses</div>
-
-          <div className="card-divs-wrap">
-            {instructorsData?.courses?.map((data) => (
-              <Cards
-                imgsrc={data.photo}
-                info={data.cleanedName}
-                courseId={data.id}
-                key={data.id}
-              />
-            ))}
+            </motion.div>
           </div>
-        </div>
+        )}
+      </AnimatePresence>
+      <div className="courses">Courses</div>
+
+      <div className="card-divs-wrap">
+        {instructorsData?.courses?.map((data) => (
+          <Cards
+            imgsrc={data.photo}
+            info={data.cleanedName}
+            courseId={data.id}
+            key={data.id}
+          />
+        ))}
       </div>
     </>
   );

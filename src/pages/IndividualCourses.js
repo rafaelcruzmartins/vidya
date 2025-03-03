@@ -313,328 +313,323 @@ const IndividualCourses = () => {
           onClose={() => setShowToast(false)}
         />
       )}
-      <div className="main">
-        <div className="container">
-          <PreNav name={course?.cleanedName} />
-          <div className="course-instructor-info">
-            <div className="course-instructor-info-container">
-              <div className="top">
-                <div className="top-container">
-                  <div className="course-instructor-title">
-                    {course?.cleanedName || "Title Not Found"}
-                    {role === "admin" && (
-                      <div className="edit-information">
-                        <div
-                          title="Edit Instructor"
-                          style={{ cursor: "pointer" }}
-                          className="svg-div"
-                          onClick={openModal}
-                        >
-                          <DotsVerticalRounded />
-                        </div>
-                      </div>
-                    )}
+
+      <PreNav name={course?.cleanedName} />
+      <div className="course-instructor-info">
+        <div className="course-instructor-info-container">
+          <div className="top">
+            <div className="top-container">
+              <div className="course-instructor-title">
+                {course?.cleanedName || "Title Not Found"}
+                {role === "admin" && (
+                  <div className="edit-information">
+                    <div
+                      title="Edit Instructor"
+                      style={{ cursor: "pointer" }}
+                      className="svg-div"
+                      onClick={openModal}
+                    >
+                      <DotsVerticalRounded />
+                    </div>
                   </div>
-                </div>
-              </div>
-              <div className="bottom">
-                <div className="bottom-container">
-                  <div className="instructor-section">
-                    Instructors:
-                    {courseInstructors.map((instructor) => (
-                      <span
-                        onClick={() => navigate(`/instructor/${instructor.id}`)}
-                      >
-                        {" "}
-                        {instructor.name}
-                      </span>
-                    ))}
-                  </div>
-                  <div className="description">
-                    <span className="drop-cap">Description : </span>
-                    {course?.description}
-                  </div>
-                  <div> {secondsToHoursRounded(course?.duration)}</div>
-                  <div>Watched : 10Hr , 50% of 20Hr</div>
-                </div>
-              </div>
-              <div className="img-container course-info-image instructor-info-image">
-                <img src={process.env.REACT_APP_API + course?.photo} alt="" />
+                )}
               </div>
             </div>
           </div>
+          <div className="bottom">
+            <div className="bottom-container">
+              <div className="instructor-section">
+                Instructors:
+                {courseInstructors.map((instructor) => (
+                  <span
+                    onClick={() => navigate(`/instructor/${instructor.id}`)}
+                  >
+                    {" "}
+                    {instructor.name}
+                  </span>
+                ))}
+              </div>
+              <div className="description">
+                <span className="drop-cap">Description : </span>
+                {course?.description}
+              </div>
+              <div> {secondsToHoursRounded(course?.duration)}</div>
+              <div>Watched : 10Hr , 50% of 20Hr</div>
+            </div>
+          </div>
+          <div className="img-container course-info-image instructor-info-image">
+            <img src={process.env.REACT_APP_API + course?.photo} alt="" />
+          </div>
+        </div>
+      </div>
 
-          <AnimatePresence>
-            {isModalOpen && (
-              <div className="modal-overlay">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  className="modal big-modal"
-                >
-                  <div className="edit-course-modal">
-                    <div className="edit-course-modal-inner">
-                      <div className="modal-heading">Edit Course</div>
-                      <div className="edit-course-form">
-                        <div className="course-title-edit">
-                          <div>Edit Title</div>
-                          <div className="modal-input-course-edit">
-                            <input
-                              onChange={(e) => setCourseTitle(e.target.value)}
-                              className="input"
-                              value={courseTitle}
-                              type="text"
-                            />
-                          </div>
+      <AnimatePresence>
+        {isModalOpen && (
+          <div className="modal-overlay">
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              className="modal big-modal"
+            >
+              <div className="edit-course-modal">
+                <div className="edit-course-modal-inner">
+                  <div className="modal-heading">Edit Course</div>
+                  <div className="edit-course-form">
+                    <div className="course-title-edit">
+                      <div>Edit Title</div>
+                      <div className="modal-input-course-edit">
+                        <input
+                          onChange={(e) => setCourseTitle(e.target.value)}
+                          className="input"
+                          value={courseTitle}
+                          type="text"
+                        />
+                      </div>
+                    </div>
+                    <div className="course-title-edit">
+                      <div>Edit Image</div>
+                      <div className="modal-input-course-edit">
+                        <input
+                          className="input"
+                          accept="image/*"
+                          type="file"
+                          onChange={handleFileChange}
+                        />
+                      </div>
+                    </div>
+                    <div className="course-title-edit">
+                      <div className="add-categories">
+                        Category
+                        <div
+                          title="Add Categories"
+                          className="svg-div icon-plus"
+                          onClick={openAddCategoryModal}
+                        >
+                          <Plus />
                         </div>
-                        <div className="course-title-edit">
-                          <div>Edit Image</div>
-                          <div className="modal-input-course-edit">
-                            <input
-                              className="input"
-                              accept="image/*"
-                              type="file"
-                              onChange={handleFileChange}
-                            />
-                          </div>
-                        </div>
-                        <div className="course-title-edit">
-                          <div className="add-categories">
-                            Category
+                      </div>
+                      <div className="category-list">
+                        {courseCategory.map((e) => (
+                          <div key={e.id} className="single-category">
+                            {e.category}
                             <div
-                              title="Add Categories"
-                              className="svg-div icon-plus"
-                              onClick={openAddCategoryModal}
+                              className="svg-div"
+                              onClick={() => handleRemoveCategory(e)}
+                              style={{ cursor: "pointer" }}
                             >
-                              <Plus />
+                              <TrashAltSolid />
                             </div>
                           </div>
-                          <div className="category-list">
-                            {courseCategory.map((e) => (
-                              <div key={e.id} className="single-category">
-                                {e.category}
-                                <div
-                                  className="svg-div"
-                                  onClick={() => handleRemoveCategory(e)}
-                                  style={{ cursor: "pointer" }}
-                                >
-                                  <TrashAltSolid />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                        <div className="course-title-edit">
-                          <div className="add-instructors">
-                            Instructors
-                            <div
-                              title="Add Instructors"
-                              className="svg-div icon-plus"
-                              onClick={openAddInstructorModal}
-                            >
-                              <Plus />
-                            </div>
-                          </div>
-                          <div className="instructor-list">
-                            {courseInstructors.map((instructor) => (
-                              <div
-                                key={instructor.id}
-                                className="single-instructor"
-                              >
-                                {instructor.name}
-                                <div
-                                  className="svg-div"
-                                  onClick={() =>
-                                    handleRemoveInstructor(instructor)
-                                  }
-                                  style={{ cursor: "pointer" }}
-                                >
-                                  <TrashAltSolid />
-                                </div>
-                              </div>
-                            ))}
-                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="course-title-edit">
+                      <div className="add-instructors">
+                        Instructors
+                        <div
+                          title="Add Instructors"
+                          className="svg-div icon-plus"
+                          onClick={openAddInstructorModal}
+                        >
+                          <Plus />
                         </div>
                       </div>
-                    </div>
-                  </div>
-                  <div className="modal-buttons-group-user modal-buttons-group-edit-course">
-                    <motion.div
-                      className="modal-buttons"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{ color: "#00a6a6" }}
-                      onClick={handleUpload}
-                    >
-                      Save
-                    </motion.div>
-                    <motion.div
-                      className="modal-buttons"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                      style={{ color: "#45312d" }}
-                      onClick={closeModal}
-                    >
-                      Cancel
-                    </motion.div>
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {isAddCategoryModalOpen && (
-              <div className="modal-overlay add-category-overlay">
-                <motion.div
-                  className="list-modal"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  ref={addCategoryRef}
-                >
-                  <div className="select-category-instructor-group">
-                    <div className="select-category-instructor">
-                      Select Category
-                    </div>
-                    <div
-                      onClick={closeAddCategoryModal}
-                      style={{ cursor: "pointer" }}
-                      className="close-button"
-                    >
-                      <div className="svg-div">
-                        <X />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="add-category-instructor-input">
-                    <input
-                      type="text"
-                      onChange={(e) => setnewCategoryInput(e.target.value)}
-                      value={newCategoryInput}
-                      onKeyDown={handleKeyDown}
-                      placeholder="create new category"
-                    />
-                    <div
-                      className="svg-div "
-                      style={{ cursor: "pointer" }}
-                      onClick={addNewQuickCategory}
-                    >
-                      <PlusCircle />
-                    </div>
-                  </div>
-                  <div className="list-modal-wrap">
-                    {categoriesList.map((e) => (
-                      <div
-                        key={e.id}
-                        className="single-add-category"
-                        onClick={() => handleAddCategory(e)}
-                      >
-                        {e.category}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {isAddInstructorModalOpen && (
-              <div className="modal-overlay add-instructor-overlay">
-                <motion.div
-                  className="list-modal"
-                  initial={{ opacity: 0, scale: 0 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0 }}
-                  ref={addInstructorRef}
-                >
-                  <div className="select-category-instructor-group">
-                    <div className="select-category-instructor">
-                      Select Instructor
-                    </div>
-                    <div
-                      onClick={closeAddInstructorModal}
-                      style={{ cursor: "pointer" }}
-                      className="close-button"
-                    >
-                      <div className="svg-div">
-                        <X />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="add-category-instructor-input">
-                    <input
-                      type="text"
-                      onChange={(e) => setnewInstructorInput(e.target.value)}
-                      value={newInstructorInput}
-                      onKeyDown={handleKeyDownInstructor}
-                      placeholder="create new instructor"
-                    />
-                    <div
-                      className="svg-div"
-                      style={{ cursor: "pointer" }}
-                      onClick={addNewQuickInstructor}
-                    >
-                      <PlusCircle />
-                    </div>
-                  </div>
-                  <div className="list-modal-wrap">
-                    {instructorList.map((instructor) => (
-                      <div
-                        key={instructor.id}
-                        className="single-add-instructor"
-                        onClick={() => handleAddInstructor(instructor)}
-                      >
-                        {instructor.name}
-                      </div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            )}
-          </AnimatePresence>
-
-          <div className="content-heading">Course Content</div>
-          <div className="course-content">
-            <div className="course-section">
-              <div className="section-list">
-                {" "}
-                {course?.sections.map((section) => (
-                  <div key={section.id} className="section-item-course">
-                    <SectionHeader
-                      sectionOrder={section.order}
-                      title={section.cleanedName}
-                      hasLectures={section.lectures.length > 0}
-                      isExpanded={expandedSections.has(section.id)}
-                      onToggle={() => toggleSection(section.id)}
-                    />
-                    <AnimatePresence>
-                      {expandedSections.has(section.id) &&
-                        section.lectures.length > 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="lectures-container"
+                      <div className="instructor-list">
+                        {courseInstructors.map((instructor) => (
+                          <div
+                            key={instructor.id}
+                            className="single-instructor"
                           >
-                            {section.lectures.map((lecture) => (
-                              <LectureItem
-                                key={lecture.id}
-                                lectureId={lecture.id}
-                                lectureOrder={lecture.order}
-                                sectionOrder={section.order}
-                                title={lecture.cleanedName}
-                              />
-                            ))}
-                          </motion.div>
-                        )}
-                    </AnimatePresence>
+                            {instructor.name}
+                            <div
+                              className="svg-div"
+                              onClick={() => handleRemoveInstructor(instructor)}
+                              style={{ cursor: "pointer" }}
+                            >
+                              <TrashAltSolid />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-buttons-group-user modal-buttons-group-edit-course">
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#00a6a6" }}
+                  onClick={handleUpload}
+                >
+                  Save
+                </motion.div>
+                <motion.div
+                  className="modal-buttons"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  style={{ color: "#45312d" }}
+                  onClick={closeModal}
+                >
+                  Cancel
+                </motion.div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAddCategoryModalOpen && (
+          <div className="modal-overlay add-category-overlay">
+            <motion.div
+              className="list-modal"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              ref={addCategoryRef}
+            >
+              <div className="select-category-instructor-group">
+                <div className="select-category-instructor">
+                  Select Category
+                </div>
+                <div
+                  onClick={closeAddCategoryModal}
+                  style={{ cursor: "pointer" }}
+                  className="close-button"
+                >
+                  <div className="svg-div">
+                    <X />
+                  </div>
+                </div>
+              </div>
+              <div className="add-category-instructor-input">
+                <input
+                  type="text"
+                  onChange={(e) => setnewCategoryInput(e.target.value)}
+                  value={newCategoryInput}
+                  onKeyDown={handleKeyDown}
+                  placeholder="create new category"
+                />
+                <div
+                  className="svg-div "
+                  style={{ cursor: "pointer" }}
+                  onClick={addNewQuickCategory}
+                >
+                  <PlusCircle />
+                </div>
+              </div>
+              <div className="list-modal-wrap">
+                {categoriesList.map((e) => (
+                  <div
+                    key={e.id}
+                    className="single-add-category"
+                    onClick={() => handleAddCategory(e)}
+                  >
+                    {e.category}
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isAddInstructorModalOpen && (
+          <div className="modal-overlay add-instructor-overlay">
+            <motion.div
+              className="list-modal"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0 }}
+              ref={addInstructorRef}
+            >
+              <div className="select-category-instructor-group">
+                <div className="select-category-instructor">
+                  Select Instructor
+                </div>
+                <div
+                  onClick={closeAddInstructorModal}
+                  style={{ cursor: "pointer" }}
+                  className="close-button"
+                >
+                  <div className="svg-div">
+                    <X />
+                  </div>
+                </div>
+              </div>
+              <div className="add-category-instructor-input">
+                <input
+                  type="text"
+                  onChange={(e) => setnewInstructorInput(e.target.value)}
+                  value={newInstructorInput}
+                  onKeyDown={handleKeyDownInstructor}
+                  placeholder="create new instructor"
+                />
+                <div
+                  className="svg-div"
+                  style={{ cursor: "pointer" }}
+                  onClick={addNewQuickInstructor}
+                >
+                  <PlusCircle />
+                </div>
+              </div>
+              <div className="list-modal-wrap">
+                {instructorList.map((instructor) => (
+                  <div
+                    key={instructor.id}
+                    className="single-add-instructor"
+                    onClick={() => handleAddInstructor(instructor)}
+                  >
+                    {instructor.name}
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <div className="content-heading">Course Content</div>
+      <div className="course-content">
+        <div className="course-section">
+          <div className="section-list">
+            {" "}
+            {course?.sections.map((section) => (
+              <div key={section.id} className="section-item-course">
+                <SectionHeader
+                  sectionOrder={section.order}
+                  title={section.cleanedName}
+                  hasLectures={section.lectures.length > 0}
+                  isExpanded={expandedSections.has(section.id)}
+                  onToggle={() => toggleSection(section.id)}
+                />
+                <AnimatePresence>
+                  {expandedSections.has(section.id) &&
+                    section.lectures.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="lectures-container"
+                      >
+                        {section.lectures.map((lecture) => (
+                          <LectureItem
+                            key={lecture.id}
+                            lectureId={lecture.id}
+                            lectureOrder={lecture.order}
+                            sectionOrder={section.order}
+                            title={lecture.cleanedName}
+                          />
+                        ))}
+                      </motion.div>
+                    )}
+                </AnimatePresence>
+              </div>
+            ))}
           </div>
         </div>
       </div>

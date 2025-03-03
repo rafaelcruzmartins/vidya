@@ -16,7 +16,7 @@ import {
   Circle,
   FileArchiveSolid,
   FileBlankSolid,
-  FileHtmlSolid,
+  Html,
   FilePdfSolid,
   SkeletonLoader,
   VideoSolid,
@@ -28,10 +28,13 @@ const ICON_MAP = {
   video: <VideoSolid />,
   pdf: <FilePdfSolid />,
   zip: <FileArchiveSolid />,
-  html: <FileHtmlSolid />,
+  html: <Html />,
   url: <World />,
 };
-
+const secondsToHoursRounded = (seconds) => {
+  const minutes = (seconds / 60).toFixed(1);
+  return `${minutes}min`;
+};
 const LectureTypeIcon = memo(({ type }) => {
   return ICON_MAP[type.toLowerCase()] || <FileBlankSolid />;
 });
@@ -43,13 +46,14 @@ const SectionHeader = memo(
     isExpanded,
     onToggle,
     isSectionCompleted,
+    duration,
   }) => (
     <div
       onClick={onToggle}
       className={`section-header ${isSectionCompleted ? "green" : ""}`}
     >
       <span className="playlist-section-title">
-        {sectionOrder}: {title}
+        {sectionOrder}: {title} - {secondsToHoursRounded(duration)}
       </span>
       {hasLectures && (
         <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
@@ -74,39 +78,100 @@ const LectureItem = memo(
     nowPlaying,
     sectionOrder,
     type,
-  }) => (
-    <div
-      ref={(el) => (lectureRef.current[lectureId] = el)}
-      onClick={(e) => {
-        e.stopPropagation();
+    duration,
+    content,
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
 
-        handleNowPlaying(lectureId);
-      }}
-      className={`playlist-lecture-item ${
-        lectureId === nowPlaying ? "now-playing" : ""
-      }`}
-    >
-      <span
-        className="checkbox"
+    const toggleDropdown = () => setIsOpen(!isOpen);
+
+    return (
+      <div
+        ref={(el) => (lectureRef.current[lectureId] = el)}
         onClick={(e) => {
           e.stopPropagation();
-          onToggle(lectureId);
+
+          handleNowPlaying(lectureId);
         }}
+        className={`playlist-lecture-item ${
+          lectureId === nowPlaying ? "now-playing" : ""
+        }`}
       >
-        <div className="svg-div">
-          {isCompleted ? <CheckCircleSolid /> : <Circle />}
+        <span
+          className="checkbox"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggle(lectureId);
+          }}
+        >
+          <div className="svg-div">
+            {isCompleted ? <CheckCircleSolid /> : <Circle />}
+          </div>
+        </span>
+        <span className="type-icon">
+          <div className="svg-div">
+            <LectureTypeIcon type={type} />
+          </div>
+        </span>
+        <div className="lecture-title">
+          {sectionOrder}.{lectureOrder}: {title}
+          <div className="lecture-content-time">
+            <div className="lecture-time">
+              {type === "video" && secondsToHoursRounded(duration)}
+            </div>
+            {content?.[0]?.type && (
+              <div className="lecture-content">
+                <button
+                  className="content-button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    toggleDropdown();
+                  }}
+                >
+                  <span>Content</span>
+                  <svg
+                    className="content-arrow"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {isOpen && (
+                  <div className="content-dropdown">
+                    <span>
+                      <LectureTypeIcon type={content?.[0]?.type} />
+                    </span>
+                    <a
+                      href={
+                        process.env.REACT_APP_API +
+                        "/api/course/content/" +
+                        content?.[0]?.pathId
+                      }
+                      download
+                      target="_blank"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                    >
+                      {content?.[0]?.originalName}
+                    </a>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </span>
-      <span className="type-icon">
-        <div className="svg-div">
-          <LectureTypeIcon type={type} />
-        </div>
-      </span>
-      <span className="lecture-title">
-        {sectionOrder}.{lectureOrder}: {title}
-      </span>
-    </div>
-  )
+      </div>
+    );
+  }
 );
 
 const Player = () => {
@@ -384,77 +449,78 @@ const Player = () => {
   }
 
   return (
-    <div className="main">
-      <div className="container">
-        <PreNav name={courseData?.cleanedName} />
-        <div className="player-container">
-          {lectureDictionary[nowPlaying]?.type &&
-          lectureDictionary[nowPlaying]?.type === "video" ? (
-            <VideoPlayer
-              videoSource={currentVideo}
-              initialVideoProgress={initialVideoProgress}
-              onPlayRequest={playRequest}
-              onVideoEnd={handleVideoEnd}
-              onNextVideo={handleVideoNext}
-              onPreviousVideo={handleVideoPrev}
-              isNextVideo={isNextVideo}
-              isPrevVideo={isPrevVideo}
-              handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
-              LectureId={nowPlaying}
-              CourseId={id}
-            />
-          ) : (
-            <FileRenderer
-              fileType={lectureDictionary?.[nowPlaying]?.type}
-              fileSrc={currentVideo}
-              fileName={lectureDictionary[nowPlaying]?.cleanedName}
-            />
-          )}
+    <>
+      <PreNav name={courseData?.cleanedName} />
+      <div className="player-container">
+        {lectureDictionary[nowPlaying]?.type &&
+        lectureDictionary[nowPlaying]?.type === "video" ? (
+          <VideoPlayer
+            videoSource={currentVideo}
+            initialVideoProgress={initialVideoProgress}
+            onPlayRequest={playRequest}
+            onVideoEnd={handleVideoEnd}
+            onNextVideo={handleVideoNext}
+            onPreviousVideo={handleVideoPrev}
+            isNextVideo={isNextVideo}
+            isPrevVideo={isPrevVideo}
+            handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
+            LectureId={nowPlaying}
+            CourseId={id}
+          />
+        ) : (
+          <FileRenderer
+            fileType={lectureDictionary?.[nowPlaying]?.type}
+            fileSrc={currentVideo}
+            fileName={lectureDictionary[nowPlaying]?.cleanedName}
+          />
+        )}
 
-          <div className="playlist-container">
-            {courseData?.sections.map((section) => (
-              <div key={section.id} className="section-item">
-                <SectionHeader
-                  sectionOrder={section.order}
-                  title={section.cleanedName}
-                  hasLectures={section.lectures.length > 0}
-                  isSectionCompleted={completedSections.has(section.id)}
-                  isExpanded={expandedSections.has(section.id)}
-                  onToggle={() => toggleSection(section.id)}
-                />
-                <AnimatePresence>
-                  {expandedSections.has(section.id) &&
-                    section.lectures.length > 0 && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: "auto" }}
-                        exit={{ opacity: 0, height: 0 }}
-                        className="lectures-container"
-                      >
-                        {section.lectures.map((lecture) => (
-                          <LectureItem
-                            key={lecture.id}
-                            lectureId={lecture.id}
-                            lectureOrder={lecture.order}
-                            sectionOrder={section.order}
-                            title={lecture.cleanedName}
-                            isCompleted={completedLectures.has(lecture.id)}
-                            nowPlaying={nowPlaying}
-                            handleNowPlaying={handleNowPlaying}
-                            onToggle={toggleLecture}
-                            lectureRef={lectureRef}
-                            type={lecture.type}
-                          />
-                        ))}
-                      </motion.div>
-                    )}
-                </AnimatePresence>
-              </div>
-            ))}
-          </div>
+        <div className="playlist-container">
+          {courseData?.sections.map((section) => (
+            <div key={section.id} className="section-item">
+              <SectionHeader
+                sectionOrder={section.order}
+                title={section.cleanedName}
+                hasLectures={section.lectures.length > 0}
+                isSectionCompleted={completedSections.has(section.id)}
+                isExpanded={expandedSections.has(section.id)}
+                duration={section.duration}
+                onToggle={() => toggleSection(section.id)}
+              />
+              <AnimatePresence>
+                {expandedSections.has(section.id) &&
+                  section.lectures.length > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="lectures-container"
+                    >
+                      {section.lectures.map((lecture) => (
+                        <LectureItem
+                          key={lecture.id}
+                          lectureId={lecture.id}
+                          lectureOrder={lecture.order}
+                          sectionOrder={section.order}
+                          title={lecture.cleanedName}
+                          isCompleted={completedLectures.has(lecture.id)}
+                          nowPlaying={nowPlaying}
+                          handleNowPlaying={handleNowPlaying}
+                          onToggle={toggleLecture}
+                          lectureRef={lectureRef}
+                          type={lecture.type}
+                          duration={lecture.duration}
+                          content={lecture.content}
+                        />
+                      ))}
+                    </motion.div>
+                  )}
+              </AnimatePresence>
+            </div>
+          ))}
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
