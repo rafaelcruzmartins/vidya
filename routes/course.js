@@ -10,6 +10,7 @@ import {
   TrackingSystem,
   UserLastWatched,
   Instructor,
+  PathFile,
 } from "../models/index.js";
 import fs from "fs";
 import path from "path";
@@ -225,6 +226,42 @@ router.get("/download/:LectureId", isAuthenticated, async (req, res) => {
         `attachment; filename="${fileName}"`
       );
     }
+
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+
+    fileStream.on("error", (error) => {
+      console.error("Error streaming file:", error);
+      res.status(500).end();
+    });
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+router.get("/content/:contentId", isAuthenticated, async (req, res) => {
+  try {
+    const { contentId } = req.params;
+    const content = await PathFile.findByPk(contentId);
+
+    if (!content || !content.path) {
+      return res.status(404).send("File not found");
+    }
+    const filePath = content.path;
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send("File not found");
+    }
+
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const fileName = path.basename(filePath);
+    const fileExtension = path.extname(filePath).toLowerCase();
+
+    res.setHeader("Content-Length", fileSize);
+
+    res.setHeader("Content-Type", "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
 
     const fileStream = fs.createReadStream(filePath);
     fileStream.pipe(res);

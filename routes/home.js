@@ -10,7 +10,7 @@ import {
 const router = Router();
 const getUserData = async (userId, featuredCourseId) => {
   try {
-    const [lastWatched, watchTime, featuredCourse, latestCourse, category] =
+    const [lastWatched, watchTime, featuredCourse, latestCourse] =
       await Promise.all([
         UserLastWatched.findAll({
           where: { UserId: userId },
@@ -36,7 +36,6 @@ const getUserData = async (userId, featuredCourseId) => {
           limit: 10,
           attributes: ["id", "cleanedName", "photo"],
         }),
-        Category.findAll({ limit: 6 }),
       ]);
 
     return {
@@ -44,7 +43,6 @@ const getUserData = async (userId, featuredCourseId) => {
       categoryWatchTime: watchTime || {},
       featuredCourse: featuredCourse || null,
       latestCourse: latestCourse || [],
-      category: category || [],
 
       hasIncompleteData:
         !lastWatched || !watchTime || !featuredCourse || !latestCourse,
