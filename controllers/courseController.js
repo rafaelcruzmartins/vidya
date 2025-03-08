@@ -389,12 +389,150 @@ const syncCourseDirectory = async (coursedirectory) => {
         };
       });
 
+      const languageMap = {
+        afrikaans: "af",
+        albanian: "sq",
+        amharic: "am",
+        arabic: "ar",
+        armenian: "hy",
+        assamese: "as",
+        azerbaijani: "az",
+        bambara: "bm",
+        basque: "eu",
+        belarusian: "be",
+        bengali: "bn",
+        bosnian: "bs",
+        bulgarian: "bg",
+        burmese: "my",
+        catalan: "ca",
+        cebuano: "ceb",
+        chichewa: "ny",
+        chinese: "zh",
+        corsican: "co",
+        croatian: "hr",
+        czech: "cs",
+        danish: "da",
+        dhivehi: "dv",
+        dutch: "nl",
+        english: "en",
+        esperanto: "eo",
+        estonian: "et",
+        ewe: "ee",
+        filipino: "fil",
+        finnish: "fi",
+        french: "fr",
+        frisian: "fy",
+        galician: "gl",
+        georgian: "ka",
+        german: "de",
+        greek: "el",
+        gujarati: "gu",
+        "haitian creole": "ht",
+        hausa: "ha",
+        hawaiian: "haw",
+        hebrew: "he",
+        hindi: "hi",
+        hmong: "hmn",
+        hungarian: "hu",
+        icelandic: "is",
+        igbo: "ig",
+        indonesian: "id",
+        irish: "ga",
+        italian: "it",
+        japanese: "ja",
+        javanese: "jv",
+        kannada: "kn",
+        kazakh: "kk",
+        khmer: "km",
+        kinyarwanda: "rw",
+        korean: "ko",
+        krio: "kri",
+        kurdish: "ku",
+        kyrgyz: "ky",
+        lao: "lo",
+        latin: "la",
+        latvian: "lv",
+        lithuanian: "lt",
+        luxembourgish: "lb",
+        macedonian: "mk",
+        malagasy: "mg",
+        malay: "ms",
+        malayalam: "ml",
+        maltese: "mt",
+        maori: "mi",
+        marathi: "mr",
+        mongolian: "mn",
+        nepali: "ne",
+        norwegian: "no",
+        odia: "or",
+        oriya: "or",
+        pashto: "ps",
+        persian: "fa",
+        polish: "pl",
+        portuguese: "pt",
+        punjabi: "pa",
+        romanian: "ro",
+        russian: "ru",
+        samoan: "sm",
+        "scottish gaelic": "gd",
+        serbian: "sr",
+        sesotho: "st",
+        shona: "sn",
+        sindhi: "sd",
+        sinhala: "si",
+        slovak: "sk",
+        slovenian: "sl",
+        somali: "so",
+        spanish: "es",
+        sundanese: "su",
+        swahili: "sw",
+        swedish: "sv",
+        tagalog: "tl",
+        tajik: "tg",
+        tamil: "ta",
+        telugu: "te",
+        thai: "th",
+        turkish: "tr",
+        ukrainian: "uk",
+        urdu: "ur",
+        uyghur: "ug",
+        uzbek: "uz",
+        vietnamese: "vi",
+        welsh: "cy",
+        xhosa: "xh",
+        yiddish: "yi",
+        yoruba: "yo",
+        zulu: "zu",
+        "simplified chinese": "zh",
+      };
+
       const subtitles = group.subtitles.map((f) => {
         const subtitlePath = path.join(sectionPath, f);
         const subtitlePathId = pathCache.getPathId(subtitlePath);
-        const langMatch = f.match(/\.([a-z]{2})\./i);
+
+        const langMatch = f.match(/(?:[\s_\-]+)([A-Za-z\s]+)(?=\.[a-z]{3}$)/i);
+        let detectedLang = "en";
+
+        if (langMatch) {
+          const rawLang = langMatch[1]
+            .toLowerCase()
+            .replace(/\s+/g, " ")
+            .trim();
+
+          if (languageMap[rawLang]) {
+            detectedLang = languageMap[rawLang];
+          } else if (/^[a-z]{2}$/.test(rawLang)) {
+            detectedLang = rawLang;
+          } else {
+            const matchedKey = Object.keys(languageMap).find((key) =>
+              rawLang.includes(key)
+            );
+            detectedLang = matchedKey ? languageMap[matchedKey] : "en";
+          }
+        }
+
         return {
-          language: langMatch ? langMatch[1] : "en",
+          language: detectedLang,
           pathId: subtitlePathId,
           type: path.extname(f).replace(".", ""),
           originalName: f,

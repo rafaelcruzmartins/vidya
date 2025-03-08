@@ -46,6 +46,7 @@ const User = sequelize.define("User", {
     defaultValue: "user",
   },
   featuredCourse: DataTypes.STRING,
+  deflang: DataTypes.STRING,
 });
 
 export default User;

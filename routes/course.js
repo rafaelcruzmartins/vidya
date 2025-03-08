@@ -11,10 +11,31 @@ import {
   UserLastWatched,
   Instructor,
   PathFile,
+  User,
 } from "../models/index.js";
-import fs from "fs";
+import fs, { promises as fsp } from "fs";
 import path from "path";
 const router = Router();
+const convertSRTToWebVTT = (srtContent) => {
+  return [
+    "WEBVTT\n",
+    ...srtContent
+      .trim()
+      .replace(/\r\n/g, "\n")
+      .split(/\n{2,}/)
+      .map((cue) => {
+        const lines = cue.split("\n").filter((l) => l.trim());
+        if (lines.length < 3) return null;
+        const timecode = lines[1]
+          .replace(/,/g, ".")
+          .replace(/(\d+:\d+:\d+).(\d+)/g, "$1.$2")
+          .replace(/ /g, "");
+        return `${timecode}\n${lines.slice(2).join("\n")}`;
+      })
+      .filter(Boolean),
+  ].join("\n\n");
+};
+
 router.get("/", isAuthenticated, async (req, res) => {
   try {
     const course = await Course.findAll();
@@ -74,8 +95,8 @@ router.post("/player", isAuthenticated, async (req, res) => {
       ],
       attributes: ["id", "cleanedName", "description"],
     });
-
-    res.json(courseData);
+    const deflang = { deflang: req.user.deflang };
+    res.json([courseData, deflang]);
   } catch (error) {
     console.error(error);
   }
@@ -123,6 +144,7 @@ const getCourseData = async (CourseId) => {
     throw new Error("Failed to fetch course data");
   }
 };
+
 router.post("/individual", isAuthenticated, async (req, res) => {
   try {
     const { CourseId } = req.body;
@@ -256,10 +278,8 @@ router.get("/content/:contentId", isAuthenticated, async (req, res) => {
     const stat = fs.statSync(filePath);
     const fileSize = stat.size;
     const fileName = path.basename(filePath);
-    const fileExtension = path.extname(filePath).toLowerCase();
 
     res.setHeader("Content-Length", fileSize);
-
     res.setHeader("Content-Type", "application/octet-stream");
     res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
 
@@ -270,6 +290,39 @@ router.get("/content/:contentId", isAuthenticated, async (req, res) => {
       console.error("Error streaming file:", error);
       res.status(500).end();
     });
+  } catch (error) {
+    console.error("Error downloading file:", error);
+    res.status(500).send("Internal server error");
+  }
+});
+router.get("/subtitle/:subtitleId", async (req, res) => {
+  try {
+    const { subtitleId } = req.params;
+    const subtitle = await PathFile.findByPk(subtitleId);
+
+    if (!subtitle || !subtitle.path) {
+      return res.status(404).send("File not found");
+    }
+    const filePath = subtitle.path;
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).send("File not found");
+    }
+
+    const fileExtension = path.extname(filePath).toLowerCase();
+
+    res.setHeader("Content-Type", "text/vtt");
+    if (fileExtension === ".srt") {
+      const srtContent = await fsp.readFile(filePath, "utf8");
+      const webVTTContent = convertSRTToWebVTT(srtContent);
+      res.send(webVTTContent);
+    } else {
+      res.sendFile(filePath, (err) => {
+        if (err) {
+          res.status(404).send("Subtitle not found");
+        }
+      });
+    }
   } catch (error) {
     console.error("Error downloading file:", error);
     res.status(500).send("Internal server error");
@@ -329,5 +382,16 @@ router.post("/progress/watchtime", isAuthenticated, async (req, res) => {
     res.status(500);
   }
 });
-
+router.post("/subtitle/preference", isAuthenticated, async (req, res) => {
+  const userId = req.user.id;
+  const { language } = req.body;
+  try {
+    const user = await User.findByPk(userId);
+    await user.update({ deflang: language });
+    res.status(204).send("Subtitle preference updated successfully");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("internal server error");
+  }
+});
 export default router;

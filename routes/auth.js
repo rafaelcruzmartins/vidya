@@ -11,9 +11,14 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/user", (req, res) => {
-  req.user
-    ? res.json({ id: req.user.id, username: req.user.username })
-    : res.status(401).json({ error: "Not authenticated" });
+  try {
+    req.user
+      ? res.json({ id: req.user.id, username: req.user.username })
+      : res.status(401).json({ error: "Not authenticated" });
+  } catch (error) {
+    res.status(500).send("internal server error");
+    console.error(error);
+  }
 });
 
 export default router;

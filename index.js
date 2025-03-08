@@ -77,7 +77,10 @@ passport.deserializeUser(async (id, done) => {
     const user = await User.findByPk(id);
     done(null, user);
   } catch (error) {
-    done(error);
+    console.error(error);
+    const serverError = new Error("Internal server error");
+    serverError.status = 500;
+    done(serverError);
   }
 });
 
