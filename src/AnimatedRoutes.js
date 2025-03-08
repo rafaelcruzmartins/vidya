@@ -21,12 +21,16 @@ const AnimatedRoutes = () => {
 
   useEffect(() => {
     const fetchCategory = async () => {
-      const { data } = await axios.get(
-        "/api/category/6",
+      try {
+        const { data } = await axios.get(
+          "/api/category/6",
 
-        { withCredentials: true }
-      );
-      setCategory(data);
+          { withCredentials: true }
+        );
+        setCategory(data);
+      } catch (error) {
+        console.error(error);
+      }
     };
     fetchCategory();
   }, []);

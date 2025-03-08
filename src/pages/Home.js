@@ -89,7 +89,9 @@ const Home = ({ category }) => {
                     process.env.REACT_APP_API +
                       (!homeData.featuredCourse === null
                         ? homeData.featuredCourse.photo
-                        : homeData.latestCourse[1].photo)
+                        : homeData.latestCourse[1].photo === null
+                        ? "/assets/placeholder.avif"
+                        : "")
                   }
                   alt=""
                 />
@@ -153,7 +155,11 @@ const Home = ({ category }) => {
               homeData.continueWatching.map((item, index) => (
                 <ContinueWatching
                   key={index}
-                  imgsrc={item.course.photo}
+                  imgsrc={
+                    item.course.photo === null
+                      ? "/assets/placeholder.avif"
+                      : item.course.photo
+                  }
                   lectureName={item.lecture.cleanedName}
                   courseId={item.course.id}
                   courseName={item.course.cleanedName}
@@ -179,7 +185,11 @@ const Home = ({ category }) => {
               homeData.latestCourse.map((item, index) => (
                 <Cards
                   key={index}
-                  imgsrc={item.photo}
+                  imgsrc={
+                    item.photo === null
+                      ? "/assets/placeholder.avif"
+                      : item.photo
+                  }
                   info={item.cleanedName}
                   courseId={item.id}
                 />

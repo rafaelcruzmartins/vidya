@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import axios from "../api/axiosInstance.js";
 import PreNav from "../components/Navbar/PreNav";
-import VideoPlayer from "../components/VideoPlayer/VideoPlayer";
+import VideoPlayer from "../components/VideoPlayer/VideoPlayer.js";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   CheckCircleSolid,
@@ -184,10 +184,12 @@ const Player = () => {
   const [expandedSections, setExpandedSections] = useState(new Set([0]));
   const [completedLectures, setCompletedLectures] = useState(new Set([]));
   const [completedSections, setCompletedSections] = useState(new Set([]));
+  const [subtitles, setSubtitles] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isNextVideo, setIsNextVideo] = useState(null);
   const [isPrevVideo, setIsPrevVideo] = useState(null);
+  const [defLang, setDefLang] = useState(null);
   const lectureRef = useRef({});
   const scrollTimeoutRef = useRef(null);
   const { id } = useParams();
@@ -326,11 +328,11 @@ const Player = () => {
               : `${process.env.REACT_APP_API}/api/course/download/${lecture.id}`,
           next: nextLectureId,
           prev: isFirstLectureInCourse ? null : prevLectureId,
-          content: lecture.content || [],
           progress: lecture.lectureprogresses || [],
           type: lecture.type,
           order: lecture.order,
           name: lecture.cleanedName,
+          subtitles: lecture.subtitles || [],
           isCompleted,
         };
 
@@ -351,9 +353,10 @@ const Player = () => {
           { CourseId: id },
           { withCredentials: true }
         );
-        setCourseData(newData.data);
+        setCourseData(newData.data[0]);
         setError(null);
-        setLectureDictionary(createLectureDictionary(newData.data));
+        setLectureDictionary(createLectureDictionary(newData.data[0]));
+        setDefLang(newData.data[1].deflang);
       } catch (err) {
         setError(err.message);
         console.error("Error fetching course data:", err);
@@ -415,7 +418,9 @@ const Player = () => {
     setCurrentVideo(lectureDictionary[nowPlaying].url);
     setIsPrevVideo(!!lectureDictionary[nowPlaying].prev);
     setIsNextVideo(!!lectureDictionary[nowPlaying].next);
-
+    if (lectureDictionary[nowPlaying].subtitles) {
+      setSubtitles(lectureDictionary[nowPlaying].subtitles);
+    }
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
@@ -466,6 +471,8 @@ const Player = () => {
             handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
             LectureId={nowPlaying}
             CourseId={id}
+            subtitles={subtitles}
+            deflang={defLang}
           />
         ) : (
           <FileRenderer

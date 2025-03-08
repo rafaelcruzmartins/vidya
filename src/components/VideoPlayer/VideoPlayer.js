@@ -18,6 +18,7 @@ import {
   VolumeLowSolid,
   VolumeMuteSolid,
 } from "../../assets";
+
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60);
@@ -39,7 +40,6 @@ const Controls = memo(
     onPlayPause,
     onMute,
     onVolumeChange,
-    onCaption,
     onFullScreen,
     onSkipForward,
     onSkipBackward,
@@ -50,8 +50,12 @@ const Controls = memo(
     isPrevVideo,
     isNextVideo,
     onSeek,
+    subtitles,
+    selectedLanguage,
+    onSubtitleSelect,
   }) => {
     const [isVolumeSliderVisible, setIsVolumeSliderVisible] = useState(false);
+    const [showSubtitlesMenu, setShowSubtitlesMenu] = useState(false);
     const progress = (currentTime / duration) * 100 || 0;
 
     const handleProgressClick = (e) => {
@@ -60,6 +64,15 @@ const Controls = memo(
       const clickPosition = (e.clientX - rect.left) / rect.width;
       const newTime = clickPosition * duration;
       onSeek(newTime);
+    };
+
+    const handleCaptionClick = () => {
+      setShowSubtitlesMenu(!showSubtitlesMenu);
+    };
+
+    const handleSubtitleSelect = (language, pathId) => {
+      onSubtitleSelect(language, pathId);
+      setShowSubtitlesMenu(false);
     };
 
     return (
@@ -142,8 +155,81 @@ const Controls = memo(
             <div onClick={onAutoplayToggle} className="control-button">
               {isAutoplayOn ? <ToggleLeft /> : <ToggleRight />}
             </div>
-            <div onClick={onCaption} className="control-button">
-              {isCaptionOn ? <SolidCaptions /> : <Captions />}
+            <div
+              className="subtitles-container"
+              style={{ position: "relative" }}
+            >
+              <div onClick={handleCaptionClick} className="control-button">
+                {isCaptionOn ? <SolidCaptions /> : <Captions />}
+              </div>
+              <AnimatePresence>
+                {showSubtitlesMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 10 }}
+                    className="subtitles-menu"
+                  >
+                    <div
+                      className="subtitle-option"
+                      style={{
+                        padding: "4px 8px",
+                        cursor: "pointer",
+                        color: selectedLanguage === null ? "#fff" : "#ccc",
+                        backgroundColor:
+                          selectedLanguage === null
+                            ? "rgba(255, 255, 255, 0.2)"
+                            : "transparent",
+                        borderRadius: "3px",
+                        marginBottom: "5px",
+                      }}
+                      onClick={() => handleSubtitleSelect(null, null)}
+                    >
+                      Off
+                    </div>
+                    {subtitles && subtitles.length > 0 ? (
+                      subtitles.map((subtitle, index) => (
+                        <div
+                          key={index}
+                          className="subtitle-option"
+                          style={{
+                            padding: "4px 8px",
+                            cursor: "pointer",
+                            color:
+                              selectedLanguage === subtitle.language
+                                ? "#fff"
+                                : "#ccc",
+                            backgroundColor:
+                              selectedLanguage === subtitle.language
+                                ? "rgba(255, 255, 255, 0.2)"
+                                : "transparent",
+                            borderRadius: "3px",
+                            marginBottom: "5px",
+                          }}
+                          onClick={() =>
+                            handleSubtitleSelect(
+                              subtitle.language,
+                              subtitle.pathId
+                            )
+                          }
+                        >
+                          {subtitle.language}
+                        </div>
+                      ))
+                    ) : (
+                      <div
+                        style={{
+                          padding: "4px 8px",
+                          color: "#ccc",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        No subtitles available
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             <div
               onClick={() =>
@@ -177,6 +263,8 @@ const VideoPlayer = ({
   LectureId,
   CourseId,
   initialVideoProgress,
+  subtitles,
+  deflang,
 }) => {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
@@ -191,12 +279,67 @@ const VideoPlayer = ({
     buffered: 0,
     volume: 1,
     isMuted: false,
-    isCaptionOn: false,
+    isCaptionOn: deflang ? true : false,
     isFullScreen: false,
     playbackSpeed: 1,
     isAutoplayOn: true,
     showControls: true,
+    selectedLanguage: deflang || null,
   });
+
+  const updateSubtitlePreference = async (language) => {
+    try {
+      await axios.post(
+        "/api/course/subtitle/preference",
+        {
+          language,
+        },
+        { withCredentials: true }
+      );
+    } catch (error) {
+      console.error("Failed to update subtitle preference:", error);
+    }
+  };
+
+  const handleSubtitleSelect = useCallback(
+    (language, pathId) => {
+      const video = videoRef.current;
+      if (!video) return;
+
+      for (let i = 0; i < video.textTracks.length; i++) {
+        video.textTracks[i].mode = "disabled";
+      }
+      if (language && pathId) {
+        const trackIndex = subtitles.findIndex(
+          (sub) => sub.language === language
+        );
+        if (trackIndex !== -1 && trackIndex < video.textTracks.length) {
+          video.textTracks[trackIndex].mode = "showing";
+        }
+      }
+      updateSubtitlePreference(language);
+      setState((prev) => ({
+        ...prev,
+        selectedLanguage: language,
+        isCaptionOn: language !== null,
+      }));
+    },
+    [subtitles, CourseId]
+  );
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !subtitles.length) return;
+
+    if (state.selectedLanguage) {
+      const defaultSub = subtitles.find(
+        (sub) => sub.language === state.selectedLanguage
+      );
+      if (defaultSub) {
+        handleSubtitleSelect(defaultSub.language, defaultSub.pathId);
+      }
+    }
+  }, [videoSource, subtitles, handleSubtitleSelect, state.isCaptionOn]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -206,7 +349,10 @@ const VideoPlayer = ({
       if (onPlayRequest) {
         try {
           await video.play();
-          setState((prev) => ({ ...prev, isPlaying: true }));
+          setState((prev) => ({
+            ...prev,
+            isPlaying: true,
+          }));
         } catch (error) {
           console.log("Play failed:", error);
         }
@@ -214,7 +360,6 @@ const VideoPlayer = ({
     };
 
     video.addEventListener("canplay", handleCanPlay);
-
     if (video.readyState >= 3 && onPlayRequest) {
       handleCanPlay();
     }
@@ -223,13 +368,13 @@ const VideoPlayer = ({
       video.removeEventListener("canplay", handleCanPlay);
     };
   }, [onPlayRequest, videoSource]);
+
   useEffect(() => {
-    if (initialVideoProgress) {
-      if (videoRef.current) {
-        videoRef.current.currentTime = initialVideoProgress;
-      }
+    if (initialVideoProgress && videoRef.current) {
+      videoRef.current.currentTime = initialVideoProgress;
     }
-  }, [initialVideoProgress]);
+  }, [initialVideoProgress, videoSource]);
+
   const updateWatchTime = async (seconds, lectureId, courseId, progress) => {
     try {
       await axios.post(
@@ -241,13 +386,16 @@ const VideoPlayer = ({
       console.error(error);
     }
   };
+
   const handleTimeUpdate = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
+
     setState((prev) => ({
       ...prev,
       currentTime: video.currentTime,
     }));
+
     const currentTime = video.currentTime;
     const delta = currentTime - previousTimeRef.current;
 
@@ -268,11 +416,10 @@ const VideoPlayer = ({
     if (accumulatorRef.current >= 5) {
       const currentPosition = currentTime;
       const watchedSeconds = 5;
-
       updateWatchTime(watchedSeconds, LectureId, CourseId, currentPosition);
       accumulatorRef.current %= 5;
     }
-  }, [LectureId]);
+  }, [LectureId, CourseId]);
 
   const handleProgress = useCallback(() => {
     const video = videoRef.current;
@@ -299,11 +446,13 @@ const VideoPlayer = ({
   const handlePlayPause = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
+
     if (state.isPlaying) {
       video.pause();
     } else {
       video.play();
     }
+
     setState((prev) => ({
       ...prev,
       isPlaying: !prev.isPlaying,
@@ -311,22 +460,32 @@ const VideoPlayer = ({
   }, [state.isPlaying]);
 
   const handleMouseMove = useCallback(() => {
-    setState((prev) => ({ ...prev, showControls: true }));
+    setState((prev) => ({
+      ...prev,
+      showControls: true,
+    }));
 
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
     }
 
     controlsTimeoutRef.current = setTimeout(() => {
-      setState((prev) => ({ ...prev, showControls: false }));
-    }, 3000);
+      setState((prev) => ({
+        ...prev,
+        showControls: false,
+      }));
+    }, 5000);
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     if (controlsTimeoutRef.current) {
       clearTimeout(controlsTimeoutRef.current);
     }
-    setState((prev) => ({ ...prev, showControls: false }));
+
+    setState((prev) => ({
+      ...prev,
+      showControls: false,
+    }));
   }, []);
 
   const handleSkipForward = useCallback(() => {
@@ -344,8 +503,10 @@ const VideoPlayer = ({
   const handleVolumeChange = useCallback((newVolume) => {
     const video = videoRef.current;
     if (!video) return;
+
     video.volume = newVolume;
     video.muted = newVolume === 0;
+
     setState((prev) => ({
       ...prev,
       volume: newVolume,
@@ -356,8 +517,10 @@ const VideoPlayer = ({
   const handleMute = useCallback(() => {
     const video = videoRef.current;
     if (!video) return;
+
     const newMutedState = !state.isMuted;
     video.muted = newMutedState;
+
     setState((prev) => ({
       ...prev,
       isMuted: newMutedState,
@@ -366,20 +529,27 @@ const VideoPlayer = ({
 
   const handleFullScreen = useCallback(() => {
     if (!containerRef.current) return;
+
     if (!document.fullscreenElement) {
       containerRef.current.requestFullscreen();
-      setState((prev) => ({ ...prev, isFullScreen: true }));
+      setState((prev) => ({
+        ...prev,
+        isFullScreen: true,
+      }));
     } else {
       document.exitFullscreen();
-      setState((prev) => ({ ...prev, isFullScreen: false }));
+      setState((prev) => ({
+        ...prev,
+        isFullScreen: false,
+      }));
     }
   }, []);
 
   const handlePlaybackSpeedChange = useCallback((speed) => {
     const video = videoRef.current;
     if (!video) return;
-    video.playbackRate = speed;
 
+    video.playbackRate = speed;
     setState((prev) => ({
       ...prev,
       playbackSpeed: speed,
@@ -393,39 +563,54 @@ const VideoPlayer = ({
     }));
   }, []);
 
-  const handleCaption = useCallback(() => {
+  const handleVideoEnd = useCallback(() => {
     setState((prev) => ({
       ...prev,
-      isCaptionOn: !prev.isCaptionOn,
+      isPlaying: false,
     }));
-  }, []);
 
-  const handleVideoEnd = useCallback(() => {
-    setState((prev) => ({ ...prev, isPlaying: false }));
     handleLectureCompleteOnVideoEnd();
+
     if (state.isAutoplayOn && onVideoEnd) {
       onVideoEnd?.();
     }
-  }, [state.isAutoplayOn, onVideoEnd]);
+  }, [state.isAutoplayOn, onVideoEnd, handleLectureCompleteOnVideoEnd]);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    video.addEventListener("timeupdate", handleTimeUpdate);
-    video.addEventListener("progress", handleProgress);
-    video.addEventListener("ended", handleVideoEnd);
-    video.addEventListener("loadedmetadata", () => {
+    const handleVideoLoadedMetadata = () => {
       setState((prev) => ({
         ...prev,
         duration: video.duration,
       }));
-    });
+      setTimeout(() => {
+        for (let i = 0; i < video.textTracks.length; i++) {
+          video.textTracks[i].mode = "disabled";
+        }
+
+        if (state.selectedLanguage) {
+          const trackIndex = subtitles.findIndex(
+            (sub) => sub.language === state.selectedLanguage
+          );
+          if (trackIndex !== -1 && trackIndex < video.textTracks.length) {
+            video.textTracks[trackIndex].mode = "showing";
+          }
+        }
+      }, 100);
+    };
+
+    video.addEventListener("timeupdate", handleTimeUpdate);
+    video.addEventListener("progress", handleProgress);
+    video.addEventListener("ended", handleVideoEnd);
+    video.addEventListener("loadedmetadata", handleVideoLoadedMetadata);
 
     return () => {
       video.removeEventListener("timeupdate", handleTimeUpdate);
       video.removeEventListener("progress", handleProgress);
       video.removeEventListener("ended", handleVideoEnd);
+      video.removeEventListener("loadedmetadata", handleVideoLoadedMetadata);
     };
   }, [handleTimeUpdate, handleProgress, handleVideoEnd]);
 
@@ -449,7 +634,22 @@ const VideoPlayer = ({
         src={videoSource}
         className="video-element"
         onClick={handlePlayPause}
-      />
+        crossOrigin="use-credentials"
+        key={`${videoSource}-${LectureId}`}
+      >
+        {subtitles && subtitles.length > 0
+          ? subtitles.map((subtitle, index) => (
+              <track
+                key={subtitle.pathId}
+                kind="subtitles"
+                label={subtitle.cleanedName || subtitle.language}
+                src={`${process.env.REACT_APP_API}/api/course/subtitle/${subtitle.pathId}`}
+                srcLang={subtitle.language}
+              />
+            ))
+          : null}
+      </video>
+
       <AnimatePresence>
         {state.showControls && (
           <motion.div
@@ -475,7 +675,6 @@ const VideoPlayer = ({
               onPlayPause={handlePlayPause}
               onMute={handleMute}
               onVolumeChange={handleVolumeChange}
-              onCaption={handleCaption}
               onFullScreen={handleFullScreen}
               onSkipForward={handleSkipForward}
               onSkipBackward={handleSkipBackward}
@@ -484,6 +683,9 @@ const VideoPlayer = ({
               onAutoplayToggle={handleAutoplayToggle}
               onPlaybackSpeedChange={handlePlaybackSpeedChange}
               onSeek={handleSeek}
+              subtitles={subtitles}
+              selectedLanguage={state.selectedLanguage}
+              onSubtitleSelect={handleSubtitleSelect}
             />
           </motion.div>
         )}
