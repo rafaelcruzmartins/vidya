@@ -10,6 +10,8 @@ import axios from "../api/axiosInstance.js";
 import PreNav from "../components/Navbar/PreNav";
 import VideoPlayer from "../components/VideoPlayer/VideoPlayer.js";
 import { AnimatePresence, motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext.js";
+import Toast from "../components/Toast/Toast.js";
 import {
   CheckCircleSolid,
   ChevronRight,
@@ -21,6 +23,7 @@ import {
   SkeletonLoader,
   VideoSolid,
   World,
+  DotsVerticalRounded,
 } from "../assets";
 import { useParams } from "react-router-dom";
 import FileRenderer from "../components/FileRenderer/FileRenderer.js";
@@ -31,7 +34,7 @@ const ICON_MAP = {
   html: <Html />,
   url: <World />,
 };
-const secondsToHoursRounded = (seconds) => {
+const secondsToMinutesRounded = (seconds) => {
   const minutes = (seconds / 60).toFixed(1);
   return `${minutes}min`;
 };
@@ -47,14 +50,23 @@ const SectionHeader = memo(
     onToggle,
     isSectionCompleted,
     duration,
+    total,
   }) => (
     <div
       onClick={onToggle}
       className={`section-header ${isSectionCompleted ? "green" : ""}`}
     >
-      <span className="playlist-section-title">
-        {sectionOrder}: {title} - {secondsToHoursRounded(duration)}
-      </span>
+      <div className="section-title-wrap">
+        <span className="playlist-section-title">
+          {sectionOrder}: {title}
+        </span>
+        <div className="section-details">
+          <span className="section-duration">
+            {secondsToMinutesRounded(duration)}
+          </span>
+          <span className="section-lectures-total"> {total} lectures</span>
+        </div>
+      </div>
       {hasLectures && (
         <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
           <div className="svg-div">
@@ -77,99 +89,216 @@ const LectureItem = memo(
     lectureOrder,
     nowPlaying,
     sectionOrder,
+    courseId,
     type,
     duration,
     content,
+    setToastMessage,
+    setToastType,
+    setShowToast,
   }) => {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
     const toggleDropdown = () => setIsOpen(!isOpen);
+    const toggleMenu = (e) => {
+      e.stopPropagation();
+      if (isTagModalOpen) {
+        setIsTagModalOpen(false);
+        setIsMenuOpen(false);
+      } else {
+        setIsMenuOpen(!isMenuOpen);
+      }
+    };
+
+    const handleAddTag = (e) => {
+      e.stopPropagation();
+      setIsTagModalOpen(true);
+      setIsMenuOpen(false);
+    };
+
+    const handleAddBookmark = async (e) => {
+      e.stopPropagation();
+      try {
+        await axios.post(
+          "/api/course/tagsandbookmark",
+          {
+            lectureId,
+            name: title,
+            type: "bookmark",
+            courseId,
+          },
+          { withCredentials: true }
+        );
+        setToastMessage("lecture is bookmarked");
+        setToastType("success");
+        setShowToast(true);
+      } catch (error) {
+        console.error(error);
+        if (error.status === 409) {
+          setToastMessage("lecture is already bookmarked");
+          setToastType("warning");
+          setShowToast(true);
+        }
+      }
+      setIsMenuOpen(false);
+    };
+
+    const handleTagSelection = async (tagType, e) => {
+      e.stopPropagation();
+      try {
+        await axios.post(
+          "/api/course/tagsandbookmark",
+          {
+            lectureId,
+            name: title,
+            type: tagType,
+            courseId,
+          },
+          { withCredentials: true }
+        );
+        setToastMessage("lecture is tagged");
+        setToastType("success");
+        setShowToast(true);
+      } catch (error) {
+        console.error(error);
+        if (error.status === 409) {
+          setToastMessage("lecture is already tagged");
+          setToastType("warning");
+          setShowToast(true);
+        }
+      }
+      setIsTagModalOpen(false);
+    };
 
     return (
-      <div
-        ref={(el) => (lectureRef.current[lectureId] = el)}
-        onClick={(e) => {
-          e.stopPropagation();
-
-          handleNowPlaying(lectureId);
-        }}
-        className={`playlist-lecture-item ${
-          lectureId === nowPlaying ? "now-playing" : ""
-        }`}
-      >
-        <span
-          className="checkbox"
+      <>
+        <div
+          ref={(el) => (lectureRef.current[lectureId] = el)}
           onClick={(e) => {
             e.stopPropagation();
-            onToggle(lectureId);
+            handleNowPlaying(lectureId);
           }}
+          className={`playlist-lecture-item ${
+            lectureId === nowPlaying ? "now-playing" : ""
+          }`}
         >
-          <div className="svg-div">
-            {isCompleted ? <CheckCircleSolid /> : <Circle />}
-          </div>
-        </span>
-        <span className="type-icon">
-          <div className="svg-div">
-            <LectureTypeIcon type={type} />
-          </div>
-        </span>
-        <div className="lecture-title">
-          {sectionOrder}.{lectureOrder}: {title}
-          <div className="lecture-content-time">
-            <div className="lecture-time">
-              {type === "video" && secondsToHoursRounded(duration)}
+          <span
+            className="checkbox"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggle(lectureId);
+            }}
+          >
+            <div className="svg-div">
+              {isCompleted ? <CheckCircleSolid /> : <Circle />}
             </div>
-            {content?.[0]?.type && (
-              <div className="lecture-content">
-                <button
-                  className="content-button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleDropdown();
-                  }}
-                >
-                  <span>Content</span>
-                  <svg
-                    className="content-arrow"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+          </span>
+          <span className="type-icon">
+            <div className="svg-div">
+              <LectureTypeIcon type={type} />
+            </div>
+          </span>
+          <div className="lecture-title">
+            {sectionOrder}.{lectureOrder}: {title}
+            <div className="lecture-content-time">
+              <div className="lecture-time">
+                {type === "video" && secondsToMinutesRounded(duration)}
+              </div>
+              {content?.[0]?.type && (
+                <div className="lecture-content">
+                  <button
+                    className="content-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleDropdown();
+                    }}
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="2"
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </button>
-
-                {isOpen && (
-                  <div className="content-dropdown">
-                    <span>
-                      <LectureTypeIcon type={content?.[0]?.type} />
-                    </span>
-                    <a
-                      href={
-                        process.env.REACT_APP_API +
-                        "/api/course/content/" +
-                        content?.[0]?.pathId
-                      }
-                      download
-                      target="_blank"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                      }}
+                    <span>Content</span>
+                    <svg
+                      className="content-arrow"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
-                      {content?.[0]?.originalName}
-                    </a>
-                  </div>
-                )}
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div className="content-dropdown">
+                      <span>
+                        <LectureTypeIcon type={content?.[0]?.type} />
+                      </span>
+                      <a
+                        href={
+                          process.env.REACT_APP_API +
+                          "/api/course/content/" +
+                          content?.[0]?.pathId
+                        }
+                        download
+                        target="_blank"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        {content?.[0]?.originalName}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="lecture-menu">
+            <div onClick={toggleMenu}>
+              <DotsVerticalRounded />
+            </div>
+
+            {isMenuOpen && (
+              <div className="lecture-menu-modal">
+                <div className="menu-option" onClick={handleAddTag}>
+                  Add as a tag
+                </div>
+                <div className="menu-option" onClick={handleAddBookmark}>
+                  Add to bookmarks
+                </div>
+              </div>
+            )}
+
+            {isTagModalOpen && (
+              <div className="tag-selection-modal">
+                <div
+                  className="tag-option"
+                  data-tag="difficult"
+                  onClick={(e) => handleTagSelection("difficult", e)}
+                >
+                  Difficult
+                </div>
+                <div
+                  className="tag-option"
+                  data-tag="need-review"
+                  onClick={(e) => handleTagSelection("need-review", e)}
+                >
+                  Need Review
+                </div>
+                <div
+                  className="tag-option"
+                  data-tag="important"
+                  onClick={(e) => handleTagSelection("important", e)}
+                >
+                  Important
+                </div>
               </div>
             )}
           </div>
         </div>
-      </div>
+      </>
     );
   }
 );
@@ -193,7 +322,14 @@ const Player = () => {
   const lectureRef = useRef({});
   const scrollTimeoutRef = useRef(null);
   const { id } = useParams();
-
+  const {
+    setToastMessage,
+    setToastType,
+    setShowToast,
+    toastMessage,
+    toastType,
+    showToast,
+  } = useAuth();
   const handleNowPlaying = (lectureId) => {
     setNowPlaying(lectureId);
 
@@ -455,6 +591,14 @@ const Player = () => {
 
   return (
     <>
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          duration={3000}
+          onClose={() => setShowToast(false)}
+        />
+      )}
       <PreNav name={courseData?.cleanedName} />
       <div className="player-container">
         {lectureDictionary[nowPlaying]?.type &&
@@ -493,6 +637,7 @@ const Player = () => {
                 isExpanded={expandedSections.has(section.id)}
                 duration={section.duration}
                 onToggle={() => toggleSection(section.id)}
+                total={section.lectures.length}
               />
               <AnimatePresence>
                 {expandedSections.has(section.id) &&
@@ -503,11 +648,11 @@ const Player = () => {
                       exit={{ opacity: 0, height: 0 }}
                       className="lectures-container"
                     >
-                      {section.lectures.map((lecture) => (
+                      {section.lectures.map((lecture, index) => (
                         <LectureItem
                           key={lecture.id}
                           lectureId={lecture.id}
-                          lectureOrder={lecture.order}
+                          lectureOrder={index + 1}
                           sectionOrder={section.order}
                           title={lecture.cleanedName}
                           isCompleted={completedLectures.has(lecture.id)}
@@ -518,6 +663,10 @@ const Player = () => {
                           type={lecture.type}
                           duration={lecture.duration}
                           content={lecture.content}
+                          CourseId={id}
+                          setToastMessage={setToastMessage}
+                          setToastType={setToastType}
+                          setShowToast={setShowToast}
                         />
                       ))}
                     </motion.div>

@@ -4,19 +4,24 @@ import { Doughnut } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Legend);
 
-const data = {
-  datasets: [
-    {
-      data: [40, 30, 10, 12, 8],
-      backgroundColor: ["#605F5E", "#FB3640", "#0A2463", "#247BA0", "#E9A7FF"],
-
-      cutout: "87%",
-      borderWidth: 0,
-    },
-  ],
-};
-
 const Stats = () => {
+  const data = {
+    datasets: [
+      {
+        data: [40, 30, 10, 12, 8],
+        backgroundColor: [
+          "#605F5E",
+          "#FB3640",
+          "#0A2463",
+          "#247BA0",
+          "#E9A7FF",
+        ],
+
+        cutout: "87%",
+        borderWidth: 0,
+      },
+    ],
+  };
   return <Doughnut data={data} />;
 };
 

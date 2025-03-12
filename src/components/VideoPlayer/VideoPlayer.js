@@ -91,23 +91,29 @@ const Controls = memo(
             <div
               onClick={onPreviousVideo}
               style={{ opacity: isPrevVideo ? "" : "0.7" }}
-              className="control-button"
+              className="control-button previous-video"
             >
               <SkipPrevious />
             </div>
-            <div onClick={onSkipBackward} className="control-button">
+            <div
+              onClick={onSkipBackward}
+              className="control-button skip-backward"
+            >
               <Rewind />
             </div>
-            <div onClick={onPlayPause} className="control-button">
+            <div onClick={onPlayPause} className="control-button play-pause">
               {isPlaying ? <Pause /> : <Play />}
             </div>
-            <div onClick={onSkipForward} className="control-button">
+            <div
+              onClick={onSkipForward}
+              className="control-button skip-forward"
+            >
               <FastForward />
             </div>
             <div
               onClick={isNextVideo ? onNextVideo : undefined}
               style={{ opacity: isNextVideo ? "" : "0.7" }}
-              className="control-button"
+              className="control-button skip-next"
             >
               <SkipNext />
             </div>
@@ -152,14 +158,17 @@ const Controls = memo(
             </div>
           </div>
           <div className="controls-right">
-            <div onClick={onAutoplayToggle} className="control-button">
-              {isAutoplayOn ? <ToggleLeft /> : <ToggleRight />}
+            <div onClick={onAutoplayToggle} className="control-button autoplay">
+              {isAutoplayOn ? <ToggleRight /> : <ToggleLeft />}
             </div>
             <div
               className="subtitles-container"
               style={{ position: "relative" }}
             >
-              <div onClick={handleCaptionClick} className="control-button">
+              <div
+                onClick={handleCaptionClick}
+                className="control-button caption"
+              >
                 {isCaptionOn ? <SolidCaptions /> : <Captions />}
               </div>
               <AnimatePresence>

@@ -45,6 +45,20 @@ const IndividualInstrucor = () => {
     };
     fetachData();
   }, [updateCounter]);
+  const formatTime = (duration) => {
+    if (duration < 60) {
+      return `${duration} seconds`;
+    } else if (duration < 3600) {
+      const minutes = (duration / 60).toFixed(1);
+      return `${minutes} Minutes`;
+    } else if (duration < 86400) {
+      const hours = (duration / 3600).toFixed(1);
+      return `${hours} Hours`;
+    } else {
+      const days = (duration / 86400).toFixed(1);
+      return `${days} Days`;
+    }
+  };
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
@@ -122,7 +136,9 @@ const IndividualInstrucor = () => {
                 <span class="drop-cap">Description : </span>
                 {instructorsData?.description}
               </div>
-              <div>Total Hours : 20Hr</div>
+              <div>
+                Duration: {formatTime(instructorsData?.totalCourseDuration)}
+              </div>
             </div>
           </div>
           <div className="img-container instructor-info-image">

@@ -616,11 +616,11 @@ const IndividualCourses = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="lectures-container"
                       >
-                        {section.lectures.map((lecture) => (
+                        {section.lectures.map((lecture, index) => (
                           <LectureItem
                             key={lecture.id}
                             lectureId={lecture.id}
-                            lectureOrder={lecture.order}
+                            lectureOrder={index + 1}
                             sectionOrder={section.order}
                             title={lecture.cleanedName}
                           />

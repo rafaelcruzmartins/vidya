@@ -23,7 +23,20 @@ const Home = ({ category }) => {
           : homeData.latestCourse[1].id
       }`
     );
-
+  const formatTime = (duration) => {
+    if (duration < 60) {
+      return `${duration}S`;
+    } else if (duration < 3600) {
+      const minutes = (duration / 60).toFixed(1);
+      return `${minutes}M`;
+    } else if (duration < 86400) {
+      const hours = (duration / 3600).toFixed(1);
+      return `${hours}H`;
+    } else {
+      const days = (duration / 86400).toFixed(1);
+      return `${days}D`;
+    }
+  };
   const handleCourse = () => {
     navigate(
       `/courses/${
@@ -91,7 +104,7 @@ const Home = ({ category }) => {
                         ? homeData.featuredCourse.photo
                         : homeData.latestCourse[1].photo === null
                         ? "/assets/placeholder.avif"
-                        : "")
+                        : homeData.latestCourse[1].photo)
                   }
                   alt=""
                 />
@@ -114,24 +127,26 @@ const Home = ({ category }) => {
             <Tilt className="stats" perspective={4000} gyroscope={true}>
               <Stats />
               <div className="watch">
-                <div className="watch-hours">WATCH HOURS</div>
-                <div className="hours">19H</div>
+                <div className="watch-hours">WATCH TIME</div>
+                <div className="hours">
+                  {formatTime(homeData?.categoryWatchTime?.overallWatchTime)}
+                </div>
               </div>
               <div className="labels">
                 <div className="label-names">
-                  <div className="rectangle first"></div>Web - 40%
+                  <div className="rectangle first"></div>Web
                 </div>
                 <div className="label-names">
-                  <div className="rectangle second"></div>Mobile - 30%
+                  <div className="rectangle second"></div>Mobile
                 </div>
                 <div className="label-names">
-                  <div className="rectangle third"></div>Finance - 10%
+                  <div className="rectangle third"></div>Finance
                 </div>
                 <div className="label-names">
-                  <div className="rectangle fourth"></div>Health - 12%
+                  <div className="rectangle fourth"></div>Health
                 </div>
                 <div className="label-names">
-                  <div className="rectangle fifth"></div>Others - 8%
+                  <div className="rectangle fifth"></div>Others
                 </div>
               </div>
             </Tilt>
