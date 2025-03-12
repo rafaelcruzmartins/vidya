@@ -26,6 +26,7 @@ const getUserData = async (userId, featuredCourseId) => {
               attributes: ["cleanedName", "id", "photo"],
             },
           ],
+          order: [["updatedAt", "DESC"]],
         }),
         TrackingSystem.getCategoryWatchTime(userId),
         Course.findByPk(featuredCourseId, {

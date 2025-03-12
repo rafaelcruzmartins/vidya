@@ -14,8 +14,30 @@ const createInstructor = async (req, res) => {
 
 const getAllInstructor = async (req, res) => {
   try {
-    const instructors = await Instructor.findAll();
-    res.status(200).json(instructors);
+    const instructors = await Instructor.findAll({
+      include: [
+        {
+          model: Course,
+          as: "courses",
+          attributes: ["duration"],
+        },
+      ],
+      raw: false,
+    });
+
+    const instructorsWithDuration = instructors.map((instructor) => {
+      const instructorData = instructor.toJSON();
+
+      const totalDuration = instructorData.courses.reduce((total, course) => {
+        return total + (course.duration || 0);
+      }, 0);
+
+      instructorData.totalCourseDuration = totalDuration;
+
+      return instructorData;
+    });
+
+    res.status(200).json(instructorsWithDuration);
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");
@@ -30,12 +52,19 @@ const individualInstructor = async (req, res) => {
       include: {
         model: Course,
         as: "courses",
-        attributes: ["id", "photo", "cleanedName"],
+        attributes: ["id", "photo", "cleanedName", "duration"],
       },
       attributes: ["name", "description", "id", "photo"],
     });
-    const plainInstructor = instructor.toJSON();
-    res.status(200).json({ ...plainInstructor, role });
+    const instructorData = instructor.toJSON();
+
+    const totalDuration = instructorData.courses.reduce((total, course) => {
+      return total + (course.duration || 0);
+    }, 0);
+
+    instructorData.totalCourseDuration = totalDuration;
+
+    res.status(200).json({ ...instructorData, role });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal server error");

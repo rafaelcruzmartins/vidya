@@ -10,6 +10,7 @@ import Category from "./Category.js";
 import DailyWatch from "./DailyWatch.js";
 import Instructor from "./Instructor.js";
 import PathFile from "./PathFile.js";
+import TagsAndBookmark from "./TagsAndBookmark.js";
 import sequelize from "../config/database.js";
 
 Course.hasMany(Section, { foreignKey: "CourseId", as: "sections" });
@@ -30,6 +31,8 @@ Course.belongsToMany(Instructor, {
 
 User.hasMany(UserLastWatched, { foreignKey: "UserId", as: "userlastwatcheds" });
 UserLastWatched.belongsTo(User, { foreignKey: "UserId", as: "user" });
+User.hasMany(TagsAndBookmark, { foreignKey: "UserId", as: "tagsandbookmarks" });
+TagsAndBookmark.belongsTo(User, { foreignKey: "UserId", as: "user" });
 Course.hasMany(UserLastWatched, {
   foreignKey: "CourseId",
   as: "userlastwatcheds",
@@ -145,28 +148,43 @@ const TrackingSystem = {
   },
 
   async getCategoryWatchTime(userId) {
-    return await LectureProgress.findAll({
-      attributes: [
-        [sequelize.fn("SUM", sequelize.col("watchTime")), "totalWatchTime"],
-      ],
-      include: [
-        {
-          model: Course,
-          as: "course",
-          attributes: ["CategoryId"],
-          include: [
-            {
-              model: Category,
-              as: "category",
-              attributes: ["category"],
-            },
-          ],
+    return await sequelize.transaction(async (t) => {
+      const categoryWatchTime = await LectureProgress.findAll({
+        attributes: [
+          [sequelize.fn("SUM", sequelize.col("watchTime")), "totalWatchTime"],
+        ],
+        include: [
+          {
+            model: Course,
+            as: "course",
+            attributes: ["CategoryId"],
+            include: [
+              {
+                model: Category,
+                as: "category",
+                attributes: ["category"],
+              },
+            ],
+          },
+        ],
+        where: {
+          UserId: userId,
         },
-      ],
-      where: {
-        UserId: userId,
-      },
-      group: ["Course.CategoryId", "Course.category.category"],
+        group: ["Course.CategoryId", "Course.category.category"],
+        transaction: t,
+      });
+
+      const overallWatchTime = await LectureProgress.sum("watchTime", {
+        where: {
+          UserId: userId,
+        },
+        transaction: t,
+      });
+
+      return {
+        categoryWatchTime,
+        overallWatchTime: overallWatchTime || 0,
+      };
     });
   },
   async getTotalWatchTime(userId) {
@@ -275,5 +293,6 @@ export {
   Instructor,
   DailyWatch,
   PathFile,
+  TagsAndBookmark,
   TrackingSystem,
 };

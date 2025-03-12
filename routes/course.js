@@ -12,6 +12,7 @@ import {
   Instructor,
   PathFile,
   User,
+  TagsAndBookmark,
 } from "../models/index.js";
 import fs, { promises as fsp } from "fs";
 import path from "path";
@@ -391,6 +392,31 @@ router.post("/subtitle/preference", isAuthenticated, async (req, res) => {
     res.status(204).send("Subtitle preference updated successfully");
   } catch (error) {
     console.error(error);
+    res.status(500).send("internal server error");
+  }
+});
+
+router.post("/tagsandbookmark", isAuthenticated, async (req, res) => {
+  const UserId = req.user.id;
+  const { lectureId, name, type, courseId } = req.body;
+
+  try {
+    await TagsAndBookmark.create({
+      UserId,
+      lectureId,
+      name,
+      type,
+      courseId,
+    });
+    res.status(201).send("created successfully");
+  } catch (error) {
+    console.error(error);
+    if (error.name === "SequelizeUniqueConstraintError") {
+      return res.status(409).json({
+        success: false,
+        message: `This lecture already has a "${req.body.type}" tag`,
+      });
+    }
     res.status(500).send("internal server error");
   }
 });
