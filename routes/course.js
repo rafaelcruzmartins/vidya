@@ -8,11 +8,11 @@ import {
   LectureProgress,
   Section,
   TrackingSystem,
-  UserLastWatched,
   Instructor,
   PathFile,
   User,
   TagsAndBookmark,
+  CourseProgress,
 } from "../models/index.js";
 import fs, { promises as fsp } from "fs";
 import path from "path";
@@ -79,8 +79,8 @@ router.post("/player", isAuthenticated, async (req, res) => {
           },
         },
         {
-          model: UserLastWatched,
-          as: "userlastwatcheds",
+          model: CourseProgress,
+          as: "courseprogresses",
           where: { UserId },
           required: false,
         },
@@ -365,7 +365,21 @@ router.post(
     }
   }
 );
-
+router.post("/progress/courseprogress", isAuthenticated, async (req, res) => {
+  const { CourseId, progress, hasCompleted } = req.body;
+  try {
+    await TrackingSystem.updateCourseProgress(
+      req.user.id,
+      CourseId,
+      progress,
+      hasCompleted
+    );
+    res.status(201).send("Course Progress Updated");
+  } catch (error) {
+    console.error(error);
+    res.status(500);
+  }
+});
 router.post("/progress/watchtime", isAuthenticated, async (req, res) => {
   const { seconds, lectureId, courseId, progress } = req.body;
   const userId = req.user.id;

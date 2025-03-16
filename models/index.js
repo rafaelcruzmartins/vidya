@@ -5,12 +5,12 @@ import Section from "./Section.js";
 import Lecture from "./Lecture.js";
 import LectureProgress from "./LectureProgress.js";
 import CourseFolder from "./CourseFolder.js";
-import UserLastWatched from "./UserLastWatched.js";
 import Category from "./Category.js";
 import DailyWatch from "./DailyWatch.js";
 import Instructor from "./Instructor.js";
 import PathFile from "./PathFile.js";
 import TagsAndBookmark from "./TagsAndBookmark.js";
+import CourseProgress from "./CourseProgress.js";
 import sequelize from "../config/database.js";
 
 Course.hasMany(Section, { foreignKey: "CourseId", as: "sections" });
@@ -29,20 +29,8 @@ Course.belongsToMany(Instructor, {
   as: "instructors",
 });
 
-User.hasMany(UserLastWatched, { foreignKey: "UserId", as: "userlastwatcheds" });
-UserLastWatched.belongsTo(User, { foreignKey: "UserId", as: "user" });
 User.hasMany(TagsAndBookmark, { foreignKey: "UserId", as: "tagsandbookmarks" });
 TagsAndBookmark.belongsTo(User, { foreignKey: "UserId", as: "user" });
-Course.hasMany(UserLastWatched, {
-  foreignKey: "CourseId",
-  as: "userlastwatcheds",
-});
-UserLastWatched.belongsTo(Course, { foreignKey: "CourseId", as: "course" });
-Lecture.hasMany(UserLastWatched, {
-  foreignKey: "LectureId",
-  as: "userlastwatcheds",
-});
-UserLastWatched.belongsTo(Lecture, { foreignKey: "LectureId", as: "lecture" });
 Lecture.hasMany(LectureProgress, {
   foreignKey: "LectureId",
   as: "lectureprogresses",
@@ -62,6 +50,76 @@ LectureProgress.belongsTo(Course, { foreignKey: "CourseId", as: "course" });
 User.hasMany(DailyWatch, { foreignKey: "UserId", as: "dailywatches" });
 DailyWatch.belongsTo(User, { foreignKey: "UserId", as: "user" });
 
+User.hasMany(CourseProgress, { foreignKey: "UserId", as: "courseprogresses" });
+CourseProgress.belongsTo(User, { foreignKey: "UserId", as: "user" });
+
+Course.hasMany(CourseProgress, {
+  foreignKey: "CourseId",
+  as: "courseprogresses",
+});
+CourseProgress.belongsTo(Course, { foreignKey: "CourseId", as: "course" });
+
+Lecture.hasMany(CourseProgress, {
+  foreignKey: "LectureId",
+  as: "courseprogresses",
+});
+CourseProgress.belongsTo(Lecture, { foreignKey: "LectureId", as: "lecture" });
+
+const transformWatchtimeData = (data, maxCategories = 5) => {
+  const result = {
+    totalWatchtime: 0,
+    categoryWatchtime: [],
+  };
+
+  const categoryMap = new Map();
+  let othersWatchtime = 0;
+
+  data.forEach((entry) => {
+    result.totalWatchtime += entry.totalWatchTime;
+
+    const categoryName =
+      entry.course.CategoryId && entry.course.category
+        ? entry.course.category.category
+        : null;
+
+    if (categoryName === null) {
+      othersWatchtime += entry.totalWatchTime;
+    } else {
+      if (categoryMap.has(categoryName)) {
+        categoryMap.set(
+          categoryName,
+          categoryMap.get(categoryName) + entry.totalWatchTime
+        );
+      } else {
+        categoryMap.set(categoryName, entry.totalWatchTime);
+      }
+    }
+  });
+
+  const sortedCategories = Array.from(categoryMap).sort((a, b) => b[1] - a[1]);
+
+  const topCategories = sortedCategories.slice(0, maxCategories);
+
+  if (sortedCategories.length > maxCategories) {
+    for (let i = maxCategories; i < sortedCategories.length; i++) {
+      othersWatchtime += sortedCategories[i][1];
+    }
+  }
+
+  result.categoryWatchtime = topCategories.map(([category, watchtime]) => ({
+    category,
+    watchtime,
+  }));
+
+  if (othersWatchtime > 0) {
+    result.categoryWatchtime.push({
+      category: "Others",
+      watchtime: othersWatchtime,
+    });
+  }
+
+  return result;
+};
 const TrackingSystem = {
   async updateWatchTime(userId, seconds, lectureId, progress, courseId) {
     const today = new Date().toISOString().split("T")[0];
@@ -85,13 +143,13 @@ const TrackingSystem = {
       watchTime: lectureprogresses.watchTime + seconds,
     });
 
-    const [userlastwatched] = await UserLastWatched.findOrCreate({
+    const [courseprogress] = await CourseProgress.findOrCreate({
       where: {
         CourseId: courseId,
         UserId: userId,
       },
     });
-    userlastwatched.update({ LectureId: lectureId });
+    courseprogress.update({ LectureId: lectureId });
   },
 
   async toggleLectureComplete(userId, lectureId, courseId) {
@@ -113,6 +171,16 @@ const TrackingSystem = {
       },
     });
     await lectureprogresses.update({ hasCompleted: false, progress: 0 });
+  },
+  async updateCourseProgress(UserId, CourseId, progress, hasCompleted) {
+    const [courseprogress] = await CourseProgress.findOrCreate({
+      where: {
+        UserId,
+        CourseId,
+      },
+    });
+
+    await courseprogress.update({ hasCompleted, progress });
   },
   async getWatchStreak(userId) {
     const today = new Date().toISOString().split("T")[0];
@@ -148,59 +216,35 @@ const TrackingSystem = {
   },
 
   async getCategoryWatchTime(userId) {
-    return await sequelize.transaction(async (t) => {
-      const categoryWatchTime = await LectureProgress.findAll({
-        attributes: [
-          [sequelize.fn("SUM", sequelize.col("watchTime")), "totalWatchTime"],
-        ],
-        include: [
-          {
-            model: Course,
-            as: "course",
-            attributes: ["CategoryId"],
-            include: [
-              {
-                model: Category,
-                as: "category",
-                attributes: ["category"],
-              },
-            ],
-          },
-        ],
-        where: {
-          UserId: userId,
+    const categoryWatchTime = await LectureProgress.findAll({
+      attributes: [
+        [sequelize.fn("SUM", sequelize.col("watchTime")), "totalWatchTime"],
+      ],
+      include: [
+        {
+          model: Course,
+          as: "course",
+          attributes: ["CategoryId"],
+          include: [
+            {
+              model: Category,
+              as: "category",
+              attributes: ["category"],
+            },
+          ],
         },
-        group: ["Course.CategoryId", "Course.category.category"],
-        transaction: t,
-      });
-
-      const overallWatchTime = await LectureProgress.sum("watchTime", {
-        where: {
-          UserId: userId,
-        },
-        transaction: t,
-      });
-
-      return {
-        categoryWatchTime,
-        overallWatchTime: overallWatchTime || 0,
-      };
+      ],
+      where: {
+        UserId: userId,
+      },
+      group: ["course.CategoryId", "course.category.id"],
+      raw: true,
+      nest: true,
     });
-  },
-  async getTotalWatchTime(userId) {
-    try {
-      const result = await DailyWatch.sum("watchTimeSeconds", {
-        where: {
-          UserId: userId,
-        },
-      });
 
-      return result || 0;
-    } catch (error) {
-      console.error("Error calculating total watch time:", error);
-      throw error;
-    }
+    return transformWatchtimeData(categoryWatchTime);
   },
+
   async getCourseProgress(userId, courseId) {
     const totalLectures = await Lecture.count({
       include: [
@@ -287,12 +331,12 @@ export {
   Section,
   Lecture,
   CourseFolder,
-  UserLastWatched,
   LectureProgress,
   Category,
   Instructor,
   DailyWatch,
   PathFile,
   TagsAndBookmark,
+  CourseProgress,
   TrackingSystem,
 };

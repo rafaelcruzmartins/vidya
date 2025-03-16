@@ -3,6 +3,7 @@ import { isAuthenticated } from "../middleware/owner.js";
 import {
   Category,
   Course,
+  CourseProgress,
   Lecture,
   TrackingSystem,
   UserLastWatched,
@@ -12,7 +13,7 @@ const getUserData = async (userId, featuredCourseId) => {
   try {
     const [lastWatched, watchTime, featuredCourse, latestCourse] =
       await Promise.all([
-        UserLastWatched.findAll({
+        CourseProgress.findAll({
           where: { UserId: userId },
           include: [
             {
