@@ -4,17 +4,19 @@ import { Doughnut } from "react-chartjs-2";
 
 ChartJS.register(ArcElement, Legend);
 
-const Stats = () => {
+const Stats = ({ watchtimeData }) => {
+  const timeArray = watchtimeData?.map((item) => item.watchtime);
   const data = {
     datasets: [
       {
-        data: [40, 30, 10, 12, 8],
+        data: timeArray,
         backgroundColor: [
           "#605F5E",
           "#FB3640",
           "#0A2463",
           "#247BA0",
           "#E9A7FF",
+          "#E6C229",
         ],
 
         cutout: "87%",

@@ -81,7 +81,14 @@ const Home = ({ category }) => {
     };
     fetchData();
   }, []);
-
+  const statsColor = [
+    "#605F5E",
+    "#FB3640",
+    "#0A2463",
+    "#247BA0",
+    "#E9A7FF",
+    "#E6C229",
+  ];
   return (
     <>
       <PreNav name={"VIDYA"} />
@@ -124,30 +131,34 @@ const Home = ({ category }) => {
                 </div>
               </div>
             </div>
-            <Tilt className="stats" perspective={4000} gyroscope={true}>
-              <Stats />
+            <Tilt className="stats" perspective={4000}>
+              <Stats
+                watchtimeData={homeData?.categoryWatchTime?.categoryWatchtime}
+              />
               <div className="watch">
                 <div className="watch-hours">WATCH TIME</div>
                 <div className="hours">
-                  {formatTime(homeData?.categoryWatchTime?.overallWatchTime)}
+                  {formatTime(homeData?.categoryWatchTime?.totalWatchtime)}
                 </div>
               </div>
               <div className="labels">
-                <div className="label-names">
-                  <div className="rectangle first"></div>Web
-                </div>
-                <div className="label-names">
-                  <div className="rectangle second"></div>Mobile
-                </div>
-                <div className="label-names">
-                  <div className="rectangle third"></div>Finance
-                </div>
-                <div className="label-names">
-                  <div className="rectangle fourth"></div>Health
-                </div>
-                <div className="label-names">
-                  <div className="rectangle fifth"></div>Others
-                </div>
+                {homeData?.categoryWatchTime &&
+                  homeData?.categoryWatchTime?.categoryWatchtime?.map(
+                    (item, index) => (
+                      <div className="label-names">
+                        <div
+                          className="rectangle"
+                          style={{ backgroundColor: statsColor[index] }}
+                        ></div>
+                        {item.category} -{" "}
+                        {(
+                          item.watchtime /
+                          homeData?.categoryWatchTime?.totalWatchtime
+                        ).toFixed(2) * 100}{" "}
+                        %
+                      </div>
+                    )
+                  )}
               </div>
             </Tilt>
           </div>
@@ -175,7 +186,7 @@ const Home = ({ category }) => {
                       ? "/assets/placeholder.avif"
                       : item.course.photo
                   }
-                  lectureName={item.lecture.cleanedName}
+                  lectureName={item.lecture?.cleanedName}
                   courseId={item.course.id}
                   courseName={item.course.cleanedName}
                 />

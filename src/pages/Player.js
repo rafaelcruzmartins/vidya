@@ -319,6 +319,7 @@ const Player = () => {
   const [isNextVideo, setIsNextVideo] = useState(null);
   const [isPrevVideo, setIsPrevVideo] = useState(null);
   const [defLang, setDefLang] = useState(null);
+  const [totalLectures, setTotalLectures] = useState(0);
   const lectureRef = useRef({});
   const scrollTimeoutRef = useRef(null);
   const { id } = useParams();
@@ -349,7 +350,27 @@ const Player = () => {
       });
     }
   };
+  useEffect(() => {
+    const updateCourseProgress = async () => {
+      try {
+        if (completedLectures.size >= 1) {
+          await axios.post(
+            "/api/course/progress/courseprogress",
 
+            {
+              progress: (completedLectures.size / totalLectures).toFixed(2),
+              CourseId: id,
+              hasCompleted: completedLectures.size === totalLectures,
+            },
+            { withCredentials: true }
+          );
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    updateCourseProgress();
+  }, [completedLectures]);
   const toggleSection = useCallback((sectionId) => {
     setExpandedSections((prev) => {
       const newSet = new Set(prev);
@@ -361,7 +382,6 @@ const Player = () => {
       return newSet;
     });
   }, []);
-
   const areAllLecturesCompleted = useCallback(
     (sectionId) => {
       if (!courseData) return false;
@@ -386,6 +406,7 @@ const Player = () => {
     });
     setCompletedSections(newCompletedSections);
   }, [completedLectures, courseData, areAllLecturesCompleted]);
+
   const handleToggleLectureBackendComplete = async (lectureId) => {
     try {
       await axios.post(
@@ -504,12 +525,15 @@ const Player = () => {
   }, [id]);
   useEffect(() => {
     const initialload = () => {
-      if (lectureDictionary && courseData.userlastwatcheds[0]) {
-        const initiallecture = courseData.userlastwatcheds[0].LectureId;
+      if (lectureDictionary && courseData.courseprogresses[0]?.LectureId) {
+        const initiallecture = courseData.courseprogresses[0].LectureId;
         setNowPlaying(initiallecture);
         setInitialVideoProgress(
           lectureDictionary[initiallecture].progress[0].progress
         );
+      }
+      if (lectureDictionary) {
+        setTotalLectures(Object.keys(lectureDictionary).length);
       }
     };
     initialload();
