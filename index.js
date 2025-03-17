@@ -21,6 +21,7 @@ import homeRoutes from "./routes/home.js";
 import courseRoutes from "./routes/course.js";
 import categoryRoutes from "./routes/category.js";
 import instructorRoutes from "./routes/instructor.js";
+import dashboardRoutes from "./routes/dashboard.js";
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
@@ -118,6 +119,7 @@ app.use("/api/home", homeRoutes);
 app.use("/api/course", courseRoutes);
 app.use("/api/category", categoryRoutes);
 app.use("/api/instructor", instructorRoutes);
+app.use("/api/dashboard", dashboardRoutes);
 app.get("/", async (req, res) => {
   const server = await Server.findAll();
   res.status(200).json(server[0].isFirstStartUp);

@@ -117,6 +117,7 @@ const getCourseData = async (CourseId) => {
               attributes: ["id", "type", "order", "cleanedName", "duration"],
             },
           },
+          { model: CourseProgress, as: "courseprogresses" },
           { model: Category, as: "category" },
           { model: Instructor, as: "instructors" },
         ],
@@ -149,14 +150,9 @@ const getCourseData = async (CourseId) => {
 router.post("/individual", isAuthenticated, async (req, res) => {
   try {
     const { CourseId } = req.body;
-    const cachedCourse = cache.get(CourseId);
-    if (cachedCourse) {
-      res.json({ ...cachedCourse, role: req.user.role });
-    } else {
-      const courseData = await getCourseData(CourseId);
-      cache.set(CourseId, courseData);
-      res.json({ ...courseData, role: req.user.role });
-    }
+
+    const courseData = await getCourseData(CourseId);
+    res.json({ ...courseData, role: req.user.role });
   } catch (error) {
     console.error(error);
     res.status(500).send("Failed to fetch course data");

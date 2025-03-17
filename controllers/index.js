@@ -12,6 +12,8 @@ import {
   individualInstructor,
 } from "./instructorController.js";
 
+import getUserDashboardAnalytics from "./dashboardController.js";
+
 export {
   register,
   scan,
@@ -24,4 +26,5 @@ export {
   courseOfCategories,
   getAllInstructor,
   individualInstructor,
+  getUserDashboardAnalytics,
 };

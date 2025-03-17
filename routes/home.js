@@ -1,12 +1,11 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/owner.js";
 import {
-  Category,
   Course,
   CourseProgress,
+  Instructor,
   Lecture,
   TrackingSystem,
-  UserLastWatched,
 } from "../models/index.js";
 const router = Router();
 const getUserData = async (userId, featuredCourseId) => {
@@ -32,11 +31,24 @@ const getUserData = async (userId, featuredCourseId) => {
         TrackingSystem.getCategoryWatchTime(userId),
         Course.findByPk(featuredCourseId, {
           attributes: ["id", "title", "photo"],
+          include: [
+            {
+              model: Instructor,
+              as: "instructors",
+              attributes: ["id", "name"],
+            },
+          ],
         }),
         Course.findAll({
           order: [["createdAt", "DESC"]],
           limit: 10,
-          attributes: ["id", "cleanedName", "photo"],
+          attributes: ["id", "cleanedName", "photo", "createdAt"],
+          include: [
+            {
+              model: Instructor,
+              as: "instructors",
+            },
+          ],
         }),
       ]);
 
@@ -45,9 +57,6 @@ const getUserData = async (userId, featuredCourseId) => {
       categoryWatchTime: watchTime || {},
       featuredCourse: featuredCourse || null,
       latestCourse: latestCourse || [],
-
-      hasIncompleteData:
-        !lastWatched || !watchTime || !featuredCourse || !latestCourse,
     };
   } catch (error) {
     console.error("Error fetching home data:", error);
