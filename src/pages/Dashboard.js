@@ -1,5 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PreNav from "../components/Navbar/PreNav";
+import axios from "../api/axiosInstance";
+import { useAuth } from "../context/AuthContext";
+import WatchTimeAnalytics from "../components/WatchTimeAnalytics";
 import {
   FlagAltSolid,
   TimeFive,
@@ -7,10 +10,34 @@ import {
   Bookmark,
   PurchaseTag,
   Play,
+  SkeletonLoader,
 } from "../assets";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("difficult");
+  const [dashboardData, setDashboardData] = useState(null);
+  const [errorData, setErrorData] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { data } = await axios.get(
+          "/api/dashboard/",
+
+          { withCredentials: true }
+        );
+        setDashboardData(data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        setErrorData("Error fetching dashrboad data");
+      }
+    };
+    fetchData();
+  }, []);
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
@@ -19,474 +46,219 @@ const Dashboard = () => {
       case "difficult":
         return (
           <>
-            <div className="tag-content">
-              <div className="tag-icon-difficult">
-                <PurchaseTag />
+            {dashboardData &&
+            dashboardData?.tagsAndBookmarks.difficult.length === 0 ? (
+              <div style={{ opacity: ".6", margin: "1rem" }}>
+                No Tags, select lecture menu when playing to add
               </div>
-              <div className="tag-content-title">
-                Advanced React Patterns difficult
-              </div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-difficult">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">
-                Advanced React Patterns difficult
-              </div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-difficult">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">
-                Advanced React Patterns difficult
-              </div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-difficult">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">
-                Advanced React Patterns difficult
-              </div>
-            </div>
+            ) : (
+              dashboardData?.tagsAndBookmarks.difficult.map((item) => (
+                <div className="tag-content" key={item.id}>
+                  <div className="tag-icon-difficult">
+                    <PurchaseTag />
+                  </div>
+                  <div className="tag-content-title">{item.name} </div>
+                </div>
+              ))
+            )}
           </>
         );
 
       case "need review":
         return (
           <>
-            <div className="tag-content">
-              <div className="tag-icon-need-review">
-                <PurchaseTag />
+            {dashboardData &&
+            dashboardData?.tagsAndBookmarks["need-review"].length === 0 ? (
+              <div style={{ opacity: ".6", margin: "1rem" }}>
+                No Tags, select lecture menu when playing to add
               </div>
-              <div className="tag-content-title">
-                Introduction to Javascript
-              </div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-need-review">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">
-                Introduction to Javascript
-              </div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-need-review">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">
-                Introduction to Javascript
-              </div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-need-review">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">
-                Introduction to Javascript
-              </div>
-            </div>
+            ) : (
+              dashboardData?.tagsAndBookmarks["need-review"].map((item) => (
+                <div className="tag-content" key={item.id}>
+                  <div className="tag-icon-need-review">
+                    <PurchaseTag />
+                  </div>
+                  <div className="tag-content-title">{item.name} </div>
+                </div>
+              ))
+            )}
           </>
         );
       case "important":
         return (
           <>
-            <div className="tag-content">
-              <div className="tag-icon-important">
-                <PurchaseTag />
+            {dashboardData &&
+            dashboardData?.tagsAndBookmarks.important.length === 0 ? (
+              <div style={{ opacity: ".6", margin: "1rem" }}>
+                No Bookmarks, select lecture menu when playing to add
               </div>
-              <div className="tag-content-title">Class based components</div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-important">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">Class based components</div>
-            </div>
-            <div className="tag-content">
-              <div className="tag-icon-important">
-                <PurchaseTag />
-              </div>
-              <div className="tag-content-title">Class based components</div>
-            </div>
+            ) : (
+              dashboardData?.tagsAndBookmarks.important.map((item) => (
+                <div className="tag-content" key={item.id}>
+                  <div className="tag-icon-important">
+                    <PurchaseTag />
+                  </div>
+                  <div className="tag-content-title">{item.name} </div>
+                </div>
+              ))
+            )}
           </>
         );
     }
   };
-  return (
-    <>
-      <PreNav name={"Dashboard"} />
-      <div className="inner-container">
-        <div className="welcome-streak">
-          <div className="welcome">
-            <div className="welcome-heading">Welcome Back</div>
-            <div className="student-name">Rakesh</div>
-          </div>
-          <div className="streak">
-            <div className="hrs-this-week">
-              <TimeFive /> 28.8 hrs this week
-            </div>
-            <div className="streak-days">
-              <FlagAltSolid /> 7 days streak!
-            </div>
-          </div>
-        </div>
-        <div className="current-progress-quick-stats">
-          <div className="current-progress">
-            <div className="current-progress-name">Current Progress</div>
-            <div className="current-progress-categories">
-              <div className="current-progress-categories-wrap">
-                <div className="current-progress-categories-name">
-                  Web Developement
-                </div>
-                <div className="current-progress-categories-percentage">
-                  75%
-                </div>
-              </div>
-              <div className="current-progress-bar">
-                <div
-                  className="current-progress-bar-filled"
-                  style={{ width: "75%" }}
-                ></div>
-              </div>
-            </div>
-            <div className="current-progress-categories">
-              <div className="current-progress-categories-wrap">
-                <div className="current-progress-categories-name">
-                  Web Developement
-                </div>
-                <div className="current-progress-categories-percentage">
-                  75%
-                </div>
-              </div>
-              <div className="current-progress-bar">
-                <div
-                  className="current-progress-bar-filled"
-                  style={{ width: "75%" }}
-                ></div>
-              </div>
-            </div>
-            <div className="current-progress-categories">
-              <div className="current-progress-categories-wrap">
-                <div className="current-progress-categories-name">
-                  Web Developement
-                </div>
-                <div className="current-progress-categories-percentage">
-                  75%
-                </div>
-              </div>
-              <div className="current-progress-bar">
-                <div
-                  className="current-progress-bar-filled"
-                  style={{ width: "75%" }}
-                ></div>
-              </div>
-            </div>
-          </div>
-          <div className="quick-stats">
-            <div className="quick-stats-name">Quick Stats</div>
-            <div className="quick-stats-data-wrap">
-              <div className="quick-stats-data">
-                <BookContent />
-                Completed Courses
-              </div>
-              2/8
-            </div>
-            <div className="quick-stats-data-wrap">
-              <div className="quick-stats-data">
-                <Play />
-                Currently Watching
-              </div>
-              2 Courses
-            </div>
-            <div className="quick-stats-data-wrap">
-              <div className="quick-stats-data">
-                <Bookmark />
-                Bookmark
-              </div>
-              8 Lectures
-            </div>
-          </div>
-        </div>
 
-        <div className="watch-time-analytics">
-          <div className="watch-time-analytics-graph">
-            <div className="watch-time-title">Watch Time Analytics</div>
-            <div className="watch-time-details">
-              Your learning activity this week
+  if (errorData) {
+    return <div>{errorData}</div>;
+  } else if (loading) {
+    return <SkeletonLoader />;
+  } else {
+    return (
+      <>
+        <PreNav name={"Dashboard"} />
+        <div className="inner-container">
+          <div className="welcome-streak">
+            <div className="welcome">
+              <div className="welcome-heading">Welcome Back</div>
+              <div className="student-name">{user.username}</div>
             </div>
-            <div className="graph-div">
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "60%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Mon</div>
+            <div className="streak">
+              <div className="hrs-this-week">
+                <TimeFive />{" "}
+                {dashboardData?.weeklyWatchTime.totalWatchTimeFormatted} this
+                week
               </div>
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "30%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Tue</div>
-              </div>
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "30%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Wed</div>
-              </div>
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "30%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Thu</div>
-              </div>
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "30%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Fri</div>
-              </div>
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "30%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Sat</div>
-              </div>
-              <div className="graph-div-wrap">
-                <div className="graph-hour">3.2hr</div>
-                <div
-                  className="graph-bar"
-                  style={{
-                    height: "30%",
-                    backgroundColor: "#0a2463",
-                    width: "2.5rem",
-                  }}
-                ></div>
-                <div className="graph-day">Sun</div>
+              <div className="streak-days">
+                <FlagAltSolid />{" "}
+                {dashboardData?.watchStreak === 1
+                  ? dashboardData?.watchStreak + " day streak!"
+                  : dashboardData?.watchStreak + " days streak!"}
               </div>
             </div>
           </div>
-          <div className="watch-time-analytics-categories">
-            <div className="watch-time-category-details">
-              Your watch time by categories
-            </div>
-            <div className="graph-div-categories">
-              <div className="graph-name">Web</div>
-              <div className="graph-div-wrap-categories">
-                <div
-                  className="graph-bar-categories"
-                  style={{
-                    width: "60%",
-                    backgroundColor: "#0a2463",
-                    height: "1rem",
-                  }}
-                ></div>
-                <div className="graph-hour">6hr</div>
-              </div>
-              <div className="graph-name">Mobile</div>
-              <div className="graph-div-wrap-categories">
-                <div
-                  className="graph-bar-categories"
-                  style={{
-                    width: "30%",
-                    backgroundColor: "#0a2463",
-                    height: "1rem",
-                  }}
-                ></div>
-                <div className="graph-hour">2.4hr</div>
-              </div>
-              <div className="graph-name">Finance</div>
-              <div className="graph-div-wrap-categories">
-                <div
-                  className="graph-bar-categories"
-                  style={{
-                    width: "30%",
-                    backgroundColor: "#0a2463",
-                    height: "1rem",
-                  }}
-                ></div>
-                <div className="graph-hour">3hr</div>
-              </div>
-              <div className="graph-name">Health</div>
-              <div className="graph-div-wrap-categories">
-                <div
-                  className="graph-bar-categories"
-                  style={{
-                    width: "30%",
-                    backgroundColor: "#0a2463",
-                    height: "1rem",
-                  }}
-                ></div>
-                <div className="graph-hour">5hr</div>
-              </div>
-            </div>
-          </div>
-        </div>
+          <div className="current-progress-quick-stats">
+            <div className="current-progress">
+              <div className="current-progress-name">Current Progress</div>
 
-        <div className="bookmark-tags">
-          <div className="bookmark">
-            <div className="bookmark-name">Bookmark</div>
-            <div className="bookmarks">
-              <div className="bookmark-icon">
-                <Bookmark />
-              </div>
-              <div className="bookmark-title">Advanced React Patterns</div>
+              {dashboardData &&
+                dashboardData.recentCoursesProgress.map((item) => (
+                  <div className="current-progress-categories" key={item.id}>
+                    <div className="current-progress-categories-wrap">
+                      <div
+                        className="current-progress-categories-name"
+                        onClick={() => navigate(`/courses/${item.course.id}`)}
+                      >
+                        {item.course.cleanedName}
+                      </div>
+                      <div className="current-progress-categories-percentage">
+                        {item.progress}%
+                      </div>
+                    </div>
+                    <div className="current-progress-bar">
+                      <div
+                        className="current-progress-bar-filled"
+                        style={{ width: `${item.progress}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
             </div>
-            <div className="bookmarks">
-              <div className="bookmark-icon">
-                <Bookmark />
+            <div className="quick-stats">
+              <div className="quick-stats-name">Quick Stats</div>
+              <div className="quick-stats-data-wrap">
+                <div className="quick-stats-data">
+                  <BookContent />
+                  Completed Courses
+                </div>
+                {dashboardData?.courseCompletionStats.completedCourses}/
+                {dashboardData?.courseCompletionStats.totalCourses}
               </div>
-              <div className="bookmark-title">Advanced React Patterns</div>
-            </div>
-            <div className="bookmarks">
-              <div className="bookmark-icon">
-                <Bookmark />
+              <div className="quick-stats-data-wrap">
+                <div className="quick-stats-data">
+                  <Play />
+                  Currently Watching
+                </div>
+                {dashboardData?.courseCompletionStats.currentlyWatching} Courses
               </div>
-              <div className="bookmark-title">Advanced React Patterns</div>
-            </div>
-            <div className="bookmarks">
-              <div className="bookmark-icon">
-                <Bookmark />
+              <div className="quick-stats-data-wrap">
+                <div className="quick-stats-data">
+                  <Bookmark />
+                  Bookmark
+                </div>
+                {dashboardData?.tagsAndBookmarks.bookmark.length} Lectures
               </div>
-              <div className="bookmark-title">Advanced React Patterns</div>
             </div>
           </div>
-          <div className="tags">
-            <div className="tag-tab-group">
-              <div className="tag-name">Tags</div>
-              <div className="tag-tab">
-                <div
-                  className={
-                    activeTab == "difficult"
-                      ? "tag-difficult active-tag-tab"
-                      : "tag-difficult"
-                  }
-                  onClick={() => handleTabChange("difficult")}
-                >
-                  difficult
-                </div>
-                <div
-                  className={
-                    activeTab == "need review"
-                      ? "tag-need-review active-tag-tab"
-                      : "tag-need-review"
-                  }
-                  onClick={() => handleTabChange("need review")}
-                >
-                  need review
-                </div>
-                <div
-                  onClick={() => handleTabChange("important")}
-                  className={
-                    activeTab == "important"
-                      ? "tag-important active-tag-tab"
-                      : "tag-important"
-                  }
-                >
-                  important
-                </div>
-              </div>
-            </div>
-            {renderedTabContent()}
-          </div>
-        </div>
+          {dashboardData && (
+            <WatchTimeAnalytics
+              weeklyWatchTime={dashboardData?.weeklyWatchTime}
+              categoryWatchTime={dashboardData?.categoryWatchTime}
+            />
+          )}
 
-        <div className="dashboard-notes">
-          <div className="notes-name">Notes</div>
-          <div className="dashboard-notes-wrap">
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure,
-                distinctio corporis molestias vero sed voluptatem?
+          <div className="bookmark-tags">
+            <div className="bookmark">
+              <div className="bookmark-name">Bookmark</div>
+              <div className="bookmark-tags-wrap">
+                {dashboardData &&
+                dashboardData?.tagsAndBookmarks.bookmark.length === 0 ? (
+                  <div style={{ opacity: ".6" }}>
+                    No Bookmarks, select lecture menu when playing to add
+                  </div>
+                ) : (
+                  dashboardData?.tagsAndBookmarks.bookmark.map((item) => (
+                    <div className="bookmarks" key={item.id}>
+                      <div className="bookmark-icon">
+                        <Bookmark />
+                      </div>
+                      <div className="bookmark-title">{item.name}</div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure,
-                distinctio corporis molestias vero sed voluptatem?
+            <div className="tags">
+              <div className="tag-tab-group">
+                <div className="tag-name">Tags</div>
+                <div className="tag-tab">
+                  <div
+                    className={
+                      activeTab === "difficult"
+                        ? "tag-difficult active-tag-tab"
+                        : "tag-difficult"
+                    }
+                    onClick={() => handleTabChange("difficult")}
+                  >
+                    difficult
+                  </div>
+                  <div
+                    className={
+                      activeTab === "need review"
+                        ? "tag-need-review active-tag-tab"
+                        : "tag-need-review"
+                    }
+                    onClick={() => handleTabChange("need review")}
+                  >
+                    need review
+                  </div>
+                  <div
+                    onClick={() => handleTabChange("important")}
+                    className={
+                      activeTab === "important"
+                        ? "tag-important active-tag-tab"
+                        : "tag-important"
+                    }
+                  >
+                    important
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure,
-                distinctio corporis molestias vero sed voluptatem?
-              </div>
-            </div>
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure,
-                distinctio corporis molestias vero sed voluptatem?
-              </div>
-            </div>
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure,
-                distinctio corporis molestias vero sed voluptatem?
-              </div>
-            </div>
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                Expedita corrupti, sequi illum.
-              </div>
-            </div>
-            <div className="notes-card">
-              <div className="notes-title">React Hooks Deep Dive</div>
-              <div className="notes-content">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit. Iure,
-                distinctio corporis molestias vero sed voluptatem?
-              </div>
+              <div className="bookmark-tags-wrap">{renderedTabContent()}</div>
             </div>
           </div>
         </div>
-      </div>
-    </>
-  );
+      </>
+    );
+  }
 };
 
 export default Dashboard;

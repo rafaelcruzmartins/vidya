@@ -339,13 +339,14 @@ const IndividualCourses = () => {
           <div className="bottom">
             <div className="bottom-container">
               <div className="instructor-section">
-                Instructors:
-                {courseInstructors.map((instructor) => (
+                Instructors :{" "}
+                {courseInstructors.map((instructor, index) => (
                   <span
                     onClick={() => navigate(`/instructor/${instructor.id}`)}
+                    key={instructor.id}
+                    className="featured-instructor-link"
                   >
-                    {" "}
-                    {instructor.name}
+                    {(index ? ", " : "") + instructor.name}
                   </span>
                 ))}
               </div>
@@ -354,7 +355,7 @@ const IndividualCourses = () => {
                 {course?.description}
               </div>
               <div> {secondsToHoursRounded(course?.duration)}</div>
-              <div>Watched : 10Hr , 50% of 20Hr</div>
+              <div>Progress : {course?.courseprogresses?.[0].progress}%</div>
             </div>
           </div>
           <div className="img-container course-info-image instructor-info-image">

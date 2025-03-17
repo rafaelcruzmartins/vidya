@@ -16,7 +16,7 @@ import {
 } from "../../assets";
 import { useAuth } from "../../context/AuthContext";
 
-const PreNav = ({ name }) => {
+const PreNav = ({ name, progress }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -90,9 +90,7 @@ const PreNav = ({ name }) => {
           <Search />
         </div>
         <div className="profile">
-          <div className="svg-div">
-            <User />
-          </div>
+          <div className="svg-div">{progress ? progress : <User />}</div>
         </div>
       </div>
 

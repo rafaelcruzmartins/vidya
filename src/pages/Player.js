@@ -319,7 +319,7 @@ const Player = () => {
   const [isNextVideo, setIsNextVideo] = useState(null);
   const [isPrevVideo, setIsPrevVideo] = useState(null);
   const [defLang, setDefLang] = useState(null);
-  const [totalLectures, setTotalLectures] = useState(0);
+  const [totalLectures, setTotalLectures] = useState(null);
   const lectureRef = useRef({});
   const scrollTimeoutRef = useRef(null);
   const { id } = useParams();
@@ -353,7 +353,7 @@ const Player = () => {
   useEffect(() => {
     const updateCourseProgress = async () => {
       try {
-        if (completedLectures.size >= 1) {
+        if (completedLectures.size >= 1 && totalLectures) {
           await axios.post(
             "/api/course/progress/courseprogress",
 
@@ -532,7 +532,7 @@ const Player = () => {
           lectureDictionary[initiallecture].progress[0].progress
         );
       }
-      if (lectureDictionary) {
+      if (lectureDictionary && !isLoading) {
         setTotalLectures(Object.keys(lectureDictionary).length);
       }
     };
@@ -623,7 +623,10 @@ const Player = () => {
           onClose={() => setShowToast(false)}
         />
       )}
-      <PreNav name={courseData?.cleanedName} />
+      <PreNav
+        name={courseData?.cleanedName}
+        progress={(completedLectures.size / totalLectures).toFixed(2) + "%"}
+      />
       <div className="player-container">
         {lectureDictionary[nowPlaying]?.type &&
         lectureDictionary[nowPlaying]?.type === "video" ? (

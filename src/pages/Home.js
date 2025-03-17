@@ -46,6 +46,9 @@ const Home = ({ category }) => {
       }`
     );
   };
+  const handleInstructor = (id) => {
+    navigate(`instructor/${id}`);
+  };
   const scrollLeft = () => {
     if (latestRef.current) {
       latestRef.current.scrollBy({ left: -900, behavior: "smooth" });
@@ -124,7 +127,24 @@ const Home = ({ category }) => {
                         ? homeData.featuredCourse.cleanedName
                         : homeData.latestCourse[1].cleanedName)}
                   </div>
-                  <div className="instructor-name">by Andre Sivan</div>
+                  <div className="instructor-name">
+                    by{" "}
+                    {homeData &&
+                      (!homeData.featuredCourse === null
+                        ? homeData.featuredCourse.intructors
+                        : homeData.latestCourse[1].instructors
+                      ).map((item, index) => (
+                        <span
+                          className="featured-instructor-link"
+                          onClick={() => {
+                            handleInstructor(item.id);
+                          }}
+                          key={item.id}
+                        >
+                          {(index ? ", " : "") + item.name}
+                        </span>
+                      ))}
+                  </div>
                   <div className="play-button" onClick={handlePlayer}>
                     Play Now
                   </div>
@@ -145,7 +165,7 @@ const Home = ({ category }) => {
                 {homeData?.categoryWatchTime &&
                   homeData?.categoryWatchTime?.categoryWatchtime?.map(
                     (item, index) => (
-                      <div className="label-names">
+                      <div className="label-names" key={index}>
                         <div
                           className="rectangle"
                           style={{ backgroundColor: statsColor[index] }}
