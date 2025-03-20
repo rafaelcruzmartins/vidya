@@ -83,7 +83,7 @@ const SelectedFolders = ({ selectedFolders, onAddFolder, onRemoveFolder }) => (
     className="selected-folders-container"
   >
     <div className="folders-setup">
-      <div className="folders-title">Add Folders to scan for lectures</div>
+      <div className="folders-title">Add Folders to scan for courses</div>
     </div>
     <div className="folders-list">
       {selectedFolders.map((folder, index) => (
@@ -174,7 +174,7 @@ const FileBrowser = ({ onSelect }) => {
   return (
     <div className="drive-container">
       <div className="drive-setup">
-        <div className="drive-title">Choose the Lecture directory</div>
+        <div className="drive-title">Choose the Course directory</div>
       </div>
       <div className="drives">
         {drives.map((drive) => (

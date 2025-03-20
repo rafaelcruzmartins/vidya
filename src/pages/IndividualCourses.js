@@ -10,16 +10,58 @@ import {
   PlusCircle,
   X,
   ChevronRight,
+  VideoSolid,
+  FilePdfSolid,
+  Html,
+  World,
+  FileArchiveSolid,
+  FileBlankSolid,
+  CheckCircleSolid,
+  Circle,
 } from "../assets";
 import { useRef, useState, useEffect, memo, useCallback } from "react";
 import Toast from "../components/Toast/Toast.js";
 import { useAuth } from "../context/AuthContext.js";
+const ICON_MAP = {
+  video: <VideoSolid />,
+  pdf: <FilePdfSolid />,
+  zip: <FileArchiveSolid />,
+  html: <Html />,
+  url: <World />,
+};
+const LectureTypeIcon = memo(({ type }) => {
+  return ICON_MAP[type.toLowerCase()] || <FileBlankSolid />;
+});
+const secondsToMinutesRounded = (seconds) => {
+  const minutes = (seconds / 60).toFixed(1);
+  return `${minutes}min`;
+};
 const SectionHeader = memo(
-  ({ sectionOrder, title, hasLectures, isExpanded, onToggle }) => (
-    <div onClick={onToggle} className={`section-header `}>
-      <span className="playlist-section-title">
-        {sectionOrder}: {title}
-      </span>
+  ({
+    sectionOrder,
+    title,
+    hasLectures,
+    isExpanded,
+    onToggle,
+    isSectionCompleted,
+    duration,
+    total,
+  }) => (
+    <div
+      onClick={onToggle}
+      className={`section-header ${isSectionCompleted ? "green" : ""}`}
+    >
+      <div className="section-title-wrap">
+        <span className="playlist-section-title">
+          {sectionOrder}: {title}
+        </span>
+        <div className="section-details">
+          <span className="section-duration">
+            {secondsToMinutesRounded(duration)}
+          </span>
+          <span className="section-lectures-total"> {total} lectures</span>
+        </div>
+      </div>
       {hasLectures && (
         <span className={`chevron-icon ${isExpanded ? "expanded" : ""}`}>
           <div className="svg-div">
@@ -35,28 +77,207 @@ const LectureItem = memo(
   ({
     lectureId,
     title,
-
+    isCompleted,
     onToggle,
-
+    handleNowPlaying,
     lectureOrder,
-
+    nowPlaying,
     sectionOrder,
-  }) => (
-    <div className={`playlist-lecture-item`}>
-      <span
-        className="checkbox"
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggle(lectureId);
-        }}
-      >
-        <div className="svg-div"></div>
-      </span>
-      <span className="lecture-title">
-        {sectionOrder}.{lectureOrder}: {title}
-      </span>
-    </div>
-  )
+    courseId,
+    type,
+    duration,
+    content,
+    setToastMessage,
+    setToastType,
+    setShowToast,
+  }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+
+    const toggleDropdown = () => setIsOpen(!isOpen);
+    const toggleMenu = (e) => {
+      e.stopPropagation();
+      if (isTagModalOpen) {
+        setIsTagModalOpen(false);
+        setIsMenuOpen(false);
+      } else {
+        setIsMenuOpen(!isMenuOpen);
+      }
+    };
+
+    const handleAddTag = (e) => {
+      e.stopPropagation();
+      setIsTagModalOpen(true);
+      setIsMenuOpen(false);
+    };
+
+    const handleAddBookmark = async (e) => {
+      e.stopPropagation();
+      try {
+        await axios.post(
+          "/api/course/tagsandbookmark",
+          {
+            lectureId,
+            name: title,
+            type: "bookmark",
+            courseId,
+          },
+          { withCredentials: true }
+        );
+        setToastMessage("lecture is bookmarked");
+        setToastType("success");
+        setShowToast(true);
+      } catch (error) {
+        console.error(error);
+        if (error.status === 409) {
+          setToastMessage("lecture is already bookmarked");
+          setToastType("warning");
+          setShowToast(true);
+        }
+      }
+      setIsMenuOpen(false);
+    };
+
+    const handleTagSelection = async (tagType, e) => {
+      e.stopPropagation();
+      try {
+        await axios.post(
+          "/api/course/tagsandbookmark",
+          {
+            lectureId,
+            name: title,
+            type: tagType,
+            courseId,
+          },
+          { withCredentials: true }
+        );
+        setToastMessage("lecture is tagged");
+        setToastType("success");
+        setShowToast(true);
+      } catch (error) {
+        console.error(error);
+        if (error.status === 409) {
+          setToastMessage("lecture is already tagged");
+          setToastType("warning");
+          setShowToast(true);
+        }
+      }
+      setIsTagModalOpen(false);
+    };
+
+    return (
+      <>
+        <div className={`playlist-lecture-item `}>
+          <span className="checkbox">
+            <div className="svg-div"></div>
+          </span>
+          <span className="type-icon">
+            <div className="svg-div">
+              <LectureTypeIcon type={type} />
+            </div>
+          </span>
+          <div className="lecture-title">
+            {sectionOrder}.{lectureOrder}: {title}
+            <div className="lecture-content-time">
+              <div className="lecture-time">
+                {type === "video" && secondsToMinutesRounded(duration)}
+              </div>
+              {content?.[0]?.type && (
+                <div className="lecture-content">
+                  <button
+                    className="content-button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleDropdown();
+                    }}
+                  >
+                    <span>Content</span>
+                    <svg
+                      className="content-arrow"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  {isOpen && (
+                    <div className="content-dropdown">
+                      <span>
+                        <LectureTypeIcon type={content?.[0]?.type} />
+                      </span>
+                      <a
+                        href={
+                          process.env.REACT_APP_API +
+                          "/api/course/content/" +
+                          content?.[0]?.pathId
+                        }
+                        download
+                        target="_blank"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        {content?.[0]?.originalName}
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="lecture-menu">
+            <div onClick={toggleMenu}>
+              <DotsVerticalRounded />
+            </div>
+
+            {isMenuOpen && (
+              <div className="lecture-menu-modal">
+                <div className="menu-option" onClick={handleAddTag}>
+                  Add as a tag
+                </div>
+                <div className="menu-option" onClick={handleAddBookmark}>
+                  Add to bookmarks
+                </div>
+              </div>
+            )}
+
+            {isTagModalOpen && (
+              <div className="tag-selection-modal">
+                <div
+                  className="tag-option"
+                  data-tag="difficult"
+                  onClick={(e) => handleTagSelection("difficult", e)}
+                >
+                  Difficult
+                </div>
+                <div
+                  className="tag-option"
+                  data-tag="need-review"
+                  onClick={(e) => handleTagSelection("need-review", e)}
+                >
+                  Need Review
+                </div>
+                <div
+                  className="tag-option"
+                  data-tag="important"
+                  onClick={(e) => handleTagSelection("important", e)}
+                >
+                  Important
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </>
+    );
+  }
 );
 
 const IndividualCourses = () => {
@@ -355,7 +576,12 @@ const IndividualCourses = () => {
                 {course?.description}
               </div>
               <div> {secondsToHoursRounded(course?.duration)}</div>
-              <div>Progress : {course?.courseprogresses?.[0].progress}%</div>
+              <div>
+                Progress :{" "}
+                {course?.courseprogresses?.[0]?.progress
+                  ? `${course?.courseprogresses?.[0]?.progress}%`
+                  : ""}
+              </div>
             </div>
           </div>
           <div className="img-container course-info-image instructor-info-image">
@@ -606,7 +832,9 @@ const IndividualCourses = () => {
                   title={section.cleanedName}
                   hasLectures={section.lectures.length > 0}
                   isExpanded={expandedSections.has(section.id)}
+                  duration={section.duration}
                   onToggle={() => toggleSection(section.id)}
+                  total={section.lectures.length}
                 />
                 <AnimatePresence>
                   {expandedSections.has(section.id) &&
@@ -624,6 +852,13 @@ const IndividualCourses = () => {
                             lectureOrder={index + 1}
                             sectionOrder={section.order}
                             title={lecture.cleanedName}
+                            type={lecture.type}
+                            duration={lecture.duration}
+                            content={lecture.content}
+                            CourseId={id}
+                            setToastMessage={setToastMessage}
+                            setToastType={setToastType}
+                            setShowToast={setShowToast}
                           />
                         ))}
                       </motion.div>

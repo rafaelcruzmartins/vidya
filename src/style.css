@@ -700,6 +700,7 @@ img {
   right: 0;
   bottom: 0;
   z-index: 10;
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 .user > div {
@@ -899,14 +900,8 @@ img {
   margin-bottom: 1rem;
 }
 .active-indicator {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
   background: rgba(255, 255, 255, 0.34);
   border: 1px solid #ffffff;
-  z-index: -1;
   border-radius: 0.5rem;
 }
 .settings-content > .img-container {
@@ -967,7 +962,7 @@ select option {
   background: rgba(255, 255, 255, 0.34);
   display: flex;
   align-items: center;
-  margin-right: 1rem;
+  margin: 1rem;
   border-radius: 1rem;
 
   svg {
@@ -998,7 +993,60 @@ select option {
   justify-content: space-around;
   align-items: center;
 }
+.drive-container-admin {
+  height: 93%;
+  margin-left: 1rem;
+}
+.folder-item {
+  width: 100%;
+  display: flex;
+  background: rgba(255, 255, 255, 0.4);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  margin: 1rem;
+}
+.add-folder-modal {
+  width: 70vw;
+  height: 70vh;
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(50px);
+  border: 1px solid white;
+  border-radius: 1rem;
+}
+.folder-actions {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+.save-cancel-folder-buttons,
+.yes-button {
+  background: #e20044;
+  border-radius: 0.4rem;
+  color: white;
+  padding: 0.2rem 0.4rem;
+}
+.rotating {
+  animation: rotate 2s linear infinite;
+}
 
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.cancel-button {
+  background: #00a6a6;
+  border-radius: 0.4rem;
+  color: white;
+  padding: 0.2rem 0.4rem;
+}
 .folder-plus {
   fill: #00a6a6;
 
@@ -1007,7 +1055,19 @@ select option {
     height: 1.8rem;
   }
 }
-
+.confiramation-dialog {
+  display: flex;
+  height: 80%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+.confiramtion-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1rem;
+}
 .folder-refresh {
   fill: rgb(10, 36, 99);
 

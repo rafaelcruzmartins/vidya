@@ -111,10 +111,10 @@ const Home = ({ category }) => {
                     homeData &&
                     process.env.REACT_APP_API +
                       (!homeData.featuredCourse === null
-                        ? homeData.featuredCourse.photo
-                        : homeData.latestCourse[1].photo === null
+                        ? homeData?.featuredCourse?.photo
+                        : homeData?.latestCourse[1]?.photo === null
                         ? "/assets/placeholder.avif"
-                        : homeData.latestCourse[1].photo)
+                        : homeData?.latestCourse[1]?.photo)
                   }
                   alt=""
                 />
@@ -124,16 +124,16 @@ const Home = ({ category }) => {
                   <div className="info-title" onClick={handleCourse}>
                     {homeData &&
                       (!homeData.featuredCourse === null
-                        ? homeData.featuredCourse.cleanedName
-                        : homeData.latestCourse[1].cleanedName)}
+                        ? homeData.featuredCourse?.cleanedName
+                        : homeData.latestCourse[1]?.cleanedName)}
                   </div>
                   <div className="instructor-name">
                     by{" "}
                     {homeData &&
                       (!homeData.featuredCourse === null
-                        ? homeData.featuredCourse.intructors
-                        : homeData.latestCourse[1].instructors
-                      ).map((item, index) => (
+                        ? homeData.featuredCourse?.intructors
+                        : homeData.latestCourse[1]?.instructors
+                      )?.map((item, index) => (
                         <span
                           className="featured-instructor-link"
                           onClick={() => {
