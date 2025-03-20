@@ -7,7 +7,6 @@ import {
   DailyWatch,
   LectureProgress,
   Category,
-  Lecture,
 } from "../models/index.js";
 
 export const getUserDashboardAnalytics = async (req, res) => {
@@ -199,7 +198,7 @@ const calculateWatchStreak = (watchData, today) => {
   return streak;
 };
 
-const transformWatchtimeData = (data, maxCategories = 5) => {
+const transformWatchtimeData = (data, maxCategories = 100) => {
   const result = {
     totalWatchtime: 0,
     categoryWatchtime: [],

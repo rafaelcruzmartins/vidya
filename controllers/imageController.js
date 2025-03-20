@@ -3,7 +3,6 @@ import { fileURLToPath } from "url";
 import sharp from "sharp";
 import { Course, Instructor } from "../models/index.js";
 import crypto from "crypto";
-import cache from "../cache/nodecache.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const UPLOAD_DIR = join(__dirname, "../assets");
@@ -56,7 +55,6 @@ const uploadImageCourse = async (req, res) => {
       const course = await Course.findByPk(CourseId);
       await course.setInstructors(parsedInstructor);
     }
-    cache.del(CourseId);
     res.status(201).json({
       message: "Updated Successfully",
     });

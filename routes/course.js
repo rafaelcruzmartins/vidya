@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/owner.js";
-import cache from "../cache/nodecache.js";
 import {
   Category,
   Course,

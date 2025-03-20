@@ -6,14 +6,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import session from "express-session";
 import sessionConnect from "connect-session-sequelize";
-import {
-  User,
-  Course,
-  Server,
-  Section,
-  Lecture,
-  LectureProgress,
-} from "./models/index.js";
+import { User, Server } from "./models/index.js";
 import authRoutes from "./routes/auth.js";
 import adminRoutes from "./routes/admin.js";
 import driveRoutes from "./routes/drive.js";

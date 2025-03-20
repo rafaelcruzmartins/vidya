@@ -13,9 +13,24 @@ import TagsAndBookmark from "./TagsAndBookmark.js";
 import CourseProgress from "./CourseProgress.js";
 import sequelize from "../config/database.js";
 
-Course.hasMany(Section, { foreignKey: "CourseId", as: "sections" });
+CourseFolder.hasMany(Course, { foreignKey: "CourseFolderId", as: "courses" });
+Course.belongsTo(CourseFolder, {
+  foreignKey: "CourseFolderId",
+  as: "coursefolder",
+});
+Course.hasMany(Section, {
+  foreignKey: "CourseId",
+  as: "sections",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 Section.belongsTo(Course, { foreignKey: "CourseId", as: "course" });
-Section.hasMany(Lecture, { foreignKey: "SectionId", as: "lectures" });
+Section.hasMany(Lecture, {
+  foreignKey: "SectionId",
+  as: "lectures",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 Lecture.belongsTo(Section, { foreignKey: "SectionId", as: "section" });
 Category.hasMany(Course, { foreignKey: "CategoryId", as: "courses" });
 Course.belongsTo(Category, { foreignKey: "CategoryId", as: "category" });
@@ -34,6 +49,8 @@ TagsAndBookmark.belongsTo(User, { foreignKey: "UserId", as: "user" });
 Lecture.hasMany(LectureProgress, {
   foreignKey: "LectureId",
   as: "lectureprogresses",
+  onDelete: "CASCADE",
+  hooks: true,
 });
 LectureProgress.belongsTo(Lecture, { foreignKey: "LectureId", as: "lecture" });
 User.hasMany(LectureProgress, {
@@ -56,6 +73,8 @@ CourseProgress.belongsTo(User, { foreignKey: "UserId", as: "user" });
 Course.hasMany(CourseProgress, {
   foreignKey: "CourseId",
   as: "courseprogresses",
+  onDelete: "CASCADE",
+  hooks: true,
 });
 CourseProgress.belongsTo(Course, { foreignKey: "CourseId", as: "course" });
 

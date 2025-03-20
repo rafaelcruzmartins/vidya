@@ -13,7 +13,7 @@ const getUserData = async (userId, featuredCourseId) => {
     const [lastWatched, watchTime, featuredCourse, latestCourse] =
       await Promise.all([
         CourseProgress.findAll({
-          where: { UserId: userId },
+          where: { UserId: userId, hasCompleted: false },
           include: [
             {
               model: Lecture,

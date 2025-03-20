@@ -1,5 +1,10 @@
-import { register, scan } from "./courseController.js";
-import { user } from "./userController.js";
+import {
+  register,
+  scan,
+  addCourseFolder,
+  deleteFolder,
+} from "./courseController.js";
+import { createUser, getAdminData } from "./adminController.js";
 import { uploadImageCourse, uploadImageInstructor } from "./imageController.js";
 import {
   createCategory,
@@ -17,7 +22,8 @@ import getUserDashboardAnalytics from "./dashboardController.js";
 export {
   register,
   scan,
-  user,
+  createUser,
+  getAdminData,
   uploadImageCourse,
   uploadImageInstructor,
   createCategory,
@@ -26,5 +32,7 @@ export {
   courseOfCategories,
   getAllInstructor,
   individualInstructor,
+  addCourseFolder,
   getUserDashboardAnalytics,
+  deleteFolder,
 };

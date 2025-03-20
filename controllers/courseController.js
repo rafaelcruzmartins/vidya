@@ -249,7 +249,7 @@ const collectPathIdsForSection = async (sectionId) => {
   return Array.from(pathIds);
 };
 
-const syncCourseDirectory = async (coursedirectory) => {
+const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
   pathCache.reset();
   await durationCache.initialize();
 
@@ -259,7 +259,7 @@ const syncCourseDirectory = async (coursedirectory) => {
   if (!fs.existsSync(directory)) {
     const course = await Course.findOne({ where: { directory } });
     if (course) {
-      await course.destroy();
+      await deleteCourse(course.id);
       console.log(`Deleted course: ${course.cleanedName}`);
     }
     return null;
@@ -272,6 +272,7 @@ const syncCourseDirectory = async (coursedirectory) => {
       cleanedName: cleanNameCourse(path.basename(directory)),
       directory,
       duration: 0,
+      CourseFolderId: courseFolderId,
     });
     console.log("new course created");
   }
@@ -684,7 +685,62 @@ const scanForDirectory = async (directory) =>
         .map((f) => path.join(directory, f))
     )
   );
+const collectPathIdsForCourse = async (courseId) => {
+  const sections = await Section.findAll({
+    where: { CourseId: courseId },
+    include: [
+      {
+        model: Lecture,
+        as: "lectures",
+      },
+    ],
+  });
 
+  const pathIds = new Set();
+
+  for (const section of sections) {
+    if (section.lectures) {
+      for (const lecture of section.lectures) {
+        if (lecture.content && Array.isArray(lecture.content)) {
+          lecture.content.forEach((item) => {
+            if (item.pathId) pathIds.add(item.pathId);
+          });
+        }
+
+        if (lecture.subtitles && Array.isArray(lecture.subtitles)) {
+          lecture.subtitles.forEach((item) => {
+            if (item.pathId) pathIds.add(item.pathId);
+          });
+        }
+
+        if (lecture.pathId) pathIds.add(lecture.pathId);
+      }
+    }
+  }
+
+  return Array.from(pathIds);
+};
+const deleteCourse = async (courseId) => {
+  const pathIdsToDelete = await collectPathIdsForCourse(courseId);
+
+  const course = await Course.findByPk(courseId);
+  if (course) {
+    await course.destroy();
+  }
+
+  if (pathIdsToDelete.length > 0) {
+    await PathFile.destroy({
+      where: {
+        id: pathIdsToDelete,
+      },
+    });
+  }
+
+  return {
+    courseDeleted: course ? true : false,
+    pathFilesDeleted: pathIdsToDelete.length,
+  };
+};
 const register = async (req, res) => {
   try {
     const user = await User.create({
@@ -704,13 +760,17 @@ const register = async (req, res) => {
       })
     );
 
-    const coursefolder = await CourseFolder.bulkCreate(folders);
-    const savedfolders = coursefolder.map((folder) => folder.directory);
+    const coursefolder = await CourseFolder.bulkCreate(folders, {
+      returning: true,
+    });
 
-    for (const folder of savedfolders) {
-      const individualCourseDirectory = await scanForDirectory(folder);
+    for (const folder of coursefolder) {
+      const individualCourseDirectory = await scanForDirectory(
+        folder.directory
+      );
       for (const individualCourse of individualCourseDirectory) {
-        await syncCourseDirectory(normalizePath(individualCourse));
+        console.log(folder.id);
+        await syncCourseDirectory(normalizePath(individualCourse), folder.id);
       }
     }
 
@@ -730,12 +790,13 @@ const register = async (req, res) => {
 const scan = async (req, res) => {
   try {
     const coursefolder = await CourseFolder.findAll();
-    const savedfolders = coursefolder.map((folder) => folder.directory);
 
-    for (const folder of savedfolders) {
-      const individualCourseDirectory = await scanForDirectory(folder);
+    for (const folder of coursefolder) {
+      const individualCourseDirectory = await scanForDirectory(
+        folder.directory
+      );
       for (const individualCourse of individualCourseDirectory) {
-        await syncCourseDirectory(normalizePath(individualCourse));
+        await syncCourseDirectory(normalizePath(individualCourse), folder.id);
       }
     }
   } catch (error) {
@@ -744,5 +805,55 @@ const scan = async (req, res) => {
   }
   res.status(201).send("successfully updated the course");
 };
+const addCourseFolder = async (req, res) => {
+  try {
+    const folders = await Promise.all(
+      req.body.folders.map(async (folder) => {
+        const stats = await fsp.stat(folder);
+        return {
+          directory: normalizePath(folder),
+          lastModified: stats.mtime,
+          lastChecked: new Date(),
+        };
+      })
+    );
 
-export { register, scan };
+    const coursefolder = await CourseFolder.bulkCreate(folders);
+    res.status(201).send("folder successfully ceated");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+const deleteFolder = async (req, res) => {
+  try {
+    const { folderId } = req.body;
+    const coursefolder = await CourseFolder.findByPk(folderId);
+
+    if (coursefolder) {
+      const courses = await Course.findAll({
+        where: { CourseFolderId: folderId },
+      });
+
+      const deletionResults = [];
+      for (const course of courses) {
+        const result = await deleteCourse(course.id);
+        deletionResults.push(result);
+      }
+
+      await coursefolder.destroy();
+
+      res.status(200).json({
+        message: "Successfully removed folder and associated courses",
+        folder: coursefolder,
+        coursesRemoved: deletionResults,
+      });
+    } else {
+      res.status(404).json({ message: "Folder not found" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Error removing folder");
+  }
+};
+export { register, scan, addCourseFolder, deleteFolder };
