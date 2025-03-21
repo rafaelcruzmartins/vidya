@@ -15,6 +15,7 @@ import courseRoutes from "./routes/course.js";
 import categoryRoutes from "./routes/category.js";
 import instructorRoutes from "./routes/instructor.js";
 import dashboardRoutes from "./routes/dashboard.js";
+import userRoutes from "./routes/user.js";
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
@@ -106,6 +107,7 @@ app.use(passport.session());
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/drive", driveRoutes);
 app.use("/api/home", homeRoutes);

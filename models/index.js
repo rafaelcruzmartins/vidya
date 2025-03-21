@@ -44,7 +44,12 @@ Course.belongsToMany(Instructor, {
   as: "instructors",
 });
 
-User.hasMany(TagsAndBookmark, { foreignKey: "UserId", as: "tagsandbookmarks" });
+User.hasMany(TagsAndBookmark, {
+  foreignKey: "UserId",
+  as: "tagsandbookmarks",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 TagsAndBookmark.belongsTo(User, { foreignKey: "UserId", as: "user" });
 Lecture.hasMany(LectureProgress, {
   foreignKey: "LectureId",
@@ -56,6 +61,8 @@ LectureProgress.belongsTo(Lecture, { foreignKey: "LectureId", as: "lecture" });
 User.hasMany(LectureProgress, {
   foreignKey: "UserId",
   as: "lectureprogresses",
+  onDelete: "CASCADE",
+  hooks: true,
 });
 LectureProgress.belongsTo(User, { foreignKey: "UserId", as: "user" });
 Course.hasMany(LectureProgress, {
@@ -64,10 +71,20 @@ Course.hasMany(LectureProgress, {
 });
 LectureProgress.belongsTo(Course, { foreignKey: "CourseId", as: "course" });
 
-User.hasMany(DailyWatch, { foreignKey: "UserId", as: "dailywatches" });
+User.hasMany(DailyWatch, {
+  foreignKey: "UserId",
+  as: "dailywatches",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 DailyWatch.belongsTo(User, { foreignKey: "UserId", as: "user" });
 
-User.hasMany(CourseProgress, { foreignKey: "UserId", as: "courseprogresses" });
+User.hasMany(CourseProgress, {
+  foreignKey: "UserId",
+  as: "courseprogresses",
+  onDelete: "CASCADE",
+  hooks: true,
+});
 CourseProgress.belongsTo(User, { foreignKey: "UserId", as: "user" });
 
 Course.hasMany(CourseProgress, {

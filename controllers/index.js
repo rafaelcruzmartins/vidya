@@ -4,7 +4,13 @@ import {
   addCourseFolder,
   deleteFolder,
 } from "./courseController.js";
-import { createUser, getAdminData } from "./adminController.js";
+import {
+  createUser,
+  getAdminData,
+  updateUser,
+  promoteUser,
+  removeUser,
+} from "./adminController.js";
 import { uploadImageCourse, uploadImageInstructor } from "./imageController.js";
 import {
   createCategory,
@@ -16,6 +22,7 @@ import {
   getAllInstructor,
   individualInstructor,
 } from "./instructorController.js";
+import { removeTag } from "./userController.js";
 
 import getUserDashboardAnalytics from "./dashboardController.js";
 
@@ -35,4 +42,8 @@ export {
   addCourseFolder,
   getUserDashboardAnalytics,
   deleteFolder,
+  updateUser,
+  promoteUser,
+  removeUser,
+  removeTag,
 };
