@@ -892,6 +892,8 @@ img {
 .settings-content {
   margin: 1rem 2rem;
   opacity: 1;
+  overflow-y: auto;
+  height: 92%;
 }
 
 .settings-title {
@@ -962,7 +964,7 @@ select option {
   background: rgba(255, 255, 255, 0.34);
   display: flex;
   align-items: center;
-  margin: 1rem;
+  margin-bottom: 1rem;
   border-radius: 1rem;
 
   svg {
@@ -1105,6 +1107,7 @@ select option {
   padding: 10px;
   width: 10vw;
   margin-bottom: 1rem;
+  justify-content: space-between;
 }
 
 .user-info {
@@ -1265,7 +1268,10 @@ select option {
   width: 20vw;
   height: 20vh;
 }
-
+.medium-modal {
+  width: 20vw;
+  height: 35vh;
+}
 .modal-buttons-group-user {
   display: flex;
   gap: 1rem;
@@ -2305,8 +2311,19 @@ video::-moz-media-controls {
   gap: 1rem;
   margin: 1rem;
 }
+.tag-delete-icon {
+  display: none;
+  cursor: pointer;
+}
 
-.tag-icon-difficult > svg {
+.tag-content:hover .tag-delete-icon {
+  display: block;
+}
+.bookmarks:hover .tag-delete-icon {
+  display: block;
+}
+.tag-icon-difficult,
+.tag-delete-icon > svg {
   fill: #e20044;
 }
 
@@ -2317,7 +2334,6 @@ video::-moz-media-controls {
 .tag-icon-important > svg {
   fill: #00a6a6;
 }
-
 .dashboard-notes {
   background: radial-gradient(
     100% 195.79% at 0% 0%,

@@ -3,6 +3,7 @@ import PreNav from "../components/Navbar/PreNav";
 import axios from "../api/axiosInstance";
 import { useAuth } from "../context/AuthContext";
 import WatchTimeAnalytics from "../components/WatchTimeAnalytics";
+import Toast from "../components/Toast/Toast";
 import {
   FlagAltSolid,
   TimeFive,
@@ -11,6 +12,7 @@ import {
   PurchaseTag,
   Play,
   SkeletonLoader,
+  TrashAltSolid,
 } from "../assets";
 import { useNavigate } from "react-router-dom";
 
@@ -19,6 +21,9 @@ const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [errorData, setErrorData] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState("success");
   const { user } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
@@ -42,6 +47,34 @@ const Dashboard = () => {
     setActiveTab(tab);
   };
   const renderedTabContent = () => {
+    const handleDeleteItem = async (id) => {
+      setShowToast(false);
+
+      try {
+        const response = await axios.post(
+          "/api/user/remove-tag",
+          { id },
+          { withCredentials: true }
+        );
+        const { data } = await axios.get(
+          "/api/dashboard/",
+
+          { withCredentials: true }
+        );
+        setDashboardData(data);
+        setToastType("success");
+        setToastMessage("Item has been successfully deleted");
+        setShowToast(true);
+      } catch (error) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to delete item";
+        setToastType("error");
+        setToastMessage(errorMessage);
+        setShowToast(true);
+        console.error("Delete item error:", error);
+      }
+    };
+
     switch (activeTab) {
       case "difficult":
         return (
@@ -57,13 +90,18 @@ const Dashboard = () => {
                   <div className="tag-icon-difficult">
                     <PurchaseTag />
                   </div>
-                  <div className="tag-content-title">{item.name} </div>
+                  <div className="tag-content-title">{item.name}</div>
+                  <div
+                    className="tag-delete-icon"
+                    onClick={() => handleDeleteItem(item.id)}
+                  >
+                    <TrashAltSolid />
+                  </div>
                 </div>
               ))
             )}
           </>
         );
-
       case "need review":
         return (
           <>
@@ -78,7 +116,13 @@ const Dashboard = () => {
                   <div className="tag-icon-need-review">
                     <PurchaseTag />
                   </div>
-                  <div className="tag-content-title">{item.name} </div>
+                  <div className="tag-content-title">{item.name}</div>
+                  <div
+                    className="tag-delete-icon"
+                    onClick={() => handleDeleteItem(item.id)}
+                  >
+                    <TrashAltSolid />
+                  </div>
                 </div>
               ))
             )}
@@ -98,12 +142,45 @@ const Dashboard = () => {
                   <div className="tag-icon-important">
                     <PurchaseTag />
                   </div>
-                  <div className="tag-content-title">{item.name} </div>
+                  <div className="tag-content-title">{item.name}</div>
+                  <div
+                    className="tag-delete-icon"
+                    onClick={() => handleDeleteItem(item.id)}
+                  >
+                    <TrashAltSolid />
+                  </div>
                 </div>
               ))
             )}
           </>
         );
+    }
+  };
+  const handleDeleteItem = async (id) => {
+    setShowToast(false);
+
+    try {
+      const response = await axios.post(
+        "/api/user/remove-tag",
+        { id },
+        { withCredentials: true }
+      );
+      const { data } = await axios.get(
+        "/api/dashboard/",
+
+        { withCredentials: true }
+      );
+      setDashboardData(data);
+      setToastType("success");
+      setToastMessage("Item has been successfully deleted");
+      setShowToast(true);
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to delete item";
+      setToastType("error");
+      setToastMessage(errorMessage);
+      setShowToast(true);
+      console.error("Delete item error:", error);
     }
   };
 
@@ -115,6 +192,14 @@ const Dashboard = () => {
     return (
       <>
         <PreNav name={"Dashboard"} />
+        {showToast && (
+          <Toast
+            message={toastMessage}
+            type={toastType}
+            duration={3000}
+            onClose={() => setShowToast(false)}
+          />
+        )}
         <div className="inner-container">
           <div className="welcome-streak">
             <div className="welcome">
@@ -201,7 +286,7 @@ const Dashboard = () => {
               <div className="bookmark-tags-wrap">
                 {dashboardData &&
                 dashboardData?.tagsAndBookmarks.bookmark.length === 0 ? (
-                  <div style={{ opacity: ".6" }}>
+                  <div style={{ opacity: ".6", marginLeft: "1rem" }}>
                     No Bookmarks, select lecture menu when playing to add
                   </div>
                 ) : (
@@ -211,6 +296,12 @@ const Dashboard = () => {
                         <Bookmark />
                       </div>
                       <div className="bookmark-title">{item.name}</div>
+                      <div
+                        className="tag-delete-icon"
+                        onClick={() => handleDeleteItem(item.id)}
+                      >
+                        <TrashAltSolid />
+                      </div>
                     </div>
                   ))
                 )}

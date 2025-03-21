@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { useNavigate, useLocation } from "react-router-dom";
+import Toast from "../components/Toast/Toast";
 import PreNav from "../components/Navbar/PreNav";
 import Admin from "../components/Settings/Admin";
 import { useAuth } from "../context/AuthContext";
+import axios from "../api/axiosInstance";
 const Settings = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -56,7 +58,7 @@ const Settings = () => {
         </div>
         <div className="settings-sidebar-info">
           <div style={{ height: "100%" }} key={activeTab}>
-            {activeTab === "profile" && <ProfileSettings />}
+            {activeTab === "profile" && <ProfileSettings user={user} />}
             {activeTab === "display" && <DisplaySettings />}
             {activeTab === "admin" && user?.role === "admin" && <Admin />}
           </div>
@@ -65,23 +67,96 @@ const Settings = () => {
     </>
   );
 };
-const ProfileSettings = () => (
-  <div className="settings-content">
-    <div className="settings-title">Profile Settings</div>
-    <div className="img-container">
-      <img alt="profile" />
-    </div>
-    <div className="password-form">
-      <label>Old Password</label>
-      <input type="password" className="password" />
-      <label>New Password</label>
-      <input type="password" className="password" />
-      <label>Confirm New Password</label>
-      <input type="password" className="password" />
-      <div className="change-password-button">Change Password</div>
-    </div>
-  </div>
-);
+
+const ProfileSettings = ({ user }) => {
+  const [newPass, setNewPass] = useState("");
+  const [confirmNewPass, setConfirmNewPass] = useState("");
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastType, setToastType] = useState("success");
+
+  const handlePassChange = async () => {
+    setShowToast(false);
+
+    if (newPass.length > 0 && confirmNewPass.length > 0) {
+      if (newPass !== confirmNewPass) {
+        setToastType("error");
+        setToastMessage("Passwords don't match");
+        setShowToast(true);
+        return;
+      }
+
+      if (newPass.length < 8) {
+        setToastType("error");
+        setToastMessage("Password must be at least 8 characters long");
+        setShowToast(true);
+        return;
+      }
+
+      try {
+        const response = await axios.post(
+          "/api/auth/password-change",
+          {
+            newPassword: newPass,
+          },
+          { withCredentials: true }
+        );
+
+        setToastType("success");
+        setToastMessage("Password changed successfully");
+        setShowToast(true);
+        setNewPass("");
+        setConfirmNewPass("");
+      } catch (error) {
+        const errorMessage =
+          error.response?.data?.message || "Failed to change password";
+        setToastType("error");
+        setToastMessage(errorMessage);
+        setShowToast(true);
+        console.error("Password change error:", error);
+      }
+    } else {
+      setToastType("error");
+      setToastMessage("Please fill in both password fields");
+      setShowToast(true);
+    }
+  };
+  return (
+    <>
+      {showToast && (
+        <Toast
+          message={toastMessage}
+          type={toastType}
+          duration={3000}
+          onClose={() => setShowToast(false)}
+        />
+      )}
+      <div className="settings-content">
+        <div className="settings-title">Profile Settings</div>
+        <div className="img-container">{user?.username}</div>
+        <div className="password-form">
+          <label>New Password</label>
+          <input
+            type="password"
+            className="password"
+            value={newPass}
+            onChange={(e) => setNewPass(e.target.value)}
+          />
+          <label>Confirm New Password</label>
+          <input
+            type="password"
+            className="password"
+            value={confirmNewPass}
+            onChange={(e) => setConfirmNewPass(e.target.value)}
+          />
+          <div onClick={handlePassChange} className="change-password-button">
+            Change Password
+          </div>
+        </div>
+      </div>
+    </>
+  );
+};
 
 const DisplaySettings = () => (
   <div className="settings-content">
@@ -89,8 +164,6 @@ const DisplaySettings = () => (
     <div className="theme-label">Theme</div>
     <select name="languages" id="lang">
       <option value="glassmorphism">Glassmorphism</option>
-      <option value="clean">Clean</option>
-      <option value="dark">Dark</option>
     </select>
   </div>
 );

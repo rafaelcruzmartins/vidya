@@ -18,16 +18,13 @@ const Admin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [users, setUsers] = useState([
-    { id: 1, name: "John Doe" },
-    { id: 2, name: "Jane Smith" },
-    { id: 3, name: "Alice Johnson" },
-  ]);
   const [newUserName, setNewUserName] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [action, setAction] = useState("");
   const [activeTab, setActiveTab] = useState("profile");
   const [inputValue, setInputValue] = useState(null);
+  const [inputValuePass, setInputValuePass] = useState(null);
   const [adminData, setAdminData] = useState(null);
   const [selectedFolders, setSelectedFolders] = useState([]);
   const [isChoosingFolder, setIsChoosingFolder] = useState(false);
@@ -59,9 +56,71 @@ const Admin = () => {
   const openModal = (user) => {
     setSelectedUser(user);
     setIsModalOpen(true);
-    setInputValue(user.name);
+    setInputValue(user.username);
   };
+  const handleUserChangeByAdmin = async () => {
+    setShowToast(false);
 
+    if (!inputValue && !inputValuePass) {
+      setToastType("error");
+      setToastMessage(
+        "Please provide either a new username or password to update"
+      );
+      setShowToast(true);
+      return;
+    }
+
+    if (inputValue !== null && inputValue.length < 5) {
+      setToastType("error");
+      setToastMessage("Username must be at least 5 characters long");
+      setShowToast(true);
+      return;
+    }
+
+    if (inputValuePass !== null && inputValuePass.length < 8) {
+      setToastType("error");
+      setToastMessage("Password must be at least 8 characters long");
+      setShowToast(true);
+      return;
+    }
+
+    const updateData = {};
+    if (inputValue) updateData.username = inputValue;
+    if (inputValuePass) updateData.password = inputValuePass;
+    updateData.id = selectedUser.id;
+
+    try {
+      const response = await axios.post("/api/admin/update-user", updateData, {
+        withCredentials: true,
+      });
+
+      setToastType("success");
+
+      if (inputValue && inputValuePass) {
+        setToastMessage("Username and password updated successfully");
+      } else if (inputValue) {
+        setToastMessage("Username updated successfully");
+      } else {
+        setToastMessage("Password updated successfully");
+      }
+      const { data } = await axios.get("/api/admin/admin", {
+        withCredentials: true,
+      });
+
+      setAdminData(data);
+      setShowToast(true);
+      setInputValue(null);
+      setInputValuePass(null);
+      closeModal();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to update user";
+      setToastType("error");
+      setToastMessage(errorMessage);
+      setShowToast(true);
+      console.error("User update error:", error);
+    }
+  };
   const closeModal = () => {
     setIsModalOpen(false);
     setShowConfirmation(false);
@@ -85,24 +144,118 @@ const Admin = () => {
     setIsAddFolderModalOpen(false);
   };
 
-  const makeAdmin = (user) => {
-    closeModal();
+  const makeAdmin = async (user) => {
+    setShowToast(false);
+
+    try {
+      const response = await axios.post(
+        "/api/admin/promote-user",
+        {
+          userId: user.id,
+        },
+        { withCredentials: true }
+      );
+
+      setToastType("success");
+      setToastMessage("User has been successfully promoted to admin");
+      setShowToast(true);
+      const { data } = await axios.get("/api/admin/admin", {
+        withCredentials: true,
+      });
+
+      setAdminData(data);
+      closeModal();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to promote user to admin";
+      setToastType("error");
+      setToastMessage(errorMessage);
+      setShowToast(true);
+      console.error("Admin promotion error:", error);
+    }
   };
 
-  const removeUser = (user) => {
-    console.log(`${user.name} has been removed.`);
-    setUsers(users.filter((u) => u.id !== user.id));
-    closeModal();
+  const removeUser = async (user) => {
+    setShowToast(false);
+
+    try {
+      const response = await axios.post(
+        "/api/admin/remove-user/",
+        { userId: user.id },
+        { withCredentials: true }
+      );
+
+      setToastType("success");
+      setToastMessage("User has been successfully removed");
+      setShowToast(true);
+      const { data } = await axios.get("/api/admin/admin", {
+        withCredentials: true,
+      });
+
+      setAdminData(data);
+      closeModal();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to remove user";
+      setToastType("error");
+      setToastMessage(errorMessage);
+      setShowToast(true);
+      console.error("User removal error:", error);
+    }
   };
 
-  const addUser = () => {
-    if (newUserName.trim()) {
-      const newUser = {
-        id: users.length + 1,
-        name: newUserName.trim(),
-      };
-      setUsers([...users, newUser]);
+  const addUser = async () => {
+    setShowToast(false);
+
+    if (!newUserName.trim()) {
+      setToastType("error");
+      setToastMessage("Username is required");
+      setShowToast(true);
+      return;
+    }
+
+    if (!newUserPassword || newUserPassword.length < 8) {
+      setToastType("error");
+      setToastMessage("Password must be at least 8 characters long");
+      setShowToast(true);
+      return;
+    }
+
+    if (newUserName.trim().length < 5) {
+      setToastType("error");
+      setToastMessage("Username must be at least 5 characters long");
+      setShowToast(true);
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        "/api/admin/add-user",
+        {
+          username: newUserName.trim(),
+          password: newUserPassword,
+        },
+        { withCredentials: true }
+      );
+
+      setToastType("success");
+      setToastMessage("User has been successfully added");
+      setShowToast(true);
+      const { data } = await axios.get("/api/admin/admin", {
+        withCredentials: true,
+      });
+
+      setAdminData(data);
+      setNewUserName("");
+      setNewUserPassword("");
       closeAddUserModal();
+    } catch (error) {
+      const errorMessage =
+        error.response?.data?.message || "Failed to add user";
+      setToastType("error");
+      setToastMessage(errorMessage);
+      setShowToast(true);
+      console.error("Add user error:", error);
     }
   };
 
@@ -377,12 +530,18 @@ const Admin = () => {
               value={inputValue}
             />
             <label htmlFor="">Password</label>
-            <input className="input" type="password" />
+            <input
+              className="input"
+              onChange={(e) => setInputValuePass(e.target.value)}
+              value={inputValuePass}
+              type="password"
+            />
             <motion.div
               className="modal-buttons"
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.95 }}
               style={{ color: "#00a6a6" }}
+              onClick={handleUserChangeByAdmin}
             >
               Save
             </motion.div>
@@ -519,9 +678,9 @@ const Admin = () => {
         </div>
       </div>
       <div className="user-list">
-        {users.map((user) => (
+        {adminData?.users?.map((user) => (
           <div key={user.id} className="user-item">
-            <div className="user-info">{user.name}</div>
+            <div className="user-info">{user.username}</div>
             <div
               className="svg-div"
               title="Edit User"
@@ -564,15 +723,23 @@ const Admin = () => {
         )}
         {isAddUserModalOpen && (
           <div className="modal-overlay">
-            <div className="modal small-modal">
+            <div className="modal medium-modal">
               <div className="add-user-modal">
                 <div className="modal-heading">Add New User</div>
+                <label htmlFor="">username</label>
                 <input
                   className="input"
                   type="text"
                   value={newUserName}
                   onChange={(e) => setNewUserName(e.target.value)}
                   autoFocus
+                />
+                <label htmlFor="">password</label>
+                <input
+                  className="input"
+                  type="password"
+                  value={newUserPassword}
+                  onChange={(e) => setNewUserPassword(e.target.value)}
                 />
                 <div className="modal-buttons-group-user">
                   <motion.div
