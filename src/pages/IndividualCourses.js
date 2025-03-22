@@ -16,8 +16,6 @@ import {
   World,
   FileArchiveSolid,
   FileBlankSolid,
-  CheckCircleSolid,
-  Circle,
 } from "../assets";
 import { useRef, useState, useEffect, memo, useCallback } from "react";
 import Toast from "../components/Toast/Toast.js";
@@ -295,8 +293,9 @@ const IndividualCourses = () => {
   const [newCategoryInput, setnewCategoryInput] = useState("");
   const [updateCounter, setUpdateCounter] = useState(0);
   const [newInstructorInput, setnewInstructorInput] = useState("");
-  const [courseInstructors, setCourseInstructors] = useState([]);
-  const [courseCategory, setCourseCategory] = useState([]);
+  const [courseDescription, setCourseDescription] = useState("");
+  const [courseInstructors, setCourseInstructors] = useState(null);
+  const [courseCategory, setCourseCategory] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddCategoryModalOpen, setIsAddCategoryModalOpen] = useState(false);
   const [isAddInstructorModalOpen, setIsAddInstructorModalOpen] =
@@ -312,6 +311,7 @@ const IndividualCourses = () => {
     setToastType,
     showToast,
     setShowToast,
+    setCategoryNeedsUpdate,
   } = useAuth();
   useEffect(() => {
     const fetchData = async () => {
@@ -323,12 +323,12 @@ const IndividualCourses = () => {
         );
         setCourse(data.course);
         setCourseTitle(data.course.cleanedName);
-        setCourseCategory(data.course.category ? [data.course.category] : []);
+        setCourseCategory(data.course.category ? [data.course.category] : null);
         setRole(data.role);
         setCategoriesList(data.categories);
         setInstructorList(data.instructors);
         setCourseInstructors(
-          data.course.instructors ? data.course.instructors : []
+          data.course.instructors ? data.course.instructors : null
         );
       } catch (error) {
         console.error(error);
@@ -371,7 +371,7 @@ const IndividualCourses = () => {
   };
 
   const handleAddCategory = (e) => {
-    const category = courseCategory.find((category) => category.id === e.id);
+    const category = courseCategory?.find((category) => category.id === e.id);
     if (!category) {
       setCourseCategory([e]);
     }
@@ -385,7 +385,7 @@ const IndividualCourses = () => {
   };
 
   const handleAddInstructor = (instructor) => {
-    const exists = courseInstructors.find((i) => i.id === instructor.id);
+    const exists = courseInstructors?.find((i) => i.id === instructor.id);
     if (!exists) {
       setCourseInstructors([...courseInstructors, instructor]);
     }
@@ -393,13 +393,25 @@ const IndividualCourses = () => {
   };
 
   const addNewQuickCategory = async () => {
+    setShowToast(false);
     if (newCategoryInput.trim()) {
       const newCategory = {
         name: newCategoryInput.trim(),
       };
+      setToastType("warning");
+      setToastMessage("adding category");
+      setShowToast(true);
       const category = await addCategoryBackend(newCategory);
+      setToastType("success");
+      setToastMessage("category added");
+      setShowToast(true);
       setCategoriesList(category.data);
       setnewCategoryInput("");
+      setCategoryNeedsUpdate("a");
+    } else {
+      setToastType("error");
+      setToastMessage("name can't be empty when adding category");
+      setShowToast(true);
     }
   };
 
@@ -408,9 +420,16 @@ const IndividualCourses = () => {
       const newCategory = {
         name: newCategoryInput.trim(),
       };
+      setToastType("warning");
+      setToastMessage("adding category");
+      setShowToast(true);
       const category = await addCategoryBackend(newCategory);
+      setToastType("success");
+      setToastMessage("category added");
+      setShowToast(true);
       setCategoriesList(category.data);
       setnewCategoryInput("");
+      setCategoryNeedsUpdate("a");
     }
   };
 
@@ -419,9 +438,19 @@ const IndividualCourses = () => {
       const newInstructor = {
         name: newInstructorInput.trim(),
       };
+      setToastType("warning");
+      setToastMessage("adding instructor");
+      setShowToast(true);
       const instructor = await addInstructorBackend(newInstructor);
+      setToastType("success");
+      setToastMessage("instructor added");
+      setShowToast(true);
       setInstructorList(instructor.data);
       setnewInstructorInput("");
+    } else {
+      setToastType("error");
+      setToastMessage("name can't be empty when adding instructor");
+      setShowToast(true);
     }
   };
 
@@ -430,7 +459,13 @@ const IndividualCourses = () => {
       const newInstructor = {
         name: newInstructorInput.trim(),
       };
+      setToastType("warning");
+      setToastMessage("adding instructor");
+      setShowToast(true);
       const instructor = await addInstructorBackend(newInstructor);
+      setToastType("success");
+      setToastMessage("instructor added");
+      setShowToast(true);
       setInstructorList(instructor.data);
       setnewInstructorInput("");
     }
@@ -491,11 +526,18 @@ const IndividualCourses = () => {
   const handleUpload = async () => {
     const formData = new FormData();
     formData.append("CourseId", id);
-    formData.append("CategoryId", courseCategory[0].id);
-    formData.append(
-      "Instructors",
-      JSON.stringify(courseInstructors.map((instructor) => instructor.id))
-    );
+    if (courseCategory) {
+      formData.append("CategoryId", courseCategory[0].id);
+    }
+    if (courseDescription) {
+      formData.append("description", courseDescription);
+    }
+    if (courseInstructors) {
+      formData.append(
+        "Instructors",
+        JSON.stringify(courseInstructors.map((instructor) => instructor.id))
+      );
+    }
     formData.append("CourseName", courseTitle);
     try {
       if (file) {
@@ -561,7 +603,7 @@ const IndividualCourses = () => {
             <div className="bottom-container">
               <div className="instructor-section">
                 Instructors :{" "}
-                {courseInstructors.map((instructor, index) => (
+                {courseInstructors?.map((instructor, index) => (
                   <span
                     onClick={() => navigate(`/instructor/${instructor.id}`)}
                     key={instructor.id}
@@ -637,7 +679,7 @@ const IndividualCourses = () => {
                         </div>
                       </div>
                       <div className="category-list">
-                        {courseCategory.map((e) => (
+                        {courseCategory?.map((e) => (
                           <div key={e.id} className="single-category">
                             {e.category}
                             <div
@@ -663,7 +705,7 @@ const IndividualCourses = () => {
                         </div>
                       </div>
                       <div className="instructor-list">
-                        {courseInstructors.map((instructor) => (
+                        {courseInstructors?.map((instructor) => (
                           <div
                             key={instructor.id}
                             className="single-instructor"
@@ -678,6 +720,15 @@ const IndividualCourses = () => {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    </div>
+                    <div className="course-title-edit">
+                      <div>Edit Description</div>
+                      <div className="modal-input-description-edit">
+                        <textarea
+                          onChange={(e) => setCourseDescription(e.target.value)}
+                          value={courseDescription}
+                        ></textarea>
                       </div>
                     </div>
                   </div>

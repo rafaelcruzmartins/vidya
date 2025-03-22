@@ -12,28 +12,11 @@ import Home from "./pages/Home";
 import LogIn from "./pages/LogIn";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Courses from "./pages/Courses";
-import { useState, useEffect } from "react";
-import axios from "./api/axiosInstance";
+import { useAuth } from "./context/AuthContext";
 
 const AnimatedRoutes = () => {
   const location = useLocation();
-  const [category, setCategory] = useState([]);
-
-  useEffect(() => {
-    const fetchCategory = async () => {
-      try {
-        const { data } = await axios.get(
-          "/api/category/6",
-
-          { withCredentials: true }
-        );
-        setCategory(data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchCategory();
-  }, []);
+  const { category } = useAuth();
   return (
     <div className="main">
       <div className="container">

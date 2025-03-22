@@ -6,6 +6,8 @@ const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [category, setCategory] = useState([]);
+  const [categoryNeedsUpdate, setCategoryNeedsUpdate] = useState("");
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -21,6 +23,21 @@ export const AuthProvider = ({ children }) => {
     checkAuthStatus();
   }, []);
 
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const { data } = await axios.get(
+          "/api/category/6",
+
+          { withCredentials: true }
+        );
+        setCategory(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchCategory();
+  }, [categoryNeedsUpdate]);
   const checkAuthStatus = async () => {
     try {
       const response = await axios.get("/api/auth/user", {
@@ -83,6 +100,8 @@ export const AuthProvider = ({ children }) => {
     setShowToast,
     setToastType,
     setToastMessage,
+    category,
+    setCategoryNeedsUpdate,
   };
 
   return (

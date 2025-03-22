@@ -70,7 +70,9 @@ const IndividualInstrucor = () => {
     formData.append("InstructorId", id);
 
     formData.append("InstructorName", instructorTitle);
-    formData.append("description", instructorDescription);
+    if (instructorDescription) {
+      formData.append("description", instructorDescription);
+    }
     try {
       if (file) {
         formData.append("file", file);
