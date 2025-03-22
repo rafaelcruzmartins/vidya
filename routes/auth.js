@@ -15,7 +15,16 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
 
 router.post("/logout", (req, res) => {
   try {
-    req.logout(() => res.json({ message: "Logged out" }));
+    req.logout(() => {
+      req.session.destroy((err) => {
+        if (err) {
+          console.error("Session destruction error:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+        res.clearCookie("connect.sid");
+        res.json({ message: "Logged out" });
+      });
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal Server Error");

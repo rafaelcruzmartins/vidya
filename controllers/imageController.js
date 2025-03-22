@@ -1,6 +1,7 @@
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
+import fs, { promises as fsp } from "fs";
 import { Course, Instructor } from "../models/index.js";
 import crypto from "crypto";
 
@@ -14,7 +15,8 @@ const AVIF_CONFIG = {
 
 const uploadImageCourse = async (req, res) => {
   try {
-    const { CourseId, CourseName, CategoryId, Instructors } = req.body;
+    const { CourseId, CourseName, CategoryId, Instructors, description } =
+      req.body;
     const parsedInstructor = JSON.parse(Instructors);
 
     if (req.file) {
@@ -32,27 +34,30 @@ const uploadImageCourse = async (req, res) => {
         .toFile(outputPath);
 
       const dbPath = `/assets/${filename}`;
-
-      await Course.update(
-        {
-          photo: dbPath,
-          cleanedName: CourseName,
-          CategoryId,
-        },
-        { where: { id: CourseId } }
-      );
-
       const course = await Course.findByPk(CourseId);
+
+      if (course.photo) {
+        const photoPath = join(__dirname, `../${course.photo}`);
+        if (fs.existsSync(photoPath)) {
+          await fsp.unlink(photoPath);
+        }
+      }
+      await course.update({
+        photo: dbPath,
+        cleanedName: CourseName,
+        CategoryId,
+        description,
+      });
+
       await course.setInstructors(parsedInstructor);
     } else {
-      await Course.update(
-        {
-          cleanedName: CourseName,
-          CategoryId,
-        },
-        { where: { id: CourseId } }
-      );
       const course = await Course.findByPk(CourseId);
+
+      await course.update({
+        cleanedName: CourseName,
+        CategoryId,
+        description,
+      });
       await course.setInstructors(parsedInstructor);
     }
     res.status(201).json({
@@ -82,15 +87,18 @@ const uploadImageInstructor = async (req, res) => {
         .toFile(outputPath);
 
       const dbPath = `/assets/${filename}`;
-
-      await Instructor.update(
-        {
-          photo: dbPath,
-          name: InstructorName,
-          description,
-        },
-        { where: { id: InstructorId } }
-      );
+      const instructor = await Instructor.findByPk(InstructorId);
+      if (instructor.photo) {
+        const photoPath = join(__dirname, `../${instructor.photo}`);
+        if (fs.existsSync(photoPath)) {
+          await fsp.unlink(photoPath);
+        }
+      }
+      await instructor.update({
+        photo: dbPath,
+        name: InstructorName,
+        description,
+      });
     } else {
       await Instructor.update(
         {
