@@ -37,7 +37,7 @@ const IndividualInstrucor = () => {
         );
         setInstructorsData(data);
         setInstructorTitle(data.name);
-        setInstructorDescription(data.description);
+        setInstructorDescription(data.description || "");
         setRole(data.role);
       } catch (error) {
         console.error(error);
@@ -135,7 +135,7 @@ const IndividualInstrucor = () => {
             <div className="bottom-container">
               <div>Courses : {instructorsData?.courses?.length}</div>
               <div className="description">
-                <span class="drop-cap">Description : </span>
+                <span className="drop-cap">Description : </span>
                 {instructorsData?.description}
               </div>
               <div>

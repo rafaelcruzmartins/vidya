@@ -7,7 +7,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [category, setCategory] = useState([]);
-  const [categoryNeedsUpdate, setCategoryNeedsUpdate] = useState("");
+  const [categoryNeedsUpdate, setCategoryNeedsUpdate] = useState(1);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
@@ -80,9 +80,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await axios.post("/api/auth/logout", {
-      withCredentials: true,
-    });
+    await axios.post(
+      "/api/auth/logout",
+      {},
+      {
+        withCredentials: true,
+      }
+    );
     setUser(null);
     setShowToast(false);
     navigate("/login");
@@ -102,6 +106,7 @@ export const AuthProvider = ({ children }) => {
     setToastMessage,
     category,
     setCategoryNeedsUpdate,
+    categoryNeedsUpdate,
   };
 
   return (

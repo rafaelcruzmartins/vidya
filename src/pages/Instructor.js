@@ -1,11 +1,11 @@
 import PreNav from "../components/Navbar/PreNav";
 import InstructorInfo from "../components/Cards/InstructorInfo";
 import { useEffect, useState } from "react";
-import Tilt from "react-parallax-tilt";
 import axios from "../api/axiosInstance";
 import { Plus } from "../assets";
 import Toast from "../components/Toast/Toast";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/AuthContext";
 const Instructor = () => {
   const [instructors, setInstructors] = useState([]);
   const [showToast, setShowToast] = useState(false);
@@ -13,7 +13,9 @@ const Instructor = () => {
   const [toastType, setToastType] = useState("success");
   const [newInstructorInput, setNewInstructorInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [instructorNeedsUpdate, setInstructorNeedsUpdate] = useState("");
+  const [instructorNeedsUpdate, setInstructorNeedsUpdate] = useState(1);
+  const { user } = useAuth();
+  const isAdmin = user.role === "admin";
   useEffect(() => {
     const fetchInstructor = async () => {
       try {
@@ -51,7 +53,7 @@ const Instructor = () => {
       setToastMessage("adding instructor");
       setShowToast(true);
       const insctructor = await addInstructorBackend(newInstructor);
-      setInstructorNeedsUpdate("");
+      setInstructorNeedsUpdate(instructorNeedsUpdate + 1);
       setNewInstructorInput("");
       setToastType("success");
       setToastMessage("instructor added");
@@ -75,18 +77,20 @@ const Instructor = () => {
       )}
       <PreNav name={"INSTRUCTOR"} />
       <div className="instructor-container">
-        <Tilt className="instructor-card">
-          <div
-            className="instructor-psuedo-div"
-            onClick={() => setIsModalOpen(true)}
-          >
-            <div className="add-instructor">
-              <div className="instructor-title">Add New Instructor</div>
+        {isAdmin && (
+          <div className="instructor-card">
+            <div
+              className="instructor-psuedo-div"
+              onClick={() => setIsModalOpen(true)}
+            >
+              <div className="add-instructor">
+                <div className="instructor-title">Add New Instructor</div>
 
-              <Plus />
+                <Plus />
+              </div>
             </div>
           </div>
-        </Tilt>
+        )}
         {isModalOpen && (
           <div className="modal-overlay">
             <div className="modal small-modal">
@@ -123,7 +127,18 @@ const Instructor = () => {
           </div>
         )}
         {instructors.map((data) => (
-          <InstructorInfo data={data} key={data.id} />
+          <InstructorInfo
+            data={data}
+            key={data.id}
+            setInstructors={setInstructors}
+            isAdmin={isAdmin}
+            setShowToast={setShowToast}
+            showToast={showToast}
+            setToastMessage={setToastMessage}
+            toastMessage={toastMessage}
+            setToastType={setToastType}
+            toastType={toastType}
+          />
         ))}
       </div>
     </div>

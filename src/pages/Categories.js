@@ -14,8 +14,8 @@ const Categories = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("Completed successfully");
   const [toastType, setToastType] = useState("success");
-  const { user, setCategoryNeedsUpdate } = useAuth();
-
+  const { user, setCategoryNeedsUpdate, categoryNeedsUpdate } = useAuth();
+  const isAdmin = user.role === "admin";
   useEffect(() => {
     const fetchCategory = async () => {
       try {
@@ -56,7 +56,7 @@ const Categories = () => {
       setToastMessage("category added");
       setShowToast(true);
       setIsModalOpen(false);
-      setCategoryNeedsUpdate("b");
+      setCategoryNeedsUpdate(categoryNeedsUpdate + 1);
     } else {
       setToastType("error");
       setToastMessage("name can't be empty when adding category");
@@ -76,7 +76,7 @@ const Categories = () => {
       <PreNav name={"Categories"} />
 
       <div className="categories-container">
-        {user.role === "admin" && (
+        {isAdmin && (
           <div className="categories" onClick={() => setIsModalOpen(true)}>
             <div className="new-category">
               <Plus />
@@ -120,7 +120,18 @@ const Categories = () => {
           </div>
         )}
         {categoriesList.map((e) => (
-          <CategoriesInfo name={e.category} categoryId={e.id} />
+          <CategoriesInfo
+            name={e.category}
+            categoryId={e.id}
+            setCategoriesList={setCategoriesList}
+            setCategoryNeedsUpdate={setCategoryNeedsUpdate}
+            categoryNeedsUpdate={categoryNeedsUpdate}
+            setShowToast={setShowToast}
+            setToastMessage={setToastMessage}
+            setToastType={setToastType}
+            key={e.id}
+            isAdmin={isAdmin}
+          />
         ))}
       </div>
     </>
