@@ -44,4 +44,33 @@ const courseOfCategories = async (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 };
-export { createCategory, allCategory, courseOfCategories };
+const updateCategory = async (req, res) => {
+  const { categoryId, name } = req.body;
+  try {
+    await Category.update({ category: name }, { where: { id: categoryId } });
+    const categories = await Category.findAll();
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+const deleteCategory = async (req, res) => {
+  const { categoryId } = req.body;
+  try {
+    const category = await Category.findByPk(categoryId);
+    await category.destroy();
+    const categories = await Category.findAll();
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+};
+export {
+  createCategory,
+  allCategory,
+  courseOfCategories,
+  updateCategory,
+  deleteCategory,
+};

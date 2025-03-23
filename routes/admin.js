@@ -15,6 +15,10 @@ import {
   updateUser,
   promoteUser,
   removeUser,
+  updateCategory,
+  deleteCategory,
+  updateInstructor,
+  deleteInstructor,
 } from "../controllers/index.js";
 const router = Router();
 
@@ -38,5 +42,9 @@ router.post("/folderdelete", isAdmin, deleteFolder);
 router.post("/update-user", isAdmin, updateUser);
 router.post("/promote-user", isAdmin, promoteUser);
 router.post("/remove-user", isAdmin, removeUser);
+router.post("/update-category", isAdmin, updateCategory);
+router.post("/delete-category", isAdmin, deleteCategory);
+router.post("/update-instructor", isAdmin, updateInstructor);
+router.post("/delete-instructor", isAdmin, deleteInstructor);
 
 export default router;

@@ -16,11 +16,15 @@ import {
   createCategory,
   allCategory,
   courseOfCategories,
+  updateCategory,
+  deleteCategory,
 } from "./categoryController.js";
 import {
   createInstructor,
   getAllInstructor,
   individualInstructor,
+  updateInstructor,
+  deleteInstructor,
 } from "./instructorController.js";
 import { removeTag } from "./userController.js";
 
@@ -46,4 +50,8 @@ export {
   promoteUser,
   removeUser,
   removeTag,
+  updateCategory,
+  deleteCategory,
+  updateInstructor,
+  deleteInstructor,
 };
