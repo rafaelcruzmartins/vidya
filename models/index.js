@@ -185,7 +185,7 @@ const TrackingSystem = {
         UserId: userId,
       },
     });
-    courseprogress.update({ LectureId: lectureId });
+    courseprogress.update({ LectureId: lectureId, hasCompleted: false });
   },
 
   async toggleLectureComplete(userId, lectureId, courseId) {

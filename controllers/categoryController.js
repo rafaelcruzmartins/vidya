@@ -13,8 +13,7 @@ const createCategory = async (req, res) => {
 
 const allCategory = async (req, res) => {
   try {
-    const { limit } = req.query;
-
+    const { limit } = req.params;
     const options = {};
 
     if (limit) {

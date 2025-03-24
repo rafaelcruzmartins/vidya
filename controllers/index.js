@@ -29,6 +29,7 @@ import {
 import { removeTag } from "./userController.js";
 
 import getUserDashboardAnalytics from "./dashboardController.js";
+import { doSearch } from "./searchController.js";
 
 export {
   register,
@@ -54,4 +55,5 @@ export {
   deleteCategory,
   updateInstructor,
   deleteInstructor,
+  doSearch,
 };
