@@ -229,6 +229,7 @@ body {
   appearance: none;
   width: 100%;
   font-size: 1rem;
+  font-family: "Poppins";
 }
 
 .search-results {
@@ -245,11 +246,61 @@ body {
   border-radius: 0.5rem;
   z-index: 30;
   width: 100%;
+  max-height: 40vh;
+  overflow-y: auto;
+}
+
+.no-results {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+}
+
+.result-section {
+  padding: 8px 0;
+}
+
+.result-section:not(:last-child) {
+  border-bottom: 1px solid #45312d;
+}
+
+.result-heading {
+  margin-left: 0.5rem;
+  font-size: 14px;
+  color: #666;
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
 .search-results-list {
-  margin: 1rem;
-  padding: 0;
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  transition: background-color 0.2s;
+}
+
+.search-results-list:hover {
+  background-color: #f5f7fa;
+}
+
+.result-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.result-name {
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+.result-details {
+  display: flex;
+  font-size: 14px;
+  color: #666;
+}
+
+.result-details > span:not(:last-child)::after {
+  content: "•";
+  margin: 0 6px;
 }
 
 svg {
@@ -261,6 +312,10 @@ svg {
   display: flex;
   gap: 5%;
   margin: 2rem;
+}
+
+.nav-bar.justified {
+  justify-content: space-between;
 }
 
 .nav-item {
@@ -745,11 +800,6 @@ img {
   100% {
     opacity: 1;
   }
-}
-
-.search-results-list {
-  margin: 1rem;
-  padding: 0;
 }
 
 .categories-container {
@@ -1377,7 +1427,49 @@ select option {
   justify-content: space-between;
   margin-right: 2rem;
 }
+.course-title-inner {
+  display: flex;
+  gap: 1rem;
+}
+.play-svg {
+  svg {
+    scale: 1.5;
+    cursor: pointer;
+  }
+}
+.play-svg {
+  svg:hover {
+    opacity: 0.5;
+  }
+}
 
+.blink-background {
+  position: relative;
+}
+
+.blink-background::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #f45b69;
+  opacity: 0;
+  animation: blink 1s ease-in-out 3;
+  pointer-events: none;
+  border-radius: 0.5rem;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
 .bottom-container {
   margin: 1rem 0 0 32%;
   font-size: 1.1rem;

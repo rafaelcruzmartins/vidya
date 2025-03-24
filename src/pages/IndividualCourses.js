@@ -1,6 +1,5 @@
-import React from "react";
 import PreNav from "../components/Navbar/PreNav";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import axios from "../api/axiosInstance.js";
 import {
@@ -16,8 +15,16 @@ import {
   World,
   FileArchiveSolid,
   FileBlankSolid,
+  Play,
 } from "../assets";
-import { useRef, useState, useEffect, memo, useCallback } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  memo,
+  useCallback,
+  useLayoutEffect,
+} from "react";
 import Toast from "../components/Toast/Toast.js";
 import { useAuth } from "../context/AuthContext.js";
 const ICON_MAP = {
@@ -41,13 +48,18 @@ const SectionHeader = memo(
     hasLectures,
     isExpanded,
     onToggle,
-    isSectionCompleted,
     duration,
     total,
+    sectionRef,
+    sectionId,
+    referalData,
   }) => (
     <div
       onClick={onToggle}
-      className={`section-header ${isSectionCompleted ? "green" : ""}`}
+      className={`section-header ${
+        sectionId === referalData ? "blink-background" : ""
+      }`}
+      ref={(e) => (sectionRef.current[sectionId] = e)}
     >
       <div className="section-title-wrap">
         <span className="playlist-section-title">
@@ -75,11 +87,7 @@ const LectureItem = memo(
   ({
     lectureId,
     title,
-    isCompleted,
-    onToggle,
-    handleNowPlaying,
     lectureOrder,
-    nowPlaying,
     sectionOrder,
     courseId,
     type,
@@ -88,6 +96,7 @@ const LectureItem = memo(
     setToastMessage,
     setToastType,
     setShowToast,
+    onLectureClick,
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -166,7 +175,10 @@ const LectureItem = memo(
 
     return (
       <>
-        <div className={`playlist-lecture-item `}>
+        <div
+          className="playlist-lecture-item"
+          onClick={() => onLectureClick(courseId, lectureId)}
+        >
           <span className="checkbox">
             <div className="svg-div"></div>
           </span>
@@ -284,7 +296,8 @@ const IndividualCourses = () => {
   const [course, setCourse] = useState(null);
   const [courseTitle, setCourseTitle] = useState(course?.cleanedName);
   const [expandedSections, setExpandedSections] = useState(new Set([0]));
-
+  const location = useLocation();
+  const referalData = location.state;
   // State for categories
 
   const [categoriesList, setCategoriesList] = useState([]);
@@ -302,6 +315,8 @@ const IndividualCourses = () => {
     useState(false);
   const addCategoryRef = useRef(null);
   const addInstructorRef = useRef(null);
+  const sectionRef = useRef({});
+  const scrollTimeoutRef = useRef(null);
   const [file, setFile] = useState(null);
   const [role, setRole] = useState("");
   const {
@@ -391,7 +406,11 @@ const IndividualCourses = () => {
     }
     closeAddInstructorModal();
   };
-
+  const handleLectureClick = useCallback((courseId, lectureId) => {
+    navigate(`/course/play/${courseId}`, {
+      state: lectureId,
+    });
+  }, []);
   const addNewQuickCategory = async () => {
     setShowToast(false);
     if (newCategoryInput.trim()) {
@@ -414,7 +433,26 @@ const IndividualCourses = () => {
       setShowToast(true);
     }
   };
+  useLayoutEffect(() => {
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
 
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (referalData) {
+        sectionRef.current[referalData].scrollIntoView({
+          behavior: "smooth",
+          block: "center",
+        });
+      }
+    }, 300);
+
+    return () => {
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [referalData]);
   const handleKeyDown = async (e) => {
     if (e.key === "Enter" && newCategoryInput.trim()) {
       const newCategory = {
@@ -583,7 +621,15 @@ const IndividualCourses = () => {
           <div className="top">
             <div className="top-container">
               <div className="course-instructor-title">
-                {course?.cleanedName || "Title Not Found"}
+                <div className="course-title-inner">
+                  <span>{course?.cleanedName || ""}</span>
+                  <span
+                    className="svg-div play-svg"
+                    onClick={() => navigate(`/course/play/${id}`)}
+                  >
+                    <Play />
+                  </span>
+                </div>
                 {role === "admin" && (
                   <div className="edit-information">
                     <div
@@ -627,7 +673,13 @@ const IndividualCourses = () => {
             </div>
           </div>
           <div className="img-container course-info-image instructor-info-image">
-            <img src={process.env.REACT_APP_API + course?.photo} alt="" />
+            <img
+              src={
+                process.env.REACT_APP_API +
+                (course?.photo || "/assets/placeholder.avif")
+              }
+              alt=""
+            />
           </div>
         </div>
       </div>
@@ -875,7 +927,6 @@ const IndividualCourses = () => {
       <div className="course-content">
         <div className="course-section">
           <div className="section-list">
-            {" "}
             {course?.sections.map((section) => (
               <div key={section.id} className="section-item-course">
                 <SectionHeader
@@ -886,6 +937,9 @@ const IndividualCourses = () => {
                   duration={section.duration}
                   onToggle={() => toggleSection(section.id)}
                   total={section.lectures.length}
+                  sectionRef={sectionRef}
+                  sectionId={section.id}
+                  referalData={referalData}
                 />
                 <AnimatePresence>
                   {expandedSections.has(section.id) &&
@@ -906,10 +960,11 @@ const IndividualCourses = () => {
                             type={lecture.type}
                             duration={lecture.duration}
                             content={lecture.content}
-                            CourseId={id}
+                            courseId={id}
                             setToastMessage={setToastMessage}
                             setToastType={setToastType}
                             setShowToast={setShowToast}
+                            onLectureClick={handleLectureClick}
                           />
                         ))}
                       </motion.div>

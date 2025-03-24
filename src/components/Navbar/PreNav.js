@@ -90,7 +90,18 @@ const PreNav = ({ name, progress }) => {
           <Search />
         </div>
         <div className="profile">
-          <div className="svg-div">{progress ? progress : <User />}</div>
+          <div className="svg-div">
+            {progress ? (
+              progress
+            ) : (
+              <span
+                style={{ cursor: "pointer" }}
+                onClick={() => navigate("/settings")}
+              >
+                <User />
+              </span>
+            )}
+          </div>
         </div>
       </div>
 

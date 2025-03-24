@@ -25,7 +25,7 @@ import {
   World,
   DotsVerticalRounded,
 } from "../assets";
-import { useParams } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import FileRenderer from "../components/FileRenderer/FileRenderer.js";
 const ICON_MAP = {
   video: <VideoSolid />,
@@ -331,6 +331,8 @@ const Player = () => {
     toastType,
     showToast,
   } = useAuth();
+  const location = useLocation();
+  const referalData = location.state;
   const handleNowPlaying = (lectureId) => {
     setNowPlaying(lectureId);
 
@@ -525,11 +527,16 @@ const Player = () => {
   }, [id]);
   useEffect(() => {
     const initialload = () => {
-      if (lectureDictionary && courseData.courseprogresses[0]?.LectureId) {
-        const initiallecture = courseData.courseprogresses[0].LectureId;
+      if (
+        lectureDictionary &&
+        (referalData || courseData.courseprogresses[0]?.LectureId)
+      ) {
+        const initiallecture = referalData
+          ? referalData
+          : courseData.courseprogresses[0].LectureId;
         setNowPlaying(initiallecture);
         setInitialVideoProgress(
-          lectureDictionary[initiallecture].progress[0].progress
+          lectureDictionary[initiallecture]?.progress?.[0]?.progress
         );
       }
       if (lectureDictionary && !isLoading) {

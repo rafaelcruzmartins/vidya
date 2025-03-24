@@ -1,38 +1,96 @@
 import { AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "../../api/axiosInstance.js";
+import { useNavigate } from "react-router-dom";
 
 const Search = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState([]);
+  const [searchResults, setSearchResults] = useState({
+    lectures: [],
+    courses: [],
+    sections: [],
+    instructors: [],
+    categories: [],
+  });
   const [showResults, setShowResults] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+  const searchTimeout = useRef(null);
 
-  const mockData = [
-    "Apple",
-    "Banana",
-    "Cherry",
-    "Date",
-    "Elderberry",
-    "Fig",
-    "Grape",
-    "Honeydew",
-    "Imbe",
-    "Jackfruit",
-  ];
+  const performSearch = async (term) => {
+    if (term.trim() === "") {
+      setSearchResults({
+        lectures: [],
+        courses: [],
+        sections: [],
+        instructors: [],
+        categories: [],
+      });
+      setShowResults(false);
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const response = await axios.get("/api/search", {
+        params: {
+          query: term,
+          limit: 10,
+        },
+        withCredentials: true,
+      });
+
+      setSearchResults(response.data);
+      setShowResults(true);
+    } catch (error) {
+      console.error("Search error:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    if (searchTerm === "") {
+      setSearchResults({
+        lectures: [],
+        courses: [],
+        sections: [],
+        instructors: [],
+        categories: [],
+      });
+      setShowResults(false);
+      return;
+    }
+
+    setIsLoading(true);
+
+    searchTimeout.current = setTimeout(() => {
+      performSearch(searchTerm);
+    }, 500);
+
+    return () => {
+      if (searchTimeout.current) {
+        clearTimeout(searchTimeout.current);
+      }
+    };
+  }, [searchTerm]);
+
   const handleSearch = (event) => {
     const term = event.target.value;
     setSearchTerm(term);
-
-    if (term.trim() === "") {
-      setSearchResults([]);
-      setShowResults(false);
-    } else {
-      const filteredResults = mockData.filter((item) =>
-        item.toLowerCase().includes(term.toLowerCase())
-      );
-      setSearchResults(filteredResults);
-      setShowResults(true);
-    }
   };
+
+  const hasResults =
+    searchResults.lectures?.length > 0 ||
+    searchResults.courses?.length > 0 ||
+    searchResults.sections?.length > 0 ||
+    searchResults.instructors?.length > 0 ||
+    searchResults.categories?.length > 0;
 
   return (
     <div className="search">
@@ -41,25 +99,138 @@ const Search = () => {
         className="search-input"
         value={searchTerm}
         onChange={handleSearch}
+        placeholder="Search courses, lectures, & more..."
       />
       <AnimatePresence>
-        {showResults && searchResults.length > 0 && (
+        {showResults && hasResults && (
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: 20, opacity: 0 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-            }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className="search-results"
           >
-            {searchResults.map((result, index) => (
-              <div key={index} className="search-results-list">
-                {result}
+            {searchResults.courses && searchResults.courses.length > 0 && (
+              <div className="result-section">
+                <div className="result-heading">Courses</div>
+                {searchResults.courses.map((course) => (
+                  <div
+                    key={course.id}
+                    className="search-results-list"
+                    onClick={() => navigate(`/courses/${course.id}`)}
+                  >
+                    <div className="result-item">
+                      <span className="result-name">{course.name}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
+            {searchResults.lectures && searchResults.lectures.length > 0 && (
+              <div className="result-section">
+                <div className="result-heading">Lectures</div>
+                {searchResults.lectures.map((lecture) => (
+                  <div
+                    key={lecture.id}
+                    className="search-results-list"
+                    onClick={() => {
+                      navigate(`/course/play/${lecture.courseId}`, {
+                        state: lecture.id,
+                      });
+                      setShowResults(false);
+                    }}
+                  >
+                    <div className="result-item">
+                      <span className="result-name">{lecture.name}</span>
+                      <div className="result-details">
+                        <span className="course-reference">
+                          {lecture.courseName && `in ${lecture.courseName}`}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {searchResults.sections && searchResults.sections.length > 0 && (
+              <div className="result-section">
+                <div className="result-heading">Sections</div>
+                {searchResults.sections.map((section) => (
+                  <div
+                    key={section.id}
+                    className="search-results-list"
+                    onClick={() => {
+                      navigate(`/courses/${section.courseId}`, {
+                        state: section.id,
+                      });
+                      setShowResults(false);
+                    }}
+                  >
+                    <div className="result-item">
+                      <span className="result-name">{section.name}</span>
+                      {section.courseName && (
+                        <div className="result-details">
+                          <span className="course-reference">
+                            in {section.courseName}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {searchResults.instructors &&
+              searchResults.instructors.length > 0 && (
+                <div className="result-section">
+                  <div className="result-heading">Instructors</div>
+                  {searchResults.instructors.map((instructor) => (
+                    <div
+                      key={instructor.id}
+                      className="search-results-list"
+                      onClick={() => {
+                        navigate(`/instructor/${instructor.id}`, {
+                          state: instructor.id,
+                        });
+                        setShowResults(false);
+                      }}
+                    >
+                      <div className="result-item">
+                        <span className="result-name">{instructor.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            {searchResults.categories &&
+              searchResults.categories.length > 0 && (
+                <div className="result-section">
+                  <div className="result-heading">Categories</div>
+                  {searchResults.categories.map((category) => (
+                    <div
+                      key={category.id}
+                      className="search-results-list"
+                      onClick={() => {
+                        navigate(`/category/${category.id}`);
+                        setShowResults(false);
+                      }}
+                    >
+                      <div className="result-item">
+                        <span className="result-name">{category.name}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+            {!isLoading && !hasResults && (
+              <div className="no-results">
+                <span>No results found for "{searchTerm}"</span>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>

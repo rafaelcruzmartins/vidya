@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     const fetchCategory = async () => {
       try {
         const { data } = await axios.get(
-          "/api/category/6",
+          "/api/category/5",
 
           { withCredentials: true }
         );

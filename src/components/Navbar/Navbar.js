@@ -13,10 +13,10 @@ const Navbar = ({ navItem }) => {
   const currentPathId = location.pathname.startsWith("/category/")
     ? location.pathname.split("/category/")[1]
     : null;
-
+  const isLowerThanFive = navItem && navItem.length < 5;
   return (
     <>
-      <div className="nav-bar">
+      <div className={isLowerThanFive ? "nav-bar" : "nav-bar justified"}>
         {navItem &&
           navItem.map((cat) => (
             <div
