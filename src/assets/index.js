@@ -408,6 +408,11 @@ const VideoSolid = () => (
     <path d="M18 7c0-1.103-.897-2-2-2H4c-1.103 0-2 .897-2 2v10c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-3.333L22 17V7l-4 3.333V7z"></path>
   </svg>
 );
+const PinSolid = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+    <path d="M15 11.586V6h2V4a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2h2v5.586l-2.707 1.707A.996.996 0 0 0 6 14v2a1 1 0 0 0 1 1h4v3l1 2 1-2v-3h4a1 1 0 0 0 1-1v-2a.996.996 0 0 0-.293-.707L15 11.586z"></path>
+  </svg>
+);
 export {
   ToggleLeft,
   ToggleRight,
@@ -467,4 +472,5 @@ export {
   FilePdfSolid,
   World,
   VideoSolid,
+  PinSolid,
 };

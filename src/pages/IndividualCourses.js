@@ -16,6 +16,7 @@ import {
   FileArchiveSolid,
   FileBlankSolid,
   Play,
+  PinSolid,
 } from "../assets";
 import {
   useRef,
@@ -97,6 +98,7 @@ const LectureItem = memo(
     setToastType,
     setShowToast,
     onLectureClick,
+    courseName,
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -129,6 +131,7 @@ const LectureItem = memo(
             name: title,
             type: "bookmark",
             courseId,
+            courseName,
           },
           { withCredentials: true }
         );
@@ -156,6 +159,7 @@ const LectureItem = memo(
             name: title,
             type: tagType,
             courseId,
+            courseName,
           },
           { withCredentials: true }
         );
@@ -549,6 +553,29 @@ const IndividualCourses = () => {
       return newSet;
     });
   }, []);
+  const handlePin = async () => {
+    try {
+      setShowToast(false);
+      setToastMessage("adding course to featured");
+      setToastType("warning");
+      setShowToast(true);
+      await axios.post(
+        "/api/course/pin",
+        { courseId: id },
+        { withCredentials: true }
+      );
+      setShowToast(false);
+      setToastMessage("course added to featured");
+      setToastType("success");
+      setShowToast(true);
+    } catch (error) {
+      console.error(error);
+      setShowToast(false);
+      setToastMessage("error adding course to featured");
+      setToastType("error");
+      setShowToast(true);
+    }
+  };
   const secondsToHoursRounded = (seconds) => {
     if (typeof seconds !== "number" || isNaN(seconds)) {
       return "Invalid input. Please provide a number for seconds.";
@@ -629,6 +656,9 @@ const IndividualCourses = () => {
                   >
                     <Play />
                   </span>
+                  <span className="svg-div pin-svg" onClick={handlePin}>
+                    <PinSolid />
+                  </span>
                 </div>
                 {role === "admin" && (
                   <div className="edit-information">
@@ -658,6 +688,15 @@ const IndividualCourses = () => {
                     {(index ? ", " : "") + instructor.name}
                   </span>
                 ))}
+              </div>
+              <div className="category-bottom-container">
+                <span className="drop-cap">Category : </span>
+                <span
+                  onClick={() => navigate(`/category/${course?.category?.id}`)}
+                  className="featured-instructor-link"
+                >
+                  {course?.category?.category}
+                </span>
               </div>
               <div className="description">
                 <span className="drop-cap">Description : </span>
@@ -791,7 +830,7 @@ const IndividualCourses = () => {
                   className="modal-buttons"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  style={{ color: "#00a6a6" }}
+                  style={{ color: "#00a6a6", cursor: "pointer" }}
                   onClick={handleUpload}
                 >
                   Save
@@ -800,7 +839,7 @@ const IndividualCourses = () => {
                   className="modal-buttons"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  style={{ color: "#45312d" }}
+                  style={{ color: "#45312d", cursor: "pointer" }}
                   onClick={closeModal}
                 >
                   Cancel
@@ -857,6 +896,7 @@ const IndividualCourses = () => {
                     key={e.id}
                     className="single-add-category"
                     onClick={() => handleAddCategory(e)}
+                    style={{ cursor: "pointer" }}
                   >
                     {e.category}
                   </div>
@@ -913,6 +953,7 @@ const IndividualCourses = () => {
                     key={instructor.id}
                     className="single-add-instructor"
                     onClick={() => handleAddInstructor(instructor)}
+                    style={{ cursor: "pointer" }}
                   >
                     {instructor.name}
                   </div>
@@ -965,6 +1006,7 @@ const IndividualCourses = () => {
                             setToastType={setToastType}
                             setShowToast={setShowToast}
                             onLectureClick={handleLectureClick}
+                            courseName={course.cleanedName}
                           />
                         ))}
                       </motion.div>

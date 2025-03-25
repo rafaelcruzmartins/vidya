@@ -96,6 +96,7 @@ const LectureItem = memo(
     setToastMessage,
     setToastType,
     setShowToast,
+    courseName,
   }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -128,6 +129,7 @@ const LectureItem = memo(
             name: title,
             type: "bookmark",
             courseId,
+            courseName,
           },
           { withCredentials: true }
         );
@@ -155,6 +157,7 @@ const LectureItem = memo(
             name: title,
             type: tagType,
             courseId,
+            courseName,
           },
           { withCredentials: true }
         );
@@ -697,10 +700,11 @@ const Player = () => {
                           type={lecture.type}
                           duration={lecture.duration}
                           content={lecture.content}
-                          CourseId={id}
+                          courseId={id}
                           setToastMessage={setToastMessage}
                           setToastType={setToastType}
                           setShowToast={setShowToast}
+                          courseName={courseData.cleanedName}
                         />
                       ))}
                     </motion.div>

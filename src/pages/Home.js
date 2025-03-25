@@ -42,7 +42,7 @@ const Home = ({ category }) => {
       `/courses/${
         homeData?.featuredCourse
           ? homeData.featuredCourse.id
-          : homeData.latestCourse[1].id
+          : homeData.latestCourse[0].id
       }`
     );
   };
@@ -110,11 +110,13 @@ const Home = ({ category }) => {
                   src={
                     homeData &&
                     process.env.REACT_APP_API +
-                      (!homeData.featuredCourse === null
-                        ? homeData?.featuredCourse?.photo
-                        : homeData?.latestCourse[1]?.photo === null
+                      (!(homeData?.featuredCourse === null)
+                        ? homeData?.featuredCourse?.photo === null
+                          ? "/assets/placeholder.avif"
+                          : homeData?.featuredCourse?.photo
+                        : homeData?.latestCourse[0]?.photo === null
                         ? "/assets/placeholder.avif"
-                        : homeData?.latestCourse[1]?.photo)
+                        : homeData?.latestCourse[0]?.photo)
                   }
                   alt=""
                 />
@@ -123,16 +125,16 @@ const Home = ({ category }) => {
                 <div className="featured-info-details">
                   <div className="info-title" onClick={handleCourse}>
                     {homeData &&
-                      (!homeData.featuredCourse === null
+                      (!(homeData?.featuredCourse === null)
                         ? homeData.featuredCourse?.cleanedName
-                        : homeData.latestCourse[1]?.cleanedName)}
+                        : homeData.latestCourse[0]?.cleanedName)}
                   </div>
                   <div className="instructor-name">
                     by{" "}
                     {homeData &&
-                      (!homeData.featuredCourse === null
-                        ? homeData.featuredCourse?.intructors
-                        : homeData.latestCourse[1]?.instructors
+                      (!(homeData?.featuredCourse === null)
+                        ? homeData.featuredCourse?.instructors
+                        : homeData.latestCourse[0]?.instructors
                       )?.map((item, index) => (
                         <span
                           className="featured-instructor-link"

@@ -1443,6 +1443,15 @@ select option {
   }
 }
 
+.pin-svg {
+  cursor: pointer;
+}
+.pin-svg {
+  svg:hover {
+    opacity: 0.5;
+  }
+}
+
 .blink-background {
   position: relative;
 }
@@ -2248,7 +2257,9 @@ video::-moz-media-controls {
   height: 0.2rem;
   background-color: rgb(54, 54, 54);
 }
-
+.current-progress-categories-name:hover {
+  text-decoration: underline;
+}
 .quick-stats-name {
   margin: 1rem;
   font-weight: 500;
@@ -2436,11 +2447,34 @@ video::-moz-media-controls {
   gap: 1rem;
   margin: 1rem;
 }
+.tag-content-course {
+  cursor: pointer;
+  color: #666;
+}
+.tag-content-course:hover {
+  text-decoration: underline;
+}
+.tag-bookmark-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
 .tag-delete-icon {
   display: none;
   cursor: pointer;
 }
-
+.tag-content-title {
+  cursor: pointer;
+}
+.bookmark-title {
+  cursor: pointer;
+}
+.bookmark-title:hover {
+  text-decoration: underline;
+}
+.tag-content-title:hover {
+  text-decoration: underline;
+}
 .tag-content:hover .tag-delete-icon {
   display: block;
 }

@@ -46,6 +46,11 @@ const Dashboard = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
   };
+  const handleLectureClick = (courseId, lectureId) => {
+    navigate(`/course/play/${courseId}`, {
+      state: lectureId,
+    });
+  };
   const renderedTabContent = () => {
     const handleDeleteItem = async (id) => {
       setShowToast(false);
@@ -90,7 +95,21 @@ const Dashboard = () => {
                   <div className="tag-icon-difficult">
                     <PurchaseTag />
                   </div>
-                  <div className="tag-content-title">{item.name}</div>
+                  <div
+                    onClick={() =>
+                      handleLectureClick(item.courseId, item.lectureId)
+                    }
+                    className="tag-content-title"
+                  >
+                    {item.name}
+                  </div>
+                  <div
+                    className="tag-content-course tag-bookmark-ellipsis"
+                    onClick={() => navigate(`/courses/${item.courseId}`)}
+                  >
+                    {" "}
+                    in {item.courseName}
+                  </div>
                   <div
                     className="tag-delete-icon"
                     onClick={() => handleDeleteItem(item.id)}
@@ -116,7 +135,21 @@ const Dashboard = () => {
                   <div className="tag-icon-need-review">
                     <PurchaseTag />
                   </div>
-                  <div className="tag-content-title">{item.name}</div>
+                  <div
+                    onClick={() =>
+                      handleLectureClick(item.courseId, item.lectureId)
+                    }
+                    className="tag-content-title"
+                  >
+                    {item.name}
+                  </div>
+                  <div
+                    className="tag-content-course tag-bookmark-ellipsis"
+                    onClick={() => navigate(`/courses/${item.courseId}`)}
+                  >
+                    {" "}
+                    in {item.courseName}
+                  </div>
                   <div
                     className="tag-delete-icon"
                     onClick={() => handleDeleteItem(item.id)}
@@ -142,7 +175,21 @@ const Dashboard = () => {
                   <div className="tag-icon-important">
                     <PurchaseTag />
                   </div>
-                  <div className="tag-content-title">{item.name}</div>
+                  <div
+                    onClick={() =>
+                      handleLectureClick(item.courseId, item.lectureId)
+                    }
+                    className="tag-content-title"
+                  >
+                    {item.name}
+                  </div>
+                  <div
+                    className="tag-content-course tag-bookmark-ellipsis"
+                    onClick={() => navigate(`/courses/${item.courseId}`)}
+                  >
+                    {" "}
+                    in {item.courseName}
+                  </div>
                   <div
                     className="tag-delete-icon"
                     onClick={() => handleDeleteItem(item.id)}
@@ -229,19 +276,24 @@ const Dashboard = () => {
                   <div className="current-progress-categories" key={item.id}>
                     <div className="current-progress-categories-wrap">
                       <div
+                        style={{ cursor: "pointer" }}
                         className="current-progress-categories-name"
                         onClick={() => navigate(`/courses/${item.course.id}`)}
                       >
                         {item.course.cleanedName}
                       </div>
                       <div className="current-progress-categories-percentage">
-                        {item.progress}%
+                        {item.progress === null ? 0 : item.progress}%
                       </div>
                     </div>
                     <div className="current-progress-bar">
                       <div
                         className="current-progress-bar-filled"
-                        style={{ width: `${item.progress}%` }}
+                        style={{
+                          width: `${
+                            item.progress === null ? 0 : item.progress
+                          }%`,
+                        }}
                       ></div>
                     </div>
                   </div>
@@ -295,7 +347,21 @@ const Dashboard = () => {
                       <div className="bookmark-icon">
                         <Bookmark />
                       </div>
-                      <div className="bookmark-title">{item.name}</div>
+                      <div
+                        onClick={() =>
+                          handleLectureClick(item.courseId, item.lectureId)
+                        }
+                        className="bookmark-title tag-bookmark-ellipsis"
+                      >
+                        {item.name}
+                      </div>
+                      <div
+                        className="tag-content-course tag-bookmark-ellipsis"
+                        onClick={() => navigate(`/courses/${item.courseId}`)}
+                      >
+                        {" "}
+                        in {item.courseName}
+                      </div>
                       <div
                         className="tag-delete-icon"
                         onClick={() => handleDeleteItem(item.id)}
@@ -312,6 +378,7 @@ const Dashboard = () => {
                 <div className="tag-name">Tags</div>
                 <div className="tag-tab">
                   <div
+                    style={{ cursor: "pointer" }}
                     className={
                       activeTab === "difficult"
                         ? "tag-difficult active-tag-tab"
@@ -322,6 +389,7 @@ const Dashboard = () => {
                     difficult
                   </div>
                   <div
+                    style={{ cursor: "pointer" }}
                     className={
                       activeTab === "need review"
                         ? "tag-need-review active-tag-tab"
@@ -332,6 +400,7 @@ const Dashboard = () => {
                     need review
                   </div>
                   <div
+                    style={{ cursor: "pointer" }}
                     onClick={() => handleTabChange("important")}
                     className={
                       activeTab === "important"
