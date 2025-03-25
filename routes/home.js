@@ -30,7 +30,7 @@ const getUserData = async (userId, featuredCourseId) => {
         }),
         TrackingSystem.getCategoryWatchTime(userId),
         Course.findByPk(featuredCourseId, {
-          attributes: ["id", "title", "photo"],
+          attributes: ["id", "cleanedName", "photo"],
           include: [
             {
               model: Instructor,

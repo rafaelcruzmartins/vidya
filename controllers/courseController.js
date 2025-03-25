@@ -20,10 +20,20 @@ const pathCache = {
   reset() {
     this.entries = new Map();
   },
-  getPathId(filePath) {
+  async getPathId(filePath) {
+    const existingPathFile = await PathFile.findOne({
+      where: { path: filePath },
+    });
+
+    if (existingPathFile) {
+      this.entries.set(filePath, existingPathFile.id);
+      return existingPathFile.id;
+    }
+
     if (this.entries.has(filePath)) {
       return this.entries.get(filePath);
     }
+
     const newId = uuidv4();
     this.entries.set(filePath, newId);
     return newId;
@@ -35,7 +45,6 @@ const pathCache = {
     }));
   },
 };
-
 const durationCache = {
   cache: new Map(),
   async initialize() {
@@ -379,9 +388,9 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         },
       });
 
-      const content = group.contents.map((f) => {
+      const content = group.contents.map(async (f) => {
         const contentPath = path.join(sectionPath, f);
-        const contentPathId = pathCache.getPathId(contentPath);
+        const contentPathId = await pathCache.getPathId(contentPath);
         return {
           type: path.extname(f).replace(".", ""),
           pathId: contentPathId,
@@ -507,40 +516,44 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         "simplified chinese": "zh",
       };
 
-      const subtitles = group.subtitles.map((f) => {
-        const subtitlePath = path.join(sectionPath, f);
-        const subtitlePathId = pathCache.getPathId(subtitlePath);
+      const subtitles = await Promise.all(
+        group.subtitles.map(async (f) => {
+          const subtitlePath = path.join(sectionPath, f);
+          const subtitlePathId = await pathCache.getPathId(subtitlePath);
 
-        const langMatch = f.match(/(?:[\s_\-]+)([A-Za-z\s]+)(?=\.[a-z]{3}$)/i);
-        let detectedLang = "en";
+          const langMatch = f.match(
+            /(?:[\s_\-]+)([A-Za-z\s]+)(?=\.[a-z]{3}$)/i
+          );
+          let detectedLang = "en";
 
-        if (langMatch) {
-          const rawLang = langMatch[1]
-            .toLowerCase()
-            .replace(/\s+/g, " ")
-            .trim();
+          if (langMatch) {
+            const rawLang = langMatch[1]
+              .toLowerCase()
+              .replace(/\s+/g, " ")
+              .trim();
 
-          if (languageMap[rawLang]) {
-            detectedLang = languageMap[rawLang];
-          } else if (/^[a-z]{2}$/.test(rawLang)) {
-            detectedLang = rawLang;
-          } else {
-            const matchedKey = Object.keys(languageMap).find((key) =>
-              rawLang.includes(key)
-            );
-            detectedLang = matchedKey ? languageMap[matchedKey] : "en";
+            if (languageMap[rawLang]) {
+              detectedLang = languageMap[rawLang];
+            } else if (/^[a-z]{2}$/.test(rawLang)) {
+              detectedLang = rawLang;
+            } else {
+              const matchedKey = Object.keys(languageMap).find((key) =>
+                rawLang.includes(key)
+              );
+              detectedLang = matchedKey ? languageMap[matchedKey] : "en";
+            }
           }
-        }
 
-        return {
-          language: detectedLang,
-          pathId: subtitlePathId,
-          type: path.extname(f).replace(".", ""),
-          originalName: f,
-          cleanedName: cleanName(f),
-        };
-      });
-
+          return {
+            language: detectedLang,
+            pathId: subtitlePathId,
+            type: path.extname(f).replace(".", ""),
+            originalName: f,
+            cleanedName: cleanName(f),
+          };
+        })
+      );
+      const resolvedContent = await Promise.all(content);
       if (isVideo) {
         videoFilesToProcess.push({
           sectionId: section.id,
@@ -649,10 +662,22 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
   const pathEntries = pathCache.getAllEntries();
 
   if (pathEntries.length > 0) {
-    await PathFile.bulkCreate(pathEntries, {
-      updateOnDuplicate: ["path"],
-      ignoreDuplicates: true,
+    const existingPaths = await PathFile.findAll({
+      where: {
+        path: pathEntries.map((entry) => entry.path),
+      },
+      attributes: ["path"],
     });
+
+    const existingPathSet = new Set(existingPaths.map((p) => p.path));
+
+    const newPathEntries = pathEntries.filter(
+      (entry) => !existingPathSet.has(entry.path)
+    );
+
+    if (newPathEntries.length > 0) {
+      await PathFile.bulkCreate(newPathEntries);
+    }
   }
 
   if (usedPathIds.size > 0) {
@@ -769,7 +794,6 @@ const register = async (req, res) => {
         folder.directory
       );
       for (const individualCourse of individualCourseDirectory) {
-        console.log(folder.id);
         await syncCourseDirectory(normalizePath(individualCourse), folder.id);
       }
     }

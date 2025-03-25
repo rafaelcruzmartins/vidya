@@ -13,6 +13,7 @@ const TagsAndBookmark = sequelize.define(
     type: DataTypes.STRING,
     lectureId: { type: DataTypes.UUID, allowNull: false },
     courseId: DataTypes.UUID,
+    courseName: DataTypes.STRING,
     name: DataTypes.STRING,
   },
   {

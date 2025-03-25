@@ -375,6 +375,17 @@ router.post("/progress/courseprogress", isAuthenticated, async (req, res) => {
     res.status(500);
   }
 });
+router.post("/pin", isAuthenticated, async (req, res) => {
+  const { courseId } = req.body;
+  const userId = req.user.id;
+  try {
+    await User.update({ featuredCourse: courseId }, { where: { id: userId } });
+    res.status(200).send("course added to featured course");
+  } catch (error) {
+    console.error(error);
+    res.status(500).send("internal server error");
+  }
+});
 router.post("/progress/watchtime", isAuthenticated, async (req, res) => {
   const { seconds, lectureId, courseId, progress } = req.body;
   const userId = req.user.id;
@@ -407,7 +418,7 @@ router.post("/subtitle/preference", isAuthenticated, async (req, res) => {
 
 router.post("/tagsandbookmark", isAuthenticated, async (req, res) => {
   const UserId = req.user.id;
-  const { lectureId, name, type, courseId } = req.body;
+  const { lectureId, name, type, courseId, courseName } = req.body;
 
   try {
     await TagsAndBookmark.create({
@@ -416,6 +427,7 @@ router.post("/tagsandbookmark", isAuthenticated, async (req, res) => {
       name,
       type,
       courseId,
+      courseName,
     });
     res.status(201).send("created successfully");
   } catch (error) {

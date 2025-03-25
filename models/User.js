@@ -45,7 +45,7 @@ const User = sequelize.define("User", {
     type: DataTypes.ENUM("user", "admin"),
     defaultValue: "user",
   },
-  featuredCourse: DataTypes.STRING,
+  featuredCourse: DataTypes.UUIDV4,
   deflang: DataTypes.STRING,
 });
 
