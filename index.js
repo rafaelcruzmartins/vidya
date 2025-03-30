@@ -83,7 +83,7 @@ passport.deserializeUser(async (id, done) => {
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "http://192.168.1.29:3000",
     credentials: true,
   })
 );
