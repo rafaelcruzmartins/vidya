@@ -18,9 +18,9 @@
 *::-webkit-scrollbar-thumb {
   background-color: #ffb5a7;
   /* color of the scroll thumb */
-  border-radius: 20px;
+  border-radius: 1.25rem;
   /* roundness of the scroll thumb */
-  border: 3px solid rgba(255, 255, 255, 0.1);
+  border: 0.1875rem solid rgba(255, 255, 255, 0.1);
   /* creates padding around scroll thumb */
 }
 
@@ -187,17 +187,16 @@ body {
 
 .search-icon {
   position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+  right: 0.625rem;
+  top: 25%;
+
   margin-right: 0.5rem;
 }
 
 .profile {
   flex-shrink: 0;
 }
-
-.search {
+.search-placeholder {
   width: 100%;
   height: 2.5rem;
   position: relative;
@@ -210,8 +209,42 @@ body {
   box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
   border-radius: 0.5rem;
   display: flex;
-  justify-content: end;
-
+  align-items: center;
+  cursor: pointer;
+  svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+}
+.search-placeholder-icon {
+  cursor: pointer;
+  display: none;
+}
+.search-wrapper {
+  width: 100%;
+  margin-top: 15vh;
+  display: flex;
+  justify-content: center;
+}
+.search-wrapper-inner {
+  width: 50%;
+  max-height: 55vh;
+}
+.search {
+  width: 100%;
+  height: 2.5rem;
+  position: relative;
+  background: radial-gradient(
+    98.58% 260.42% at 0% 2.28%,
+    rgba(255, 255, 255, 0.8) 4.75%,
+    rgba(255, 255, 255, 0.6) 100%
+  );
+  border: 1px solid #ffffff;
+  box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  display: flex;
+  align-items: center;
+  backdrop-filter: blur(20px);
   svg {
     width: 1.2rem;
     height: 1.2rem;
@@ -233,12 +266,10 @@ body {
 }
 
 .search-results {
-  position: absolute;
-  top: 120%;
   background: radial-gradient(
     98.58% 260.42% at 0% 2.28%,
-    rgba(255, 255, 255, 0.6) 4.75%,
-    rgba(255, 255, 255, 0.3) 100%
+    rgba(255, 255, 255, 0.8) 4.75%,
+    rgba(255, 255, 255, 0.6) 100%
   );
   border: 1px solid #ffffff;
   box-shadow: 0px 4px 50px rgba(0, 0, 0, 0.1);
@@ -246,7 +277,8 @@ body {
   border-radius: 0.5rem;
   z-index: 30;
   width: 100%;
-  max-height: 40vh;
+  height: 90%;
+  margin-top: 0.5rem;
   overflow-y: auto;
 }
 
@@ -257,16 +289,16 @@ body {
 }
 
 .result-section {
-  padding: 8px 0;
+  padding: 0.5rem 0;
 }
 
 .result-section:not(:last-child) {
-  border-bottom: 1px solid #45312d;
+  border-bottom: 0.0625rem solid #45312d;
 }
 
 .result-heading {
   margin-left: 0.5rem;
-  font-size: 14px;
+  font-size: 0.9rem;
   color: #666;
   font-weight: 600;
   text-transform: uppercase;
@@ -289,18 +321,18 @@ body {
 
 .result-name {
   font-weight: 500;
-  margin-bottom: 2px;
+  margin-bottom: 0.125rem;
 }
 
 .result-details {
   display: flex;
-  font-size: 14px;
+  font-size: 0.9rem;
   color: #666;
 }
 
 .result-details > span:not(:last-child)::after {
   content: "•";
-  margin: 0 6px;
+  margin: 0 0.375rem;
 }
 
 svg {
@@ -323,8 +355,8 @@ svg {
   display: flex;
   justify-content: center;
   font-size: 1rem;
-  min-width: 13vw;
-  height: 6vh;
+  min-width: 12rem;
+  height: 3rem;
   background: rgba(255, 255, 255, 0.34);
   border-radius: 0.7rem;
   font-weight: 500;
@@ -368,7 +400,7 @@ svg {
 .feat-stats {
   display: flex;
   justify-content: space-between;
-  height: 55vh;
+  height: 26rem;
 }
 
 .featured-course {
@@ -447,8 +479,8 @@ img {
   cursor: pointer;
 
   border-radius: 0.7rem;
-  width: 9vw;
-  height: 4.5vh;
+  width: 8rem;
+  height: 2.25rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -474,7 +506,7 @@ img {
 }
 
 .stats > * {
-  transform: translateZ(60px);
+  transform: translateZ(3.75rem);
 }
 
 .watch {
@@ -545,7 +577,7 @@ img {
 }
 
 .card-divs {
-  max-height: 40vh;
+  max-height: 30rem;
   display: flex;
   align-items: center;
   gap: 5%;
@@ -588,7 +620,7 @@ img {
 }
 .cards {
   width: 30%;
-  height: 40vh;
+  height: 20rem;
   background: radial-gradient(
     98.58% 260.42% at 0% 2.28%,
     rgba(255, 255, 255, 0.098) 4.75%,
@@ -693,7 +725,6 @@ img {
 .card-divs-wrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 1%;
   margin: 1rem;
 }
 
@@ -706,7 +737,7 @@ img {
   top: 0;
   left: 0;
   height: 90vh;
-  width: 16vw;
+  width: 15rem;
   background: radial-gradient(
     100% 195.79% at 0% 0%,
     rgba(255, 255, 255, 0.28) 1.29%,
@@ -809,8 +840,8 @@ img {
 }
 
 .categories {
-  width: 20vw;
-  height: 18vh;
+  width: 20rem;
+  height: 9rem;
   background: rgba(255, 255, 255, 0.4);
   border: 1px solid #ffffff;
   border-radius: 0.8rem;
@@ -844,8 +875,8 @@ img {
 }
 
 .instructor-card {
-  width: 20vw;
-  height: 35vh;
+  width: 20rem;
+  height: 18rem;
   background: radial-gradient(
     100% 195.79% at 0% 0%,
     rgba(255, 255, 255, 0.28) 1.29%,
@@ -923,7 +954,7 @@ img {
 }
 
 .settings-sidebar {
-  width: 20vw;
+  width: 21%;
   height: 75vh;
   background: radial-gradient(
     100% 195.79% at 0% 0%,
@@ -939,7 +970,7 @@ img {
 }
 
 .settings-sidebar-info {
-  width: 70vw;
+  width: 76%;
   height: 75vh;
   background: radial-gradient(
     100% 195.79% at 0% 0%,
@@ -995,7 +1026,7 @@ img {
 .password {
   margin: 1rem 0;
   border: none;
-  height: 4vh;
+  height: 2rem;
   border-radius: 0.5rem;
 }
 
@@ -1007,7 +1038,7 @@ img {
   background: #e20044;
   width: 60%;
   border-radius: 0.5rem;
-  height: 4vh;
+  height: 2rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1015,7 +1046,7 @@ img {
 }
 
 select {
-  height: 4vh;
+  height: 2rem;
   width: 20%;
   border: 1px solid white;
   border-radius: 0.2rem;
@@ -1035,8 +1066,8 @@ select option {
 }
 
 .folder-div {
-  width: 35vw;
-  height: 6vh;
+  width: 30rem;
+  height: 2.5rem;
   background: rgba(255, 255, 255, 0.34);
   display: flex;
   align-items: center;
@@ -1062,8 +1093,8 @@ select option {
 }
 
 .folders-action-group > div {
-  width: 12vw;
-  height: 8vh;
+  width: 10rem;
+  height: 4.5rem;
   background: rgba(255, 255, 255, 0.34);
   border-radius: 1rem;
   margin-right: 1rem;
@@ -1180,8 +1211,8 @@ select option {
   border-radius: 0.7rem;
   margin-right: 1rem;
   align-items: center;
-  padding: 10px;
-  width: 10vw;
+  padding: 0.8rem;
+  width: 10rem;
   margin-bottom: 1rem;
   justify-content: space-between;
 }
@@ -1192,8 +1223,7 @@ select option {
 
 .user-item svg {
   cursor: pointer;
-
-  margin-left: 10px;
+  margin-left: 0.625rem;
 }
 
 .modal-overlay {
@@ -1217,8 +1247,8 @@ select option {
   );
   border: 1px solid #ffffff;
   border-radius: 1rem;
-  width: 40vw;
-  height: 47vh;
+  width: 35rem;
+  height: 25rem;
   padding: 1rem 0;
   z-index: 1001;
   display: flex;
@@ -1235,8 +1265,8 @@ select option {
 
 .modal-buttons {
   background: rgba(255, 255, 255, 0.5);
-  width: 9vw;
-  height: 5vh;
+  width: 8rem;
+  height: 2.5rem;
   border-radius: 0.5rem;
   display: flex;
   justify-content: center;
@@ -1256,20 +1286,21 @@ select option {
 .tabs {
   display: flex;
   margin: 1rem;
+  padding: 0.2rem;
   border: 1px solid white;
-  border-radius: 1rem;
-  width: 13vw;
-  justify-content: center;
-  height: 6vh;
+  border-radius: 0.7rem;
+  width: 15rem;
+  justify-content: space-between;
+  height: 2rem;
   align-items: center;
 }
 
 .tab {
-  width: 6vw;
+  width: 7rem;
 
   display: flex;
-  border-radius: 0.6rem;
-  height: 5vh;
+  border-radius: 0.7rem;
+  height: 2rem;
   justify-content: center;
   align-items: center;
 }
@@ -1296,8 +1327,8 @@ select option {
   gap: 1rem;
 
   div {
-    width: 7vw;
-    height: 4vh;
+    width: 8rem;
+    height: 2.5rem;
   }
 }
 
@@ -1308,9 +1339,9 @@ select option {
     rgba(255, 255, 255, 0.014) 100%
   );
   border: 1px solid #ffffff;
-  border-radius: 1rem;
-  width: 13vw;
-  height: 4vh;
+  border-radius: 0.7rem;
+  width: 13rem;
+  height: 2rem;
   text-indent: 1rem;
   font-size: 1rem;
 }
@@ -1343,30 +1374,30 @@ select option {
   width: 90%;
 }
 .small-modal {
-  width: 20vw;
-  height: 20vh;
+  width: 19.2rem;
+  height: 10.8rem;
 }
 .small-medium-modal {
-  width: 23vw;
-  height: 20vh;
+  width: 22.08rem;
+  height: 10.8rem;
 }
 .medium-modal {
-  width: 20vw;
-  height: 35vh;
+  width: 19.2rem;
+  height: 18.9rem;
 }
 .modal-buttons-group-user {
   display: flex;
   gap: 1rem;
 
   .modal-buttons {
-    width: 6vw;
-    height: 4vh;
+    width: 6rem;
+    height: 1.8rem;
     font-size: 0.8rem;
   }
 }
 
 .course-instructor-info {
-  height: 60vh;
+  height: 32.4rem;
   margin-bottom: 1rem;
 }
 
@@ -1425,6 +1456,7 @@ select option {
   font-weight: 500;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-right: 2rem;
 }
 .course-title-inner {
@@ -1449,6 +1481,9 @@ select option {
 .pin-svg {
   svg:hover {
     opacity: 0.5;
+  }
+  svg {
+    transform: scale(0.9);
   }
 }
 
@@ -1558,8 +1593,7 @@ select option {
 }
 
 .section-content.open {
-  max-height: 500px;
-  /* Adjust this value based on your content */
+  max-height: 31.25rem;
 }
 
 .lecture-list {
@@ -1568,7 +1602,7 @@ select option {
 }
 
 .lecture-item {
-  padding: 5px 10px;
+  padding: 0.3125rem 0.625rem;
   display: flex;
   justify-content: space-between;
 }
@@ -1585,8 +1619,8 @@ select option {
 }
 
 .big-modal {
-  width: 60vw;
-  height: 70vh;
+  width: 57.6rem;
+  height: 37.8rem;
   background: rgba(255, 255, 255, 0.34);
   padding: 0;
   position: relative;
@@ -1621,7 +1655,7 @@ select option {
 }
 
 input[type="file"]::file-selector-button {
-  border-radius: 4px;
+  border-radius: 0.25rem;
   margin: 0.3rem 0;
   cursor: pointer;
   background-color: rgba(255, 255, 255, 0.34);
@@ -1667,10 +1701,10 @@ input[type="file"]::file-selector-button:hover {
   position: absolute;
   background-color: rgba(255, 255, 255, 0.34);
   border-radius: 0.5rem;
-  backdrop-filter: blur(10px);
-  max-height: 60vh;
+  backdrop-filter: blur(0.625rem);
+  max-height: 32.4rem;
   overflow: auto;
-  min-width: 17vw;
+  min-width: 16.32rem;
 }
 
 .list-modal-wrap {
@@ -1682,7 +1716,7 @@ input[type="file"]::file-selector-button:hover {
   border-radius: 0.5rem;
   min-width: 8rem;
   max-width: 10rem;
-  height: 5vh;
+  height: 2.7rem;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1696,8 +1730,8 @@ input[type="file"]::file-selector-button:hover {
   bottom: 3%;
 
   .modal-buttons {
-    width: 9vw;
-    height: 5vh;
+    width: 8.64rem;
+    height: 2.7rem;
     font-size: 1rem;
   }
 }
@@ -1814,13 +1848,13 @@ input[type="file"]::file-selector-button:hover {
 .player-container {
   display: flex;
   justify-content: space-between;
-  height: 66vh;
+  height: 32.4rem;
   margin: 2rem;
 }
 
 @-moz-document url-prefix() {
   .player-container {
-    height: 67vh;
+    height: 36.18rem;
   }
 }
 
@@ -1966,16 +2000,16 @@ input[type="file"]::file-selector-button:hover {
 
 .volume-slider input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  width: 12px;
-  height: 12px;
+  width: 0.75rem;
+  height: 0.75rem;
   background: #e20044;
   border-radius: 50%;
   cursor: pointer;
 }
 
 .volume-slider input[type="range"]::-moz-range-thumb {
-  width: 12px;
-  height: 12px;
+  width: 0.75rem;
+  height: 0.75rem;
   background: #e20044;
   border: none;
   border-radius: 50%;
@@ -1987,24 +2021,24 @@ input[type="file"]::file-selector-button:hover {
 }
 
 .playback-speed {
-  min-width: 40px;
+  min-width: 2.5rem;
 }
 
 .subtitles-menu {
   position: absolute;
-  bottom: 40px;
+  bottom: 2.5rem;
   right: 0;
   background-color: rgba(0, 0, 0, 0.8);
-  border-radius: 4px;
-  padding: 8px;
+  border-radius: 0.25rem;
+  padding: 0.5rem;
   z-index: 10;
-  min-width: 150px;
-  max-height: 200px;
+  min-width: 9.375rem;
+  max-height: 12.5rem;
   overflow-y: auto;
 }
 
 .progress-container:hover {
-  height: 16px;
+  height: 1rem;
   transition: height 0.2s ease-in-out;
 }
 
@@ -2164,7 +2198,7 @@ video::-moz-media-controls {
 }
 
 .cool {
-  width: 30px;
+  width: 1.875rem;
 }
 
 .svg-div {
@@ -2332,7 +2366,7 @@ video::-moz-media-controls {
 
 .graph-div-wrap {
   margin: 1rem;
-  height: 30vh;
+  height: 16.2rem;
   display: flex;
   flex-direction: column;
   justify-content: end;
@@ -2343,7 +2377,7 @@ video::-moz-media-controls {
   opacity: 0.7;
 }
 .graph-div-categories {
-  height: 33vh;
+  height: 17.82rem;
   overflow-y: auto;
 }
 .graph-div-wrap-categories {
@@ -2362,7 +2396,7 @@ video::-moz-media-controls {
   justify-content: space-between;
 }
 .bookmark-tags-wrap {
-  max-height: 30vh;
+  max-height: 16.2rem;
   overflow-y: auto;
 }
 .bookmark,
@@ -2398,7 +2432,7 @@ video::-moz-media-controls {
   display: flex;
   margin: 1rem;
   gap: 1rem;
-  height: 5vh;
+  height: 2.7rem;
   align-items: center;
 }
 
@@ -2542,7 +2576,7 @@ video::-moz-media-controls {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 54rem;
 }
 
 .first-startup-container {
@@ -2941,7 +2975,7 @@ video::-moz-media-controls {
 }
 
 .menu-option {
-  padding: 10px 15px;
+  padding: 0.625rem 0.9375rem;
   font-size: 1rem;
 }
 
@@ -2963,7 +2997,7 @@ video::-moz-media-controls {
 }
 
 .tag-option {
-  padding: 10px 15px;
+  padding: 0.625rem 0.9375rem;
   font-size: 1rem;
 }
 
@@ -2977,10 +3011,10 @@ video::-moz-media-controls {
 .tag-option[data-tag="important"]::before {
   content: "";
   display: inline-block;
-  width: 10px;
-  height: 10px;
+  width: 0.625rem;
+  height: 0.625rem;
   border-radius: 50%;
-  margin-right: 8px;
+  margin-right: 0.5rem;
 }
 
 .tag-option[data-tag="difficult"]::before {
@@ -3004,4 +3038,693 @@ video::-moz-media-controls {
 .section-title-wrap {
   margin: 0.5rem 1rem;
   flex-grow: 1;
+}
+
+@media screen and (max-width: 1367px) and (orientation: landscape) {
+  html {
+    font-size: 14px;
+  }
+  .feat-stats {
+    height: 28rem;
+  }
+  .play-button {
+    width: 7rem;
+    height: 2rem;
+  }
+
+  .player-container {
+    height: 33rem;
+  }
+}
+@media screen and (max-width: 1281px) and (orientation: landscape) {
+  html {
+    font-size: 14px;
+  }
+  .feat-stats {
+    height: 28rem;
+  }
+  .cards {
+    height: 18rem;
+  }
+  .player-container {
+    height: 31rem;
+  }
+}
+@media screen and (max-width: 1181px) and (orientation: landscape) {
+  html {
+    font-size: 13px;
+  }
+  .cards {
+    height: 18rem;
+  }
+}
+
+@media screen and (max-width: 933px) and (orientation: landscape) {
+  html {
+    font-size: 11px;
+  }
+  body {
+    font-size: 1.1rem;
+  }
+  .feat-stats {
+    height: 26rem;
+  }
+  .cards {
+    height: 16rem;
+  }
+  .result-heading {
+    font-size: 1.3rem;
+  }
+  .result-name {
+    font-size: 1.2rem;
+  }
+  .result-details {
+    font-size: 1rem;
+  }
+  .player-container {
+    height: 29rem;
+  }
+
+  .lectures {
+    font-size: 1.5rem;
+  }
+  .lectures > div {
+    height: 4rem;
+  }
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  .search-bar {
+    min-width: 35rem;
+    max-width: 35rem;
+  }
+  .search {
+    height: 3rem;
+  }
+  .search-icon {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+  .search-results {
+    max-height: 80vh;
+  }
+  .user {
+    font-size: 1.5rem;
+  }
+  .user > div {
+    height: 4rem;
+  }
+  .sidebar {
+    width: 20rem;
+  }
+  .sidebar-tab {
+    height: 2.5rem;
+    font-size: 1.2rem;
+  }
+  .modal-buttons-group-user .modal-buttons {
+    font-size: 1rem;
+    width: 7rem;
+    height: 2.1rem;
+  }
+  .change-password-button {
+    width: 80%;
+  }
+  .input {
+    font-size: 1.1rem;
+  }
+}
+
+@media screen and (max-width: 845px) and (orientation: landscape) {
+  html {
+    font-size: 10px;
+  }
+  .feat-stats {
+    height: 26rem;
+  }
+  .cards {
+    height: 18rem;
+  }
+  .card-info {
+    font-size: 1.1rem;
+  }
+  .card-info-lecture-title {
+    font-size: 0.9rem;
+  }
+  .result-heading {
+    font-size: 1rem;
+  }
+  .result-details {
+    font-size: 0.9rem;
+  }
+  .player-container {
+    height: 29rem;
+  }
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+@media screen and (max-width: 801px) and (orientation: landscape) {
+  html {
+    font-size: 9px;
+  }
+  .feat-stats {
+    height: 26rem;
+  }
+  .cards {
+    height: 18rem;
+  }
+  .result-heading {
+    font-size: 1rem;
+  }
+  .result-details {
+    font-size: 0.9rem;
+  }
+  .player-container {
+    height: 30rem;
+  }
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media screen and (max-width: 668px) and (orientation: landscape) {
+  html {
+    font-size: 8px;
+  }
+  body {
+    font-size: 1.1rem;
+  }
+  .feat-stats {
+    height: 26rem;
+  }
+  .cards {
+    height: 20rem;
+    width: 30rem;
+  }
+  .card-info {
+    font-size: 1.2rem;
+  }
+  .card-info-lecture-title {
+    font-size: 1.1rem;
+  }
+  .nav-item {
+    font-size: 1.2rem;
+  }
+  .stats canvas {
+    width: 14rem !important;
+    height: 14rem !important;
+  }
+  .watch-hours {
+    font-size: 1.2rem;
+  }
+  .hours {
+    font-size: 2rem;
+  }
+  .label-names {
+    font-size: 1.1rem;
+  }
+  .search-input {
+    font-size: 1.1rem;
+  }
+  .pinned-title {
+    font-size: 1.5rem;
+  }
+  .result-heading {
+    font-size: 1.3rem;
+  }
+  .result-name {
+    font-size: 1.2rem;
+  }
+  .result-details {
+    font-size: 1rem;
+  }
+  .player-container {
+    height: 33rem;
+  }
+  .video-player-container {
+    width: 67%;
+  }
+  .playlist-container {
+    width: 32%;
+  }
+  .lectures {
+    font-size: 1.5rem;
+  }
+  .lectures > div {
+    height: 4rem;
+  }
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  .search-bar {
+    min-width: 35rem;
+    max-width: 35rem;
+  }
+  .search {
+    height: 3rem;
+  }
+  .user {
+    font-size: 1.5rem;
+  }
+  .user > div {
+    height: 4rem;
+  }
+  .sidebar {
+    width: 20rem;
+  }
+}
+
+@media screen and (max-width: 845px) and (orientation: portrait) {
+  html {
+    font-size: 10px;
+  }
+  .inner-container {
+    font-size: 1.1rem;
+  }
+  .playlist-container {
+    font-size: 1.1rem;
+  }
+  .section-details {
+    font-size: 1rem;
+  }
+  .nav-bar {
+    white-space: nowrap;
+    width: 95%;
+    overflow-x: scroll;
+    scrollbar-width: none;
+  }
+  .feat-stats {
+    height: 26rem;
+  }
+  .cards {
+    height: 20rem;
+    width: 30rem;
+  }
+  .card-divs-wrap {
+    justify-content: space-around;
+  }
+  .card-info {
+    font-size: 1.2rem;
+  }
+  .card-info-lecture-title {
+    font-size: 1.1rem;
+  }
+  .nav-item {
+    font-size: 1.2rem;
+  }
+  .stats canvas {
+    width: 14rem !important;
+    height: 14rem !important;
+  }
+  .watch-hours {
+    font-size: 1.2rem;
+  }
+  .hours {
+    font-size: 2rem;
+  }
+  .label-names {
+    font-size: 1.1rem;
+  }
+  .search-input {
+    font-size: 1.1rem;
+  }
+  .pinned-title {
+    font-size: 1.2rem;
+  }
+  .result-heading {
+    font-size: 1.3rem;
+  }
+  .result-name {
+    font-size: 1.2rem;
+  }
+  .result-details,
+  .lecture-time {
+    font-size: 1.1rem;
+  }
+  .player-container {
+    height: 90vh;
+    flex-direction: column;
+    gap: 1rem;
+    justify-content: start;
+  }
+  .video-player-container {
+    width: 100%;
+    aspect-ratio: 16/9;
+    flex: 0 0 auto;
+  }
+  .playlist-container {
+    width: 100%;
+    flex: 1;
+  }
+  .control-button > svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  .lectures {
+    font-size: 1.5rem;
+  }
+  .lectures > div {
+    height: 4rem;
+  }
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  .search-bar {
+    min-width: 35rem;
+    max-width: 35rem;
+  }
+  .search {
+    height: 3rem;
+  }
+  .user {
+    font-size: 1.5rem;
+  }
+  .user > div {
+    height: 4rem;
+  }
+  .sidebar {
+    width: 25rem;
+    height: 50rem;
+  }
+  .settings-sidebar {
+    height: 50rem;
+  }
+  .settings-sidebar-info {
+    height: 50rem;
+  }
+  .sidebar {
+    width: 20rem;
+  }
+  .sidebar-tab {
+    height: 2.5rem;
+    font-size: 1.2rem;
+  }
+  .modal-buttons-group-user .modal-buttons {
+    font-size: 1rem;
+    width: 7rem;
+    height: 2.1rem;
+  }
+  .change-password-button {
+    width: 80%;
+  }
+  .input {
+    font-size: 1.1rem;
+  }
+  .modal-overlay {
+    align-items: flex-start;
+  }
+  .modal {
+    margin-top: 12%;
+  }
+  /* Settings Page  */
+
+  .settings-container {
+    flex-direction: column;
+  }
+}
+
+@media screen and (max-width: 450px) and (orientation: portrait) {
+  /*General*/
+
+  html {
+    font-size: 8px;
+  }
+  .pre-nav {
+    margin: 2rem 1rem;
+    svg {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+  }
+  svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  .search-bar {
+    min-width: 0;
+    max-width: 2rem;
+    margin-right: 1.5rem;
+  }
+  .pre-nav-name {
+    font-size: 2rem;
+  }
+  .left-group {
+    flex-grow: 1;
+  }
+  .search-wrapper-inner {
+    width: 90%;
+  }
+  .search {
+    height: 3rem;
+    svg {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+  }
+  .search-input {
+    font-size: 1.4rem;
+  }
+  .user {
+    font-size: 1.5rem;
+  }
+  .user > div {
+    height: 4rem;
+  }
+  .sidebar {
+    width: 20rem;
+  }
+  .search-placeholder {
+    display: none;
+  }
+  .search-placeholder-icon {
+    display: block;
+  }
+
+  .result-heading {
+    font-size: 1.5rem;
+  }
+  .result-name {
+    font-size: 1.4rem;
+  }
+  .result-details {
+    font-size: 1.5rem;
+  }
+  .profile {
+    font-size: 1.5rem;
+    font-weight: 500;
+  }
+
+  .nav-bar {
+    white-space: nowrap;
+    width: 95%;
+    overflow-x: scroll;
+    margin: 2rem 1rem;
+  }
+  .nav-item {
+    font-size: 1.4rem;
+  }
+  .modal-heading {
+    font-size: 1.5rem;
+  }
+  .input {
+    font-size: 1.5rem;
+    height: 3rem;
+  }
+
+  /* Home Page */
+
+  .pinned-title {
+    font-size: 1.5rem;
+    margin-left: 1rem;
+  }
+
+  .featured {
+    margin: 2rem 1rem;
+  }
+  .feat-stats {
+    flex-direction: column;
+    gap: 1rem;
+    height: 25vh;
+  }
+  .stats {
+    display: none;
+  }
+  .featured-course {
+    width: 100%;
+    height: 100%;
+  }
+
+  .scroll-button {
+    margin-right: 1rem;
+  }
+  .home-card-divs {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Categories Page  */
+
+  .categories {
+    font-size: 1.4rem;
+  }
+
+  /* Instructor Page  */
+
+  .instructor-container {
+    font-size: 1.4rem;
+  }
+  /* Play Page */
+
+  .player-container {
+    margin: 2rem 0.5rem;
+  }
+  .control-button > svg {
+    width: 2rem;
+    height: 2rem;
+  }
+  .skip-backward {
+    display: none;
+  }
+  .skip-forward {
+    display: none;
+  }
+  .time-display {
+    font-size: 1.2rem;
+  }
+  .lectures {
+    font-size: 1.5rem;
+  }
+  .lectures > div {
+    height: 4rem;
+  }
+  .lecture-time {
+    font-size: 1.4rem;
+  }
+  .playlist-container {
+    font-size: 1.4rem;
+  }
+  .section-details {
+    font-size: 1.4rem;
+  }
+
+  /* Dashboard Page */
+
+  .inner-container {
+    font-size: 1.2rem;
+  }
+  .watch-time-analytics {
+    flex-direction: column;
+  }
+
+  .watch-time-analytics-categories,
+  .watch-time-analytics-graph {
+    width: 100%;
+  }
+  .bookmark-tags {
+    flex-direction: column;
+  }
+  .bookmark,
+  .tags {
+    width: 100%;
+  }
+
+  /* Individual Course Page  */
+  .course-info-image {
+    height: 11rem;
+  }
+  .content-heading {
+    font-size: 1.5rem;
+  }
+  .menu-option,
+  .tag-option {
+    font-size: 1.5rem;
+  }
+  .play-svg {
+    svg {
+      scale: 1.4;
+    }
+  }
+  .bottom {
+    overflow: auto;
+  }
+  .bottom-container {
+    font-size: 1.4rem;
+  }
+  .drop-cap {
+    font-size: 1.4rem;
+  }
+  .course-instructor-info {
+    min-height: 32.4rem;
+  }
+  .add-category-overlay,
+  .add-instructor-overlay {
+    align-items: center;
+  }
+  .add-category-instructor-input {
+    input {
+      font-size: 1.5rem;
+    }
+    svg {
+      width: 2rem;
+      height: 2rem;
+    }
+  }
+  .select-category-instructor-group {
+    font-size: 1.5rem;
+  }
+  .instructor-list {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .list-modal-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .modal-buttons-group-user .modal-buttons {
+    font-size: 1.5rem;
+    padding: 0.5rem 1.5rem;
+  }
+  .modal-input-description-edit {
+    textarea {
+      font-size: 1.5rem;
+    }
+  }
+  .description {
+    font-size: 1.5rem;
+  }
+
+  /* Cards */
+
+  .card-info {
+    font-size: 1.2rem;
+  }
+  .card-info-lecture-title {
+    font-size: 1.1rem;
+  }
+
+  .current-progress-quick-stats {
+    flex-direction: column;
+  }
+  .current-progress-quick-stats > div {
+    width: 100%;
+  }
+
+  /* Modals  */
+
+  .big-modal {
+    width: 95vw;
+    height: 80vh;
+  }
+
+  /* General Containers */
+
+  .container {
+    width: 100%;
+    font-size: 1.5rem;
+  }
 }

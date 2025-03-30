@@ -15,7 +15,13 @@ const Cards = ({ imgsrc, info, courseId }) => {
   return (
     <div className="cards">
       <div className="card-image" onClick={handlePlayer}>
-        <img src={process.env.REACT_APP_API + imgsrc} alt="" />
+        <img
+          src={
+            process.env.REACT_APP_API +
+            (imgsrc ? imgsrc : "/assets/placeholder.avif")
+          }
+          alt=""
+        />
         <div className="overlay-card">
           <div className="play-button-card">
             <Play />

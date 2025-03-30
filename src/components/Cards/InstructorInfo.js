@@ -139,7 +139,13 @@ const InstructorInfo = ({
       <div className="instructor-card">
         <div className="instructor-psuedo-div" onClick={handleInstructor}>
           <div className="img-container-instructor">
-            <img src={process.env.REACT_APP_API + data.photo} alt="" />
+            <img
+              src={
+                process.env.REACT_APP_API +
+                (data.photo ? data.photo : "/assets/placeholder.avif")
+              }
+              alt=""
+            />
           </div>
           <div className="instructor-title">{data.name}</div>
           <div>Courses : {data.Courses}</div>

@@ -167,7 +167,7 @@ const Dashboard = () => {
             {dashboardData &&
             dashboardData?.tagsAndBookmarks.important.length === 0 ? (
               <div style={{ opacity: ".6", margin: "1rem" }}>
-                No Bookmarks, select lecture menu when playing to add
+                No Tags, select lecture menu when playing to add
               </div>
             ) : (
               dashboardData?.tagsAndBookmarks.important.map((item) => (
