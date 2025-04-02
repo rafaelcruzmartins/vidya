@@ -394,7 +394,6 @@ const FirstStartUp = () => {
                         ease: "linear",
                       }}
                       viewBox="0 0 50 50"
-                      style={{ width: 24, height: 24 }}
                       className="spinny"
                     >
                       <circle
