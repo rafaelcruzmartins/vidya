@@ -17,14 +17,14 @@ import instructorRoutes from "./routes/instructor.js";
 import dashboardRoutes from "./routes/dashboard.js";
 import userRoutes from "./routes/user.js";
 import searchRoutes from "./routes/search.js";
+import { populateUser } from "./middleware/owner.js";
+
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
-// Sync all models with database
 const syncdb = async () => {
   await sequelize.sync({ logging: false });
   console.log("Database & tables created!");
-
   await Server.findOrCreate({
     where: { name: "VIDYA" },
     defaults: { name: "VIDYA" },
@@ -32,7 +32,6 @@ const syncdb = async () => {
 };
 syncdb();
 
-// Passport configuration
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
@@ -42,13 +41,11 @@ passport.use(
         crypto.pbkdf2Sync("dummypassword", dummySalt, 1000, 64, "sha512");
         return done(null, false, { message: "Invalid credentials" });
       }
-
       let isPasswordValid;
       try {
         const inputHash = crypto
           .pbkdf2Sync(password, user.salt, 1000, 64, "sha512")
           .toString("hex");
-
         isPasswordValid = crypto.timingSafeEqual(
           Buffer.from(inputHash),
           Buffer.from(user.password)
@@ -56,7 +53,6 @@ passport.use(
       } catch (err) {
         return done(err);
       }
-
       if (!isPasswordValid) {
         return done(null, false, { message: "Invalid credentials" });
       }
@@ -80,13 +76,17 @@ passport.deserializeUser(async (id, done) => {
   }
 });
 
-// Middleware
 app.use(
   cors({
-    origin: "http://192.168.1.29:3000",
+    origin: function (origin, callback) {
+      callback(null, origin);
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
+
 app.use(express.json());
 app.use(
   "/assets",
@@ -94,6 +94,7 @@ app.use(
     maxAge: "1y",
   })
 );
+
 app.use(
   session({
     secret: "your-secret-key",
@@ -101,15 +102,17 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
+      httpOnly: true,
       secure: false,
-      maxAge: 7 * 24 * 60 * 60 * 1000,
+      sameSite: "strict",
+      maxAge: 24 * 60 * 60 * 1000,
     },
   })
 );
+
 app.use(passport.initialize());
 app.use(passport.session());
-
-// Routes
+app.use(populateUser);
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/admin", adminRoutes);
@@ -120,6 +123,7 @@ app.use("/api/category", categoryRoutes);
 app.use("/api/instructor", instructorRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
+
 app.get("/", async (req, res) => {
   const server = await Server.findAll();
   res.status(200).json(server[0].isFirstStartUp);

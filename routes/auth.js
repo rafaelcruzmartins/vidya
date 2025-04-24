@@ -2,7 +2,9 @@ import { Router } from "express";
 import passport from "passport";
 import { User } from "../models/index.js";
 import { isAuthenticated } from "../middleware/owner.js";
+import jwt from "jsonwebtoken";
 const router = Router();
+const JWT_SECRET = "your-jwt-secret-key";
 
 router.post("/login", passport.authenticate("local"), (req, res) => {
   try {
@@ -12,7 +14,26 @@ router.post("/login", passport.authenticate("local"), (req, res) => {
     res.status(500).send("Internal Server Error");
   }
 });
+router.post("/token", (req, res, next) => {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user)
+      return res
+        .status(401)
+        .json({ message: info.message || "Authentication failed" });
 
+    const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: "7d" });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+      },
+    });
+  })(req, res, next);
+});
 router.post("/logout", (req, res) => {
   try {
     req.logout(() => {
@@ -31,7 +52,7 @@ router.post("/logout", (req, res) => {
   }
 });
 
-router.get("/user", (req, res) => {
+router.get("/user", isAuthenticated, (req, res) => {
   try {
     req.user
       ? res.json({

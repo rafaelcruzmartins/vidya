@@ -1,5 +1,9 @@
 import { Router } from "express";
-import { isAdminOrFirstStartUp, isAdmin } from "../middleware/owner.js";
+import {
+  isAdminOrFirstStartUp,
+  isAdmin,
+  isAuthenticated,
+} from "../middleware/owner.js";
 import { upload } from "../utils/imageStorage.js";
 import {
   uploadImageCourse,

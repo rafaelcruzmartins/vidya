@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { isAuthenticated } from "../middleware/owner.js";
+import { isAuthenticated, verifyQueryToken } from "../middleware/owner.js";
 import {
   Category,
   Course,
@@ -170,127 +170,145 @@ router.post("/lectureprogress", isAuthenticated, async (req, res) => {
     res.status(404).send("progress not found");
   }
 });
-router.get("/stream/:LectureId", isAuthenticated, async (req, res) => {
-  const { LectureId } = req.params;
-  const lecture = await Lecture.findByPk(LectureId);
-  const videoPath = lecture.path;
-
-  if (!fs.existsSync(videoPath)) {
-    return res.status(404).send("Video not found");
-  }
-
-  const stat = fs.statSync(videoPath);
-  const fileSize = stat.size;
-
-  const range = req.headers.range;
-
-  if (range) {
-    const parts = range.replace(/bytes=/, "").split("-");
-    const start = parseInt(parts[0]);
-    const end = parts[1] ? parseInt(parts[1]) : fileSize - 1;
-
-    const chunkSize = end - start + 1;
-
-    const stream = fs.createReadStream(videoPath, { start, end });
-
-    const headers = {
-      "Content-Range": `bytes ${start}-${end}/${fileSize}`,
-      "Accept-Ranges": "bytes",
-      "Content-Length": chunkSize,
-      "Content-Type": "video/mp4",
-    };
-
-    res.writeHead(206, headers);
-
-    stream.pipe(res);
-  } else {
-    const headers = {
-      "Content-Length": fileSize,
-      "Content-Type": "video/mp4",
-    };
-
-    res.writeHead(200, headers);
-
-    fs.createReadStream(videoPath).pipe(res);
-  }
-});
-router.get("/download/:LectureId", isAuthenticated, async (req, res) => {
-  try {
+router.get(
+  "/stream/:LectureId",
+  verifyQueryToken,
+  isAuthenticated,
+  async (req, res) => {
     const { LectureId } = req.params;
     const lecture = await Lecture.findByPk(LectureId);
+    const videoPath = lecture.path;
 
-    if (!lecture || !lecture.path) {
-      return res.status(404).send("File not found");
-    }
-    const filePath = lecture.path;
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send("File not found");
+    if (!fs.existsSync(videoPath)) {
+      return res.status(404).send("Video not found");
     }
 
-    const stat = fs.statSync(filePath);
+    const stat = fs.statSync(videoPath);
     const fileSize = stat.size;
-    const fileName = path.basename(filePath);
-    const fileExtension = path.extname(filePath).toLowerCase();
 
-    res.setHeader("Content-Length", fileSize);
+    const range = req.headers.range;
 
-    if (fileExtension === ".pdf") {
-      res.setHeader("Content-Type", "application/pdf");
+    if (range) {
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0]);
+      const end = parts[1] ? parseInt(parts[1]) : fileSize - 1;
+
+      const chunkSize = end - start + 1;
+
+      const stream = fs.createReadStream(videoPath, { start, end });
+
+      const headers = {
+        "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+        "Accept-Ranges": "bytes",
+        "Content-Length": chunkSize,
+        "Content-Type": "video/mp4",
+      };
+
+      res.writeHead(206, headers);
+
+      stream.pipe(res);
     } else {
+      const headers = {
+        "Content-Length": fileSize,
+        "Content-Type": "video/mp4",
+      };
+
+      res.writeHead(200, headers);
+
+      fs.createReadStream(videoPath).pipe(res);
+    }
+  }
+);
+router.get(
+  "/download/:LectureId",
+  verifyQueryToken,
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { LectureId } = req.params;
+      const lecture = await Lecture.findByPk(LectureId);
+
+      if (!lecture || !lecture.path) {
+        return res.status(404).send("File not found");
+      }
+      const filePath = lecture.path;
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File not found");
+      }
+
+      const stat = fs.statSync(filePath);
+      const fileSize = stat.size;
+      const fileName = path.basename(filePath);
+      const fileExtension = path.extname(filePath).toLowerCase();
+
+      res.setHeader("Content-Length", fileSize);
+
+      if (fileExtension === ".pdf") {
+        res.setHeader("Content-Type", "application/pdf");
+      } else {
+        res.setHeader("Content-Type", "application/octet-stream");
+        res.setHeader(
+          "Content-Disposition",
+          `attachment; filename="${fileName}"`
+        );
+      }
+
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+
+      fileStream.on("error", (error) => {
+        console.error("Error streaming file:", error);
+        res.status(500).end();
+      });
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      res.status(500).send("Internal server error");
+    }
+  }
+);
+router.get(
+  "/content/:contentId",
+  verifyQueryToken,
+  isAuthenticated,
+  async (req, res) => {
+    try {
+      const { contentId } = req.params;
+      const content = await PathFile.findByPk(contentId);
+
+      if (!content || !content.path) {
+        return res.status(404).send("File not found");
+      }
+      const filePath = content.path;
+
+      if (!fs.existsSync(filePath)) {
+        return res.status(404).send("File not found");
+      }
+
+      const stat = fs.statSync(filePath);
+      const fileSize = stat.size;
+      const fileName = path.basename(filePath);
+
+      res.setHeader("Content-Length", fileSize);
       res.setHeader("Content-Type", "application/octet-stream");
       res.setHeader(
         "Content-Disposition",
         `attachment; filename="${fileName}"`
       );
+
+      const fileStream = fs.createReadStream(filePath);
+      fileStream.pipe(res);
+
+      fileStream.on("error", (error) => {
+        console.error("Error streaming file:", error);
+        res.status(500).end();
+      });
+    } catch (error) {
+      console.error("Error downloading file:", error);
+      res.status(500).send("Internal server error");
     }
-
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
-    fileStream.on("error", (error) => {
-      console.error("Error streaming file:", error);
-      res.status(500).end();
-    });
-  } catch (error) {
-    console.error("Error downloading file:", error);
-    res.status(500).send("Internal server error");
   }
-});
-router.get("/content/:contentId", isAuthenticated, async (req, res) => {
-  try {
-    const { contentId } = req.params;
-    const content = await PathFile.findByPk(contentId);
-
-    if (!content || !content.path) {
-      return res.status(404).send("File not found");
-    }
-    const filePath = content.path;
-
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).send("File not found");
-    }
-
-    const stat = fs.statSync(filePath);
-    const fileSize = stat.size;
-    const fileName = path.basename(filePath);
-
-    res.setHeader("Content-Length", fileSize);
-    res.setHeader("Content-Type", "application/octet-stream");
-    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
-
-    const fileStream = fs.createReadStream(filePath);
-    fileStream.pipe(res);
-
-    fileStream.on("error", (error) => {
-      console.error("Error streaming file:", error);
-      res.status(500).end();
-    });
-  } catch (error) {
-    console.error("Error downloading file:", error);
-    res.status(500).send("Internal server error");
-  }
-});
+);
 router.get("/subtitle/:subtitleId", async (req, res) => {
   try {
     const { subtitleId } = req.params;
