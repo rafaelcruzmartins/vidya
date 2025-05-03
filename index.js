@@ -18,7 +18,14 @@ import dashboardRoutes from "./routes/dashboard.js";
 import userRoutes from "./routes/user.js";
 import searchRoutes from "./routes/search.js";
 import { populateUser } from "./middleware/owner.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
+
+const buildPath = path.join(__dirname, "web");
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
@@ -94,6 +101,7 @@ app.use(
     maxAge: "1y",
   })
 );
+app.use(express.static(buildPath));
 
 app.use(
   session({
@@ -124,11 +132,13 @@ app.use("/api/instructor", instructorRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
 
-app.get("/", async (req, res) => {
+app.get("/isFirstStartUp", async (req, res) => {
   const server = await Server.findAll();
   res.status(200).json(server[0].isFirstStartUp);
 });
-
+app.get("*", (req, res) => {
+  res.sendFile(path.join(buildPath, "index.html"));
+});
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

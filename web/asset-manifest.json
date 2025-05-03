@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/static/css/main.a2b3cc14.css",
+    "main.js": "/static/js/main.3e12a1bc.js",
+    "static/media/poppins-v23-latin-italic.woff2": "/static/media/poppins-v23-latin-italic.ed357fa1fa06a3e00d46.woff2",
+    "static/media/poppins-v23-latin-500italic.woff2": "/static/media/poppins-v23-latin-500italic.b3c3f5f820771c608eab.woff2",
+    "static/media/poppins-v23-latin-600.woff2": "/static/media/poppins-v23-latin-600.91145014c0350c248ed2.woff2",
+    "static/media/poppins-v23-latin-regular.woff2": "/static/media/poppins-v23-latin-regular.405055dd680fa1dcdfa2.woff2",
+    "static/media/poppins-v23-latin-300.woff2": "/static/media/poppins-v23-latin-300.39576fe9df8a22cc1bcc.woff2",
+    "static/media/poppins-v23-latin-700.woff2": "/static/media/poppins-v23-latin-700.d86662fe776dae29ea78.woff2",
+    "static/media/poppins-v23-latin-500.woff2": "/static/media/poppins-v23-latin-500.08491d3f7fe7ae88ef44.woff2",
+    "index.html": "/index.html",
+    "main.a2b3cc14.css.map": "/static/css/main.a2b3cc14.css.map",
+    "main.3e12a1bc.js.map": "/static/js/main.3e12a1bc.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a2b3cc14.css",
+    "static/js/main.3e12a1bc.js"
+  ]
+}
