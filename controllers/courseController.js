@@ -12,9 +12,9 @@ import {
   Course,
   PathFile,
 } from "../models/index.js";
-
+import ffprobe from "@ffprobe-installer/ffprobe";
 const isWindows = os.platform() === "win32";
-
+const ffprobePath = ffprobe.path;
 const pathCache = {
   entries: new Map(),
   reset() {
@@ -172,7 +172,7 @@ const getVideoDurations = async (filePaths) => {
     const promises = chunk.map((filePath) => {
       return new Promise((resolve) => {
         exec(
-          `ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`,
+          `${ffprobePath} -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`,
           (error, stdout) => {
             if (error) {
               console.error(`Error getting duration for ${filePath}:`, error);

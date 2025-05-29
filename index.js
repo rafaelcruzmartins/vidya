@@ -18,6 +18,7 @@ import dashboardRoutes from "./routes/dashboard.js";
 import userRoutes from "./routes/user.js";
 import searchRoutes from "./routes/search.js";
 import { populateUser } from "./middleware/owner.js";
+import { promises as fsp } from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -29,6 +30,22 @@ const buildPath = path.join(__dirname, "web");
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
+const secretKey = async () => {
+  const filepath = "keys.json";
+  try {
+    const fileContent = await fsp.readFile(filepath, "utf8");
+    const data = JSON.parse(fileContent);
+    return data.expressSecret;
+  } catch (error) {
+    console.log("No key found generating new key");
+  }
+  const data = {};
+  const newKey = crypto.randomBytes(16).toString("hex");
+  data.expressSecret = newKey;
+  await fsp.writeFile(filepath, JSON.stringify(data, null, 2));
+  return newKey;
+};
+const expressSecret = await secretKey();
 const syncdb = async () => {
   await sequelize.sync({ logging: false });
   console.log("Database & tables created!");
@@ -45,7 +62,7 @@ passport.use(
       const user = await User.findOne({ where: { username } });
       if (!user) {
         const dummySalt = crypto.randomBytes(16).toString("hex");
-        crypto.pbkdf2Sync("dummypassword", dummySalt, 1000, 64, "sha512");
+        crypto.pbkdf2Sync(expressSecret, dummySalt, 1000, 64, "sha512");
         return done(null, false, { message: "Invalid credentials" });
       }
       let isPasswordValid;
@@ -105,7 +122,7 @@ app.use(express.static(buildPath));
 
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: expressSecret,
     store: new SequelizeStore({ db: sequelize }),
     resave: false,
     saveUninitialized: false,
@@ -139,7 +156,7 @@ app.get("/isFirstStartUp", async (req, res) => {
 app.get("*", (req, res) => {
   res.sendFile(path.join(buildPath, "index.html"));
 });
-const PORT = process.env.PORT || 5000;
+const PORT = 5000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
