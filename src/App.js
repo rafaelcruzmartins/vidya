@@ -12,7 +12,7 @@ const App = () => {
   const [data, setData] = useState(null);
   const fetchData = async () => {
     try {
-      const res = await axios.get("/");
+      const res = await axios.get("/isFirstStartUp");
       setData(res.data);
     } catch (error) {
       console.error("Error fetching data:", error);

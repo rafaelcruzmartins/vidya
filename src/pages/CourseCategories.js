@@ -1,7 +1,8 @@
 import Navbar from "../components/Navbar/Navbar";
 import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
+import Loader from "../components/Loader/Loader";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "../api/axiosInstance";
@@ -21,10 +22,9 @@ const CourseCategories = ({ category }) => {
           { withCredentials: true }
         );
         setCourses(data);
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching courses:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -42,6 +42,7 @@ const CourseCategories = ({ category }) => {
         transition={{ duration: 1, ease: "easeInOut" }}
         className="card-divs-wrap"
       >
+        {loading && <Loader />}
         {!loading &&
           courses &&
           courses.courses.map((item, index) => (

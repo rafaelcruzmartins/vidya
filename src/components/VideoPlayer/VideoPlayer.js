@@ -652,7 +652,7 @@ const VideoPlayer = ({
                 key={subtitle.pathId}
                 kind="subtitles"
                 label={subtitle.cleanedName || subtitle.language}
-                src={`${process.env.REACT_APP_API}/api/course/subtitle/${subtitle.pathId}`}
+                src={`/api/course/subtitle/${subtitle.pathId}`}
                 srcLang={subtitle.language}
               />
             ))

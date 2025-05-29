@@ -1,58 +1,56 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Cards from "../components/Cards/Cards";
-import { SkeletonLoader } from "../assets";
+import Loader from "../components/Loader/Loader";
 import axios from "../api/axiosInstance";
 import PreNav from "../components/Navbar/PreNav";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 const Courses = () => {
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
+  const [error, setError] = useState(null);
+  const fetchCourses = useCallback(async () => {
     try {
-      const fetchCourse = async () => {
-        const { data } = await axios.get(
-          "/api/course/",
-
-          { withCredentials: true }
-        );
-        setCourses(data);
-      };
-      fetchCourse();
-    } catch (error) {
-      console.error(error);
-    } finally {
+      setLoading(true);
+      const { data } = await axios.get("/api/course/", {
+        withCredentials: true,
+      });
+      setCourses(data);
       setLoading(false);
+    } catch (error) {
+      console.error("Failed to fetch courses:", error);
+      setError("Failed to load courses. Please try again later.");
     }
   }, []);
+
+  useEffect(() => {
+    fetchCourses();
+  }, [fetchCourses]);
   return (
     <>
-      <PreNav name={"COURSES"} />
-      <AnimatePresence mode="wait">
+      <PreNav name="COURSES" />
+
+      {loading && <Loader />}
+
+      {error && <div className="error-message">{error}</div>}
+
+      {!loading && courses && (
         <motion.div
-          initial={{ opacity: 0, x: -20 }}
+          initial={{ opacity: 0, x: -200 }}
           animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 20 }}
-          transition={{ duration: 0.5, ease: "easeInOut" }}
+          exit={{ opacity: 0, x: 200 }}
           className="card-divs-wrap"
         >
-          {loading && <SkeletonLoader />}
-          {!loading &&
-            courses &&
-            courses.map((item, index) => (
-              <Cards
-                key={index}
-                imgsrc={
-                  item?.photo === null
-                    ? "/assets/placeholder.avif"
-                    : item?.photo
-                }
-                info={item.cleanedName}
-                courseId={item.id}
-              />
-            ))}
+          {courses.map((item, index) => (
+            <Cards
+              key={item.id || index}
+              imgsrc={item?.photo || "/assets/placeholder.avif"}
+              info={item.cleanedName}
+              courseId={item.id}
+            />
+          ))}
         </motion.div>
-      </AnimatePresence>
+      )}
     </>
   );
 };

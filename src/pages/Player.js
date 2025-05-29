@@ -27,6 +27,7 @@ import {
 } from "../assets";
 import { useParams, useLocation } from "react-router-dom";
 import FileRenderer from "../components/FileRenderer/FileRenderer.js";
+import Loader from "../components/Loader/Loader.js";
 const ICON_MAP = {
   video: <VideoSolid />,
   pdf: <FilePdfSolid />,
@@ -239,11 +240,7 @@ const LectureItem = memo(
                         <LectureTypeIcon type={content?.[0]?.type} />
                       </span>
                       <a
-                        href={
-                          process.env.REACT_APP_API +
-                          "/api/course/content/" +
-                          content?.[0]?.pathId
-                        }
+                        href={"/api/course/content/" + content?.[0]?.pathId}
                         download
                         target="_blank"
                         onClick={(e) => {
@@ -486,8 +483,8 @@ const Player = () => {
         lectureDict[currentLectureId] = {
           url:
             lecture.type === "video"
-              ? `${process.env.REACT_APP_API}/api/course/stream/${lecture.id}`
-              : `${process.env.REACT_APP_API}/api/course/download/${lecture.id}`,
+              ? `/api/course/stream/${lecture.id}`
+              : `/api/course/download/${lecture.id}`,
           next: nextLectureId,
           prev: isFirstLectureInCourse ? null : prevLectureId,
           progress: lecture.lectureprogresses || [],
@@ -517,13 +514,12 @@ const Player = () => {
         );
         setCourseData(newData.data[0]);
         setError(null);
-        setLectureDictionary(createLectureDictionary(newData.data[0]));
+        const dict = await createLectureDictionary(newData.data[0]);
+        setLectureDictionary(dict);
         setDefLang(newData.data[1].deflang);
       } catch (err) {
         setError(err.message);
         console.error("Error fetching course data:", err);
-      } finally {
-        setIsLoading(false);
       }
     };
     fetchData();
@@ -542,8 +538,10 @@ const Player = () => {
           lectureDictionary[initiallecture]?.progress?.[0]?.progress
         );
       }
-      if (lectureDictionary && !isLoading) {
+
+      if (lectureDictionary) {
         setTotalLectures(Object.keys(lectureDictionary).length);
+        setIsLoading(false);
       }
     };
     initialload();
@@ -618,7 +616,7 @@ const Player = () => {
   if (isLoading) {
     return (
       <div className="loading">
-        <SkeletonLoader />
+        <Loader />
       </div>
     );
   }
@@ -637,7 +635,12 @@ const Player = () => {
         name={courseData?.cleanedName}
         progress={(completedLectures.size / totalLectures).toFixed(2) + "%"}
       />
-      <div className="player-container">
+      <motion.div
+        initial={{ opacity: 0, x: -200 }}
+        animate={{ opacity: 1, x: 0 }}
+        exit={{ opacity: 0, x: 200 }}
+        className="player-container"
+      >
         {lectureDictionary[nowPlaying]?.type &&
         lectureDictionary[nowPlaying]?.type === "video" ? (
           <VideoPlayer
@@ -713,7 +716,7 @@ const Player = () => {
             </div>
           ))}
         </div>
-      </div>
+      </motion.div>
     </>
   );
 };
