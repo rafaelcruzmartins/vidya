@@ -72,7 +72,7 @@ passport.use(
           .toString("hex");
         isPasswordValid = crypto.timingSafeEqual(
           Buffer.from(inputHash),
-          Buffer.from(user.password)
+          Buffer.from(user.password),
         );
       } catch (err) {
         return done(err);
@@ -84,7 +84,7 @@ passport.use(
     } catch (error) {
       return done(error);
     }
-  })
+  }),
 );
 
 passport.serializeUser((user, done) => done(null, user.id));
@@ -108,15 +108,15 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  })
+  }),
 );
 
 app.use(express.json());
 app.use(
   "/assets",
-  express.static("assets", {
+  express.static(path.join(__dirname, "assets"), {
     maxAge: "1y",
-  })
+  }),
 );
 app.use(express.static(buildPath));
 
@@ -132,7 +132,7 @@ app.use(
       sameSite: "strict",
       maxAge: 24 * 60 * 60 * 1000,
     },
-  })
+  }),
 );
 
 app.use(passport.initialize());
@@ -156,7 +156,7 @@ app.get("/isFirstStartUp", async (req, res) => {
 app.get("*", (req, res) => {
   res.sendFile(path.join(buildPath, "index.html"));
 });
-const PORT = 5000;
+const PORT = 31415;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
