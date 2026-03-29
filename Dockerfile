@@ -1,0 +1,36 @@
+# Stage 1: Build frontend
+FROM node:20-alpine AS frontend-builder
+WORKDIR /src
+
+COPY package.json package-lock.json* ./
+COPY backend/package.json ./backend/
+RUN npm ci
+
+COPY public/ ./public/
+COPY src/ ./src/
+RUN npm run build
+
+# Stage 2: Install backend production dependencies (standalone, no workspace)
+FROM node:20-alpine AS backend-deps
+WORKDIR /deps
+COPY backend/package.json ./
+RUN npm install --production
+
+# Stage 3: Final runtime image
+FROM node:20-alpine
+WORKDIR /app
+
+COPY --from=frontend-builder /src/build ./build
+COPY backend/ ./backend/
+COPY --from=backend-deps /deps/node_modules ./backend/node_modules
+
+RUN mkdir -p /data/assets
+COPY assets/ /data/assets/
+
+EXPOSE 31415
+ENV VIDYA_DATA_PATH=/data
+ENV PORT=31415
+
+VOLUME ["/data"]
+
+CMD ["node", "backend/index.js"]

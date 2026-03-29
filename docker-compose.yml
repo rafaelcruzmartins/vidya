@@ -1,0 +1,17 @@
+services:
+  vidya:
+    image: ghcr.io/dextify/vidya:latest
+    container_name: vidya
+    ports:
+      - "31415:31415"
+    volumes:
+      - ./vidya-data:/data
+      - /path/to/your/media:/media:ro
+    environment:
+      - VIDYA_DATA_PATH=/data
+      - PORT=31415
+    restart: unless-stopped
+
+volumes:
+  vidya-data:
+    driver: local

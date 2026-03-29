@@ -1,12 +1,11 @@
-import { dirname, join } from "path";
-import { fileURLToPath } from "url";
+import { join } from "path";
 import sharp from "sharp";
 import fs, { promises as fsp } from "fs";
 import { Course, Instructor } from "../models/index.js";
 import crypto from "crypto";
+import { ASSETS_PATH } from "../config/path.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const UPLOAD_DIR = join(__dirname, "../assets");
+const UPLOAD_DIR = ASSETS_PATH;
 const AVIF_CONFIG = {
   quality: 50,
   lossless: false,
@@ -37,7 +36,10 @@ const uploadImageCourse = async (req, res) => {
       const course = await Course.findByPk(CourseId);
 
       if (course.photo) {
-        const photoPath = join(__dirname, `../${course.photo}`);
+        const photoPath = join(
+          ASSETS_PATH,
+          course.photo.replace("/assets/", ""),
+        );
         if (fs.existsSync(photoPath)) {
           await fsp.unlink(photoPath);
         }
@@ -89,7 +91,10 @@ const uploadImageInstructor = async (req, res) => {
       const dbPath = `/assets/${filename}`;
       const instructor = await Instructor.findByPk(InstructorId);
       if (instructor.photo) {
-        const photoPath = join(__dirname, `../${instructor.photo}`);
+        const photoPath = join(
+          ASSETS_PATH,
+          instructor.photo.replace("/assets/", ""),
+        );
         if (fs.existsSync(photoPath)) {
           await fsp.unlink(photoPath);
         }
@@ -105,7 +110,7 @@ const uploadImageInstructor = async (req, res) => {
           name: InstructorName,
           description,
         },
-        { where: { id: InstructorId } }
+        { where: { id: InstructorId } },
       );
     }
 

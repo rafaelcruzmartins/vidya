@@ -1,0 +1,14 @@
+node_modules/
+build/
+staging/
+.git/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+database.sqlite
+keys.json
+dataPath.json
+*.exe
+*.log
+npm-debug.log*

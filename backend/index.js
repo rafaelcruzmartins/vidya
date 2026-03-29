@@ -20,18 +20,12 @@ import searchRoutes from "./routes/search.js";
 import { populateUser } from "./middleware/owner.js";
 import { promises as fsp } from "fs";
 import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-
-const __dirname = path.dirname(__filename);
-
-const buildPath = path.join(__dirname, "web");
+import { ASSETS_PATH, WEB_PATH, PORT, KEYS_PATH } from "./config/path.js";
 const SequelizeStore = sessionConnect(session.Store);
 const app = express();
 
 const secretKey = async () => {
-  const filepath = "keys.json";
+  const filepath = KEYS_PATH;
   try {
     const fileContent = await fsp.readFile(filepath, "utf8");
     const data = JSON.parse(fileContent);
@@ -114,11 +108,11 @@ app.use(
 app.use(express.json());
 app.use(
   "/assets",
-  express.static(path.join(__dirname, "assets"), {
+  express.static(ASSETS_PATH, {
     maxAge: "1y",
   }),
 );
-app.use(express.static(buildPath));
+app.use(express.static(WEB_PATH));
 
 app.use(
   session({
@@ -154,9 +148,8 @@ app.get("/isFirstStartUp", async (req, res) => {
   res.status(200).json(server[0].isFirstStartUp);
 });
 app.get("*", (req, res) => {
-  res.sendFile(path.join(buildPath, "index.html"));
+  res.sendFile(path.join(WEB_PATH, "index.html"));
 });
-const PORT = 31415;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });

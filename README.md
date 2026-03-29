@@ -1,70 +1,493 @@
-# Getting Started with Create React App
+<h1 align="center">VIDYA Media Server</h1>
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+<p align="center">
+<b>A self-hosted, open-source media server designed exclusively for educational video content.</b>
+</p>
 
-## Available Scripts
+<p align="center">
+<a href="https://vidya.media">Website</a> •
+<a href="https://vidya.media/docs">Documentation</a> •
+<a href="https://vidya.media/downloads">Downloads</a> •
+<a href="https://github.com/dextify-org/vidya/issues">Report Bug</a>
+</p>
 
-In the project directory, you can run:
+<p align="center">
+<img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg">
+<img alt="Version" src="https://img.shields.io/badge/version-1.0.0-green.svg">
+<img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20Docker-lightgrey.svg">
+</p>
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## What is VIDYA?
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+VIDYA is a self-hosted media server built specifically for video lectures and educational content. Unlike general-purpose media servers, VIDYA automatically scans your local folders and organizes them into structured courses — turning your scattered video files into a private, fully-featured e-learning platform.
 
-### `npm test`
+### Key Features
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Course Organization** — Automatically structures video files into organized courses with sections and lectures
+- **Progress Tracking** — Track your learning progress across courses and individual lectures
+- **Bookmarking & Tagging** — Bookmark important moments and tag content for quick access
+- **Study Dashboard** — Dedicated dashboard with daily watch statistics and learning insights
+- **Multi-User Support** — Create accounts for multiple users with role-based access
+- **Search** — Search across courses, lectures, instructors, and categories
+- **Self-Hosted** — Your data stays on your machine, no cloud dependencies
+- **Cross-Platform Clients** — Access your content from any device
 
-### `npm run build`
+### Tech Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Component            | Technology                            |
+| -------------------- | ------------------------------------- |
+| **Frontend**         | React 18, React Router, Framer Motion |
+| **Backend**          | Node.js, Express.js                   |
+| **Database**         | SQLite (via Sequelize ORM)            |
+| **Authentication**   | Passport.js with local strategy       |
+| **Media Processing** | FFprobe, Sharp                        |
+| **Windows Tray App** | .NET 6.0 (C#)                         |
+| **Installer**        | NSIS                                  |
+| **Containerization** | Docker                                |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Quick Start
 
-### `npm run eject`
+### Windows Installer (Recommended)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Download the latest `VIDYA-x64.exe` installer from [GitHub Releases](https://github.com/dextify-org/vidya/releases) and run it. The installer bundles everything you need — Node.js runtime, server backend, web frontend, and the system tray application.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Docker
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+docker compose up -d
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Or use `docker run` directly:
 
-## Learn More
+```bash
+docker run -d \
+  --name vidya \
+  -p 31415:31415 \
+  -v ./vidya-data:/data \
+  -v /path/to/your/media:/media:ro \
+  -e VIDYA_DATA_PATH=/data \
+  -e PORT=31415 \
+  --restart unless-stopped \
+  ghcr.io/dextify/vidya:latest
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Then open `http://localhost:31415` in your browser.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Docker Compose
 
-### Code Splitting
+```yaml
+services:
+  vidya:
+    image: ghcr.io/dextify/vidya:latest
+    container_name: vidya
+    ports:
+      - "31415:31415"
+    volumes:
+      - ./vidya-data:/data
+      - /path/to/your/media:/media:ro
+    environment:
+      - VIDYA_DATA_PATH=/data
+      - PORT=31415
+    restart: unless-stopped
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+volumes:
+  vidya-data:
+    driver: local
+```
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Building from Source
 
-### Making a Progressive Web App
+### Prerequisites
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+| Tool         | Version | Required For                    |
+| ------------ | ------- | ------------------------------- |
+| **Node.js**  | 20+     | Frontend & Backend              |
+| **npm**      | 9+      | Dependency management           |
+| **NSIS**     | 3.x     | Windows installer (optional)    |
+| **.NET SDK** | 6.0     | Tray app from source (optional) |
+| **Docker**   | 20+     | Docker builds (optional)        |
 
-### Advanced Configuration
+### Clone the Repository
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+git clone https://github.com/dextify-org/vidya.git
+cd vidya
+```
 
-### Deployment
+### Install Dependencies
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+```bash
+npm install
+```
 
-### `npm run build` fails to minify
+This installs both frontend and backend dependencies (the project uses npm workspaces).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+### Build for Windows (Automated — PowerShell Script)
+
+The `build-windows.ps1` script automates the entire Windows build process:
+
+```powershell
+.\build-windows.ps1
+```
+
+**What the script does:**
+
+1. Builds the React frontend (`npm run build` → `build/` folder)
+2. Cleans and creates a `staging/app/` directory
+3. Copies the backend into `staging/app/` (excluding `node_modules`)
+4. Installs production-only backend dependencies inside `staging/app/`
+5. Runs NSIS to compile the installer (`VIDYA-x64.exe`)
+
+**Requirements:**
+
+- [NSIS](https://nsis.sourceforge.io/Download) installed at `C:\Program Files (x86)\NSIS\` or `C:\Program Files\NSIS\`
+- Node.js 20+ and npm on your PATH
+- The `tray/` folder must contain pre-built tray app binaries (see [Tray App](#tray-app-windows-system-tray) section below)
+
+---
+
+### Build for Windows (Manual Steps)
+
+If you prefer to build manually instead of using the script, follow these steps:
+
+#### Step 1: Build the Frontend
+
+```bash
+npm run build
+```
+
+This creates a production-optimized React build in the `build/` directory.
+
+#### Step 2: Prepare the Staging Directory
+
+Create a `staging/app/` directory and copy the backend into it:
+
+```powershell
+# Remove old staging if exists
+Remove-Item -Recurse -Force staging -ErrorAction SilentlyContinue
+
+# Create staging directory
+New-Item -ItemType Directory -Path staging\app
+
+# Copy backend files (exclude node_modules)
+robocopy backend staging\app /E /XD node_modules /XF "*.log"
+```
+
+#### Step 3: Install Production Dependencies
+
+```bash
+cd staging/app
+npm install --production
+cd ../..
+```
+
+#### Step 4: Ensure Tray App Binaries Are Present
+
+The `tray/` folder must contain the pre-built .NET tray application. The following files are required:
+
+```
+tray/
+├── VIDYA.exe                                          # Main tray executable
+├── VIDYA.dll                                          # Core library
+├── VIDYA.deps.json                                    # Dependency manifest
+├── VIDYA.runtimeconfig.json                           # Runtime configuration
+├── VIDYA.pdb                                          # Debug symbols (optional)
+├── app.ico                                            # Tray icon
+├── System.ServiceProcess.ServiceController.dll        # Service controller dependency
+└── runtimes/
+    └── win/
+        └── lib/
+            └── net6.0/
+                ├── System.Diagnostics.EventLog.Messages.dll
+                └── System.ServiceProcess.ServiceController.dll
+```
+
+These binaries are pre-built and included in the repository. If you want to build the tray app from source, see the [Tray App](#tray-app-windows-system-tray) section below.
+
+#### Step 5: Ensure Node.js Binary Is Present
+
+The `node/` folder must contain a Windows x64 Node.js binary:
+
+```
+node/
+└── node.exe    # Node.js v20 Windows x64 binary
+```
+
+Download from [nodejs.org](https://nodejs.org/en/download/) — use the Windows Binary (.zip) for x64, extract `node.exe`, and place it in the `node/` folder.
+
+#### Step 6: Build the Installer (NSIS)
+
+```powershell
+# Find NSIS and compile installer
+& "C:\Program Files (x86)\NSIS\makensis.exe" installer.nsi
+```
+
+This produces `VIDYA-x64.exe` — a full Windows installer that:
+
+- Installs to `C:\Program Files\VIDYA`
+- Creates Start Menu and Desktop shortcuts
+- Registers in Windows Add/Remove Programs
+- Bundles Node.js runtime, backend, frontend build, and tray app
+- Stores user data in `%LOCALAPPDATA%\VIDYA`
+
+---
+
+### Build with Docker
+
+```bash
+docker build -t vidya .
+```
+
+The multi-stage Dockerfile:
+
+1. **Stage 1** — Builds the React frontend
+2. **Stage 2** — Installs backend production dependencies
+3. **Stage 3** — Assembles the final lightweight runtime image
+
+Run the built image:
+
+```bash
+docker run -d \
+  --name vidya \
+  -p 31415:31415 \
+  -v ./vidya-data:/data \
+  -v /path/to/your/media:/media:ro \
+  vidya
+```
+
+---
+
+## Tray App (Windows System Tray)
+
+The VIDYA tray application is a .NET 6.0 Windows Forms app that sits in the system tray and manages the Node.js backend process. Pre-built binaries are included in the `tray/` folder.
+
+### Building the Tray App from Source
+
+If you want to build the tray app yourself:
+
+1. **Clone the tray app repository:**
+
+   ```bash
+   git clone https://github.com/dextify-org/vidya-tray.git
+   ```
+
+2. **Build with .NET SDK 6.0:**
+
+   ```bash
+   cd vidya-tray
+   dotnet build -c Release
+   ```
+
+3. **Copy the output files** from the build output directory into the `tray/` folder of this repository:
+
+   ```
+   bin/Release/net6.0/ → tray/
+   ```
+
+   Ensure all files listed in [Step 4 of the manual build](#step-4-ensure-tray-app-binaries-are-present) are present.
+
+**Note:** The tray app requires .NET 6.0 Desktop Runtime on the target machine. The NSIS installer expects the pre-built binaries to be present in `tray/` at build time.
+
+---
+
+## Project Structure
+
+```
+vidya/
+├── backend/                    # Express.js API server
+│   ├── config/                 # Database and path configuration
+│   │   ├── database.js         # Sequelize SQLite setup
+│   │   └── path.js             # Data paths and port config
+│   ├── controllers/            # Route handler logic
+│   ├── middleware/              # Auth and user middleware
+│   ├── models/                 # Sequelize data models
+│   │   ├── User.js             # User accounts
+│   │   ├── Course.js           # Course definitions
+│   │   ├── Lecture.js          # Individual lectures
+│   │   ├── Section.js          # Course sections
+│   │   ├── CourseProgress.js   # Course-level progress
+│   │   ├── LectureProgress.js  # Lecture-level progress
+│   │   ├── DailyWatch.js       # Daily watch statistics
+│   │   ├── Category.js         # Content categories
+│   │   ├── Instructor.js       # Instructor profiles
+│   │   ├── TagsAndBookmark.js  # Tags and bookmarks
+│   │   └── ...
+│   ├── routes/                 # API route definitions
+│   │   ├── auth.js             # Authentication endpoints
+│   │   ├── admin.js            # Admin management
+│   │   ├── course.js           # Course CRUD operations
+│   │   ├── drive.js            # File system scanning
+│   │   ├── home.js             # Home/feed data
+│   │   ├── dashboard.js        # Dashboard statistics
+│   │   ├── search.js           # Search functionality
+│   │   └── ...
+│   ├── index.js                # Server entry point
+│   └── package.json            # Backend dependencies
+│
+├── src/                        # React frontend source
+│   ├── components/             # Reusable UI components
+│   ├── pages/                  # Page-level components
+│   ├── api/                    # API client utilities
+│   ├── context/                # React context providers
+│   ├── assets/                 # Static assets (images, icons)
+│   ├── App.js                  # Root component
+│   ├── AnimatedRoutes.js       # Route definitions with animations
+│   ├── style.css               # Global stylesheet
+│   └── index.js                # React entry point
+│
+├── public/                     # Static public files
+├── assets/                     # Default server assets
+├── tray/                       # Pre-built Windows tray app (.NET 6.0)
+├── node/                       # Bundled Node.js binary (Windows)
+├── resources/                  # Installer resources (icons, bitmaps)
+│
+├── build-windows.ps1           # Automated Windows build script
+├── installer.nsi               # NSIS installer script
+├── Dockerfile                  # Multi-stage Docker build
+├── docker-compose.yml          # Docker Compose configuration
+├── package.json                # Root package (workspaces)
+└── LICENSE.txt                 # GNU GPL v3
+```
+
+---
+
+## API Overview
+
+The backend exposes a REST API at `http://localhost:31415/api/`:
+
+| Endpoint                  | Description          |
+| ------------------------- | -------------------- |
+| `POST /api/auth/login`    | User authentication  |
+| `POST /api/auth/register` | User registration    |
+| `GET /api/home`           | Home feed data       |
+| `GET /api/course/:id`     | Course details       |
+| `GET /api/dashboard`      | Dashboard statistics |
+| `GET /api/search`         | Search content       |
+| `POST /api/drive`         | Scan media folders   |
+| `GET /api/category`       | List categories      |
+| `GET /api/instructor`     | List instructors     |
+| `GET /api/admin`          | Admin operations     |
+| `GET /api/user`           | User profile         |
+
+---
+
+## Configuration
+
+### Environment Variables
+
+| Variable          | Default         | Description                              |
+| ----------------- | --------------- | ---------------------------------------- |
+| `VIDYA_DATA_PATH` | Repository root | Path to store database, keys, and assets |
+| `PORT`            | `31415`         | Server port                              |
+
+### Data Storage
+
+VIDYA stores its data in the following locations:
+
+| Platform                | Location                  |
+| ----------------------- | ------------------------- |
+| **Windows (Installer)** | `%LOCALAPPDATA%\VIDYA\`   |
+| **Docker**              | Mounted `/data` volume    |
+| **Development**         | Repository root directory |
+
+Data includes:
+
+- `database.sqlite` — User accounts, courses, progress, settings
+- `keys.json` — Auto-generated session secret key
+- `assets/` — Thumbnails, cover images, and other media assets
+
+---
+
+## Contributing & Development
+
+We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation — every contribution matters.
+
+### How to Contribute
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/your-feature`)
+3. **Commit** your changes (`git commit -m 'Add your feature'`)
+4. **Push** to the branch (`git push origin feature/your-feature`)
+5. **Open** a Pull Request
+
+### Development Mode
+
+Run the frontend dev server and backend simultaneously:
+
+```bash
+npm run dev
+```
+
+This starts:
+
+- **Frontend** at `http://localhost:3000` (with hot reload)
+- **Backend** at `http://localhost:31415` (with nodemon auto-restart)
+
+The frontend proxies API requests to the backend via the `proxy` field in `package.json`.
+
+You can also run them individually:
+
+```bash
+# Frontend only
+npm run start
+
+# Backend only
+npm run server
+
+# Backend in dev mode (with nodemon)
+npm run dev-server
+```
+
+---
+
+### Development Guidelines
+
+- Follow existing code style and conventions
+- Test your changes thoroughly before submitting
+- Write clear commit messages describing your changes
+- Update documentation if your changes affect the user interface or API
+- Ensure the app builds successfully with `npm run build`
+
+### Reporting Issues
+
+Found a bug or have a suggestion? [Open an issue](https://github.com/dextify-org/vidya/issues) with:
+
+- Clear description of the problem or feature request
+- Steps to reproduce (for bugs)
+- Expected vs actual behavior
+- System information (OS, Node.js version, browser)
+
+---
+
+## License
+
+VIDYA is free software licensed under the **GNU General Public License v3.0** (GPL-3.0).
+
+You are free to use, modify, and distribute this software under the terms of the GPL v3. Any modified versions must also be distributed under the same license and include the source code.
+
+See [LICENSE.txt](LICENSE.txt) for the full license text.
+
+**Copyright © 2026 [DEXTIFY](https://dextify.org)**
+
+---
+
+## Acknowledgements
+
+VIDYA is built with these excellent open-source projects:
+
+- [React](https://reactjs.org/) — UI framework
+- [Express.js](https://expressjs.com/) — Web server framework
+- [Sequelize](https://sequelize.org/) — ORM for SQLite
+- [Passport.js](http://www.passportjs.org/) — Authentication middleware
+- [Sharp](https://sharp.pixelplumbing.com/) — Image processing
+- [FFprobe](https://ffmpeg.org/ffprobe.html) — Media analysis
+- [Framer Motion](https://www.framer.com/motion/) — Animation library
+- [NSIS](https://nsis.sourceforge.io/) — Windows installer compiler
