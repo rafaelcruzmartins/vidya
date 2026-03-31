@@ -3,7 +3,9 @@
 <p align="center">
 <b>A self-hosted, open-source media server designed exclusively for educational video content.</b>
 </p>
-
+<p align="center">
+  <img width="100%" alt="Banner image" src="https://github.com/user-attachments/assets/5d87062c-9366-4f47-8e23-91ca905906a8" />
+</p>
 <p align="center">
 <a href="https://vidya.media">Website</a> •
 <a href="https://vidya.media/docs">Documentation</a> •
@@ -15,6 +17,12 @@
 <img alt="License" src="https://img.shields.io/badge/license-GPLv3-blue.svg">
 <img alt="Version" src="https://img.shields.io/badge/version-1.0.0-green.svg">
 <img alt="Platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS%20%7C%20Docker-lightgrey.svg">
+</p>
+
+<p align="center">
+<a href="https://twitter.com/vidya_server"><img alt="Follow on X" src="https://img.shields.io/badge/Follow-%40vidya__server-000000?logo=x&logoColor=white" /></a>
+<a href="https://www.reddit.com/r/VidyaMedia"><img alt="Subreddit" src="https://img.shields.io/badge/Reddit-r%2FVidyaMedia-FF4500?logo=reddit&logoColor=white" /></a>
+<a href="https://discord.gg/uavHJumK5v"><img alt="Discord" src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white" /></a>
 </p>
 
 ---
@@ -72,7 +80,7 @@ docker run -d \
   -e VIDYA_DATA_PATH=/data \
   -e PORT=31415 \
   --restart unless-stopped \
-  ghcr.io/dextify/vidya:latest
+  ghcr.io/dextify-org/vidya:latest
 ```
 
 Then open `http://localhost:31415` in your browser.
@@ -82,7 +90,7 @@ Then open `http://localhost:31415` in your browser.
 ```yaml
 services:
   vidya:
-    image: ghcr.io/dextify/vidya:latest
+    image: ghcr.io/dextify-org/vidya:latest
     container_name: vidya
     ports:
       - "31415:31415"
@@ -140,11 +148,12 @@ The `build-windows.ps1` script automates the entire Windows build process:
 
 **What the script does:**
 
-1. Builds the React frontend (`npm run build` → `build/` folder)
-2. Cleans and creates a `staging/app/` directory
-3. Copies the backend into `staging/app/` (excluding `node_modules`)
-4. Installs production-only backend dependencies inside `staging/app/`
-5. Runs NSIS to compile the installer (`VIDYA-x64.exe`)
+1. Auto-downloads the latest Node.js 22 LTS x64 binary into `node/` if `node\node.exe` is not already present
+2. Builds the React frontend (`npm run build` → `build/` folder)
+3. Cleans and creates a `staging/app/` directory
+4. Copies the backend into `staging/app/` (excluding `node_modules`)
+5. Installs production-only backend dependencies inside `staging/app/`
+6. Runs NSIS to compile the installer (`VIDYA-x64.exe`)
 
 **Requirements:**
 

@@ -5,6 +5,42 @@ $StagingDir = Join-Path $RepoRoot "staging"
 $StagingApp = Join-Path $StagingDir "app"
 $BackendDir = Join-Path $RepoRoot "backend"
 $BuildDir = Join-Path $RepoRoot "build"
+$NodeDir = Join-Path $RepoRoot "node"
+$NodeExe = Join-Path $NodeDir "node.exe"
+
+# Step 0: Ensure node.exe is present (downloads Node.js 22 LTS if missing)
+if (Test-Path $NodeExe) {
+    Write-Host ">>> node.exe already present in node/ — skipping download. (Delete node\node.exe to force a fresh download.)" -ForegroundColor DarkGray
+} else {
+    Write-Host ">>> Fetching latest Node.js 22 LTS version info..." -ForegroundColor Cyan
+    $releases = Invoke-RestMethod -Uri "https://nodejs.org/dist/index.json" -UseBasicParsing
+    $latestV22 = $releases | Where-Object { $_.version -like "v22.*" -and $_.lts } | Select-Object -First 1
+    if (-not $latestV22) { Write-Error "Could not find a Node.js 22 LTS release from nodejs.org."; exit 1 }
+
+    $nodeVersion = $latestV22.version
+    $zipName = "node-$nodeVersion-win-x64.zip"
+    $zipUrl = "https://nodejs.org/dist/$nodeVersion/$zipName"
+    $zipTemp = Join-Path $env:TEMP $zipName
+    $extractTemp = Join-Path $env:TEMP "node-$nodeVersion-win-x64"
+
+    Write-Host ">>> Downloading Node.js $nodeVersion x64 from nodejs.org..." -ForegroundColor Cyan
+    Invoke-WebRequest -Uri $zipUrl -OutFile $zipTemp -UseBasicParsing
+
+    Write-Host ">>> Extracting node.exe..." -ForegroundColor Cyan
+    if (Test-Path $extractTemp) { Remove-Item -Recurse -Force $extractTemp }
+    Expand-Archive -Path $zipTemp -DestinationPath $env:TEMP -Force
+
+    $extractedExe = Join-Path $extractTemp "node.exe"
+    if (-not (Test-Path $extractedExe)) { Write-Error "node.exe not found in extracted archive at $extractedExe"; exit 1 }
+
+    if (-not (Test-Path $NodeDir)) { New-Item -ItemType Directory -Path $NodeDir | Out-Null }
+    Copy-Item $extractedExe $NodeExe -Force
+
+    Remove-Item $zipTemp -Force -ErrorAction SilentlyContinue
+    Remove-Item $extractTemp -Recurse -Force -ErrorAction SilentlyContinue
+
+    Write-Host ">>> Node.js $nodeVersion → node\node.exe" -ForegroundColor Green
+}
 
 # Step 1: Build frontend
 Write-Host ">>> Building frontend..." -ForegroundColor Cyan
