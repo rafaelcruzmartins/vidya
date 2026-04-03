@@ -20,7 +20,7 @@
 </p>
 
 <p align="center">
-<a href="https://twitter.com/vidya_server"><img alt="Follow on X" src="https://img.shields.io/badge/Follow-%40vidya__server-000000?logo=x&logoColor=white" /></a>
+<a href="https://twitter.com/vidya_server"><img alt="Follow on X" src="https://img.shields.io/badge/X-%40vidya__server-000000" /></a>
 <a href="https://www.reddit.com/r/VidyaMedia"><img alt="Subreddit" src="https://img.shields.io/badge/Reddit-r%2FVidyaMedia-FF4500?logo=reddit&logoColor=white" /></a>
 <a href="https://discord.gg/uavHJumK5v"><img alt="Discord" src="https://img.shields.io/badge/Discord-Join%20Server-5865F2?logo=discord&logoColor=white" /></a>
 </p>
