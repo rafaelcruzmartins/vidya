@@ -415,17 +415,17 @@ Data includes:
 
 ---
 
-## Contributing & Development
+## Contributing, Code of Conduct & Development
 
 We welcome contributions from the community! Whether you're fixing bugs, adding features, or improving documentation — every contribution matters.
 
-### How to Contribute
+### Contributing
 
-1. **Fork** the repository
-2. **Create** a feature branch (`git checkout -b feature/your-feature`)
-3. **Commit** your changes (`git commit -m 'Add your feature'`)
-4. **Push** to the branch (`git push origin feature/your-feature`)
-5. **Open** a Pull Request
+Please read [CONTRIBUTING.md](./CONTRIBUTING.md) before opening issues or pull requests.
+
+### Code of Conduct
+
+This project follows the rules described in [CODE_OF_CONDUCT.md](./CODE_OF_CONDUCT.md).
 
 ### Development Mode
 
