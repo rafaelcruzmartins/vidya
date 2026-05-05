@@ -23,9 +23,9 @@ WORKDIR /app
 COPY --from=frontend-builder /src/build ./build
 COPY backend/ ./backend/
 COPY --from=backend-deps /deps/node_modules ./backend/node_modules
-
-RUN mkdir -p /data/assets
-COPY assets/ /data/assets/
+COPY assets/ /app/defaults/
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 EXPOSE 31415
 ENV VIDYA_DATA_PATH=/data
@@ -33,4 +33,4 @@ ENV PORT=31415
 
 VOLUME ["/data"]
 
-CMD ["node", "backend/index.js"]
+ENTRYPOINT ["/entrypoint.sh"]
