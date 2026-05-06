@@ -75,7 +75,7 @@ Or use `docker run` directly:
 docker run -d \
   --name vidya \
   -p 31415:31415 \
-  -v ./vidya-data:/data \
+  -v ./data:/data \
   -v /path/to/your/media:/media:ro \
   -e VIDYA_DATA_PATH=/data \
   -e PORT=31415 \
@@ -95,7 +95,7 @@ services:
     ports:
       - "31415:31415"
     volumes:
-      - ./vidya-data:/data
+      - ./data:/data
       - /path/to/your/media:/media:ro
     environment:
       - VIDYA_DATA_PATH=/data
@@ -103,7 +103,7 @@ services:
     restart: unless-stopped
 
 volumes:
-  vidya-data:
+  data:
     driver: local
 ```
 
@@ -267,7 +267,7 @@ Run the built image:
 docker run -d \
   --name vidya \
   -p 31415:31415 \
-  -v ./vidya-data:/data \
+  -v ./data:/data \
   -v /path/to/your/media:/media:ro \
   vidya
 ```
