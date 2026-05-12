@@ -3,7 +3,7 @@
 !include "FileFunc.nsh"
 
 !define APPNAME "VIDYA"
-!define APPVERSION "0.1.0"
+!define APPVERSION "1.0.0"
 !define PUBLISHER "DEXTIFY"
 !define WEBSITE "https://vidya.media"
 !define DESCRIPTION "A media server for video lectures"
