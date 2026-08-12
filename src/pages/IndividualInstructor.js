@@ -165,7 +165,6 @@ const IndividualInstrucor = () => {
           <div className="card-divs-wrap">
             {instructorsData?.courses?.map((data) => (
               <Cards
-                imgsrc={data.photo}
                 info={data.cleanedName}
                 courseId={data.id}
                 key={data.id}

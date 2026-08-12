@@ -44,7 +44,6 @@ const Courses = () => {
           {courses.map((item, index) => (
             <Cards
               key={item.id || index}
-              imgsrc={item?.photo || "/assets/placeholder.avif"}
               info={item.cleanedName}
               courseId={item.id}
             />

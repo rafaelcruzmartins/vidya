@@ -127,21 +127,6 @@ const Home = ({ category }) => {
             <p className="pinned-title featured-title">FEATURED</p>
             <div className="feat-stats">
               <div className="featured-course">
-                <div className="featured-image" onClick={handleCourse}>
-                  <img
-                    src={
-                      homeData &&
-                      (!(homeData?.featuredCourse === null)
-                        ? homeData?.featuredCourse?.photo === null
-                          ? "/assets/placeholder.avif"
-                          : homeData?.featuredCourse?.photo
-                        : homeData?.latestCourse[0]?.photo === null
-                          ? "/assets/placeholder.avif"
-                          : homeData?.latestCourse[0]?.photo)
-                    }
-                    alt=""
-                  />
-                </div>
                 <div className="featured-info">
                   <div className="featured-info-details">
                     <div className="info-title" onClick={handleCourse}>
@@ -221,11 +206,6 @@ const Home = ({ category }) => {
                 homeData.continueWatching.map((item, index) => (
                   <ContinueWatching
                     key={index}
-                    imgsrc={
-                      item.course.photo === null
-                        ? "/assets/placeholder.avif"
-                        : item.course.photo
-                    }
                     lectureName={item.lecture?.cleanedName}
                     courseId={item.course.id}
                     courseName={item.course.cleanedName}
@@ -251,11 +231,6 @@ const Home = ({ category }) => {
                 homeData.latestCourse.map((item, index) => (
                   <Cards
                     key={index}
-                    imgsrc={
-                      item.photo === null
-                        ? "/assets/placeholder.avif"
-                        : item.photo
-                    }
                     info={item.cleanedName}
                     courseId={item.id}
                   />
