@@ -1,0 +1,20 @@
+name: VIDYA Media Server
+version: "1.0.1"
+slug: vidya
+description: Servidor auto-hospedado para cursos e videoaulas
+url: https://github.com/rafaelcruzmartins/vidya
+arch:
+  - amd64
+init: false
+boot: auto
+startup: application
+ports:
+  31415/tcp: 31415
+ports_description:
+  31415/tcp: Interface web do VIDYA
+webui: http://[HOST]:[PORT:31415]
+map:
+  - type: media
+    read_only: false
+  - type: share
+    read_only: false

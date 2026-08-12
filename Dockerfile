@@ -27,6 +27,9 @@ COPY assets/ /app/defaults/
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
+# Metadados usados quando a imagem é construída como add-on do Home Assistant
+LABEL io.hass.type="addon" io.hass.arch="amd64"
+
 EXPOSE 31415
 ENV VIDYA_DATA_PATH=/data
 ENV PORT=31415
