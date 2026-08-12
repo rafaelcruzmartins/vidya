@@ -2237,8 +2237,15 @@ video::-moz-media-controls {
   padding: 1rem;
   right: 0%;
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+.content-dropdown-item {
+  display: flex;
   align-items: center;
-  gap: 5%;
+  gap: 0.5rem;
+  white-space: nowrap;
 }
 .content-arrow {
   width: 1rem;

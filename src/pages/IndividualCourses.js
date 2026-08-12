@@ -105,6 +105,10 @@ const LectureItem = memo(
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
+    const contentFiles = Array.isArray(content)
+      ? content.filter((item) => item?.type)
+      : [];
+
     const toggleDropdown = () => setIsOpen(!isOpen);
     const toggleMenu = (e) => {
       e.stopPropagation();
@@ -198,7 +202,7 @@ const LectureItem = memo(
               <div className="lecture-time">
                 {type === "video" && secondsToMinutesRounded(duration)}
               </div>
-              {content?.[0]?.type && (
+              {contentFiles.length > 0 && (
                 <div className="lecture-content">
                   <button
                     className="content-button"
@@ -224,19 +228,26 @@ const LectureItem = memo(
                   </button>
                   {isOpen && (
                     <div className="content-dropdown">
-                      <span>
-                        <LectureTypeIcon type={content?.[0]?.type} />
-                      </span>
-                      <a
-                        href={"/api/course/content/" + content?.[0]?.pathId}
-                        download
-                        target="_blank"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                        }}
-                      >
-                        {content?.[0]?.originalName}
-                      </a>
+                      {contentFiles.map((item, index) => (
+                        <div
+                          className="content-dropdown-item"
+                          key={item.pathId ?? index}
+                        >
+                          <span>
+                            <LectureTypeIcon type={item.type} />
+                          </span>
+                          <a
+                            href={"/api/course/content/" + item.pathId}
+                            download
+                            target="_blank"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                            }}
+                          >
+                            {item.originalName}
+                          </a>
+                        </div>
+                      ))}
                     </div>
                   )}
                 </div>

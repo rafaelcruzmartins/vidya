@@ -138,6 +138,13 @@ const groupFiles = (files) => {
     const ext = path.extname(file).toLowerCase();
     const group = groups.get(base);
     if (VIDEO_EXT.has(ext)) {
+      const previousMain = group.main;
+      if (
+        previousMain &&
+        !VIDEO_EXT.has(path.extname(previousMain).toLowerCase())
+      ) {
+        group.contents.push(previousMain);
+      }
       group.main = file;
     } else if (SUB_EXT.has(ext)) {
       group.subtitles.push(file);
@@ -147,6 +154,7 @@ const groupFiles = (files) => {
       group.contents.push(file);
     }
   });
+  groups.forEach((group) => naturalSort(group.contents));
   return groups;
 };
 
@@ -388,7 +396,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         },
       });
 
-      const content = group.contents.map(async (f) => {
+      const contentPromises = group.contents.map(async (f) => {
         const contentPath = path.join(sectionPath, f);
         const contentPathId = await pathCache.getPathId(contentPath);
         return {
@@ -553,7 +561,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
           };
         }),
       );
-      const resolvedContent = await Promise.all(content);
+      const content = await Promise.all(contentPromises);
       if (isVideo) {
         videoFilesToProcess.push({
           sectionId: section.id,
