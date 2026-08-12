@@ -1,22 +1,25 @@
 # VIDYA Media Server — add-on do Home Assistant
 
-Add-on local que usa a imagem publicada em
-`ghcr.io/rafaelcruzmartins/vidya`, já com as correções dos materiais
-complementares aplicadas.
+Add-on local que compila o VIDYA a partir deste repositório, já com as
+correções dos materiais complementares e a interface revisada.
 
-O código-fonte fica no repositório privado; apenas a imagem compilada é
-pública. O Home Assistant não compila nada — só baixa a imagem pronta.
+O repositório é privado, então o Home Assistant compila a imagem localmente a
+partir do código que você copia pelo Samba — sem depender de nenhum registro
+externo.
 
 ## Instalação
 
-1. Pelo Samba, abra o compartilhamento `addons` e crie a pasta `vidya`.
-2. Copie para dentro dela os quatro arquivos desta pasta do repositório
-   (`haos-addon/vidya`): `config.yaml`, `DOCS.md`, `icon.png` e `logo.png`.
-   Nada além disso — o código-fonte não precisa ser copiado.
-3. No Home Assistant: **Configurações → Complementos → Loja de complementos →
+1. Baixe este repositório como ZIP pelo GitHub (botão **Code → Download ZIP**).
+2. Descompacte. O conteúdo vem dentro de uma pasta chamada `vidya-main`.
+3. Pelo Samba, abra o compartilhamento `addons` e crie a pasta `vidya`.
+4. Copie **todo o conteúdo** de `vidya-main` para dentro de `addons/vidya`.
+   O `config.yaml` precisa ficar na raiz dessa pasta, ao lado do `Dockerfile`.
+5. No Home Assistant: **Configurações → Complementos → Loja de complementos →
    ⋮ (canto superior direito) → Verificar atualizações**.
-4. O add-on **VIDYA Media Server** aparece em *Complementos locais*. Abra e
+6. O add-on **VIDYA Media Server** aparece em *Complementos locais*. Abra e
    clique em **Instalar**.
+
+A primeira instalação compila a aplicação e leva alguns minutos.
 
 ## Configuração
 
@@ -68,18 +71,13 @@ Extensões reconhecidas:
 Arquivos `.ts` não são reconhecidos. Converta com
 `ffmpeg -i entrada.ts -c copy saida.mp4`.
 
-## Como as atualizações funcionam
+## Atualizando o add-on
 
-Quando o código muda no repositório, o GitHub compila a imagem nova sozinho e
-a publica com o número de versão que está no `config.yaml` deste add-on.
+Depois de alterar o código:
 
-Para receber a atualização no Home Assistant, edite pelo Samba o arquivo
-`addons/vidya/config.yaml` e coloque o mesmo número de versão que foi
-publicado. Depois use **Verificar atualizações** e o botão **Atualizar** que
-aparece no add-on.
-
-A versão publicada mais recente aparece em
-**GitHub → seu perfil → Packages → vidya**.
+1. Baixe o ZIP novo e substitua os arquivos em `addons/vidya`.
+2. Aumente o campo `version` no `config.yaml` (por exemplo, para `"1.0.4"`).
+3. Em **Verificar atualizações**, o Home Assistant oferece a atualização.
 
 ## Atenção após atualizar
 
