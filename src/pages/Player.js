@@ -108,10 +108,6 @@ const LectureItem = memo(
     const [isMenuOpen, setIsMenuOpen] = useState(false);
     const [isTagModalOpen, setIsTagModalOpen] = useState(false);
 
-    const contentFiles = Array.isArray(content)
-      ? content.filter((item) => item?.type)
-      : [];
-
     const toggleDropdown = () => setIsOpen(!isOpen);
     const toggleMenu = (e) => {
       e.stopPropagation();
@@ -219,70 +215,6 @@ const LectureItem = memo(
               <div className="lecture-time">
                 {type === "video" && secondsToMinutesRounded(duration)}
               </div>
-              {contentFiles.length > 0 && (
-                <div className="lecture-content">
-                  <button
-                    className="content-button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleDropdown();
-                    }}
-                  >
-                    <span>Content</span>
-                    <svg
-                      className="content-arrow"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </button>
-                  {isOpen && (
-                    <div className="content-dropdown">
-                      {contentFiles.map((item, index) => (
-                        <div
-                          className="content-dropdown-item"
-                          key={item.pathId ?? index}
-                        >
-                          <span>
-                            <LectureTypeIcon type={item.type} />
-                          </span>
-                          {VIEWABLE.has(item.type?.toLowerCase()) ? (
-                            <a
-                              href={"/api/course/content/" + item.pathId}
-                              target="_blank"
-                              rel="noreferrer"
-                              title="Abrir em nova aba"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {item.originalName}
-                            </a>
-                          ) : (
-                            <a
-                              href={
-                                "/api/course/content/" +
-                                item.pathId +
-                                "?download=1"
-                              }
-                              download
-                              title="Baixar"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {item.originalName}
-                            </a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
             </div>
           </div>
           <div className="lecture-menu">
@@ -522,6 +454,8 @@ const Player = () => {
           order: lecture.order,
           name: lecture.cleanedName,
           subtitles: lecture.subtitles || [],
+          content: Array.isArray(lecture.content) ? lecture.content : [],
+          sectionName: section.cleanedName,
           isCompleted,
         };
 
@@ -651,6 +585,12 @@ const Player = () => {
     );
   }
 
+  const currentMaterials = Array.isArray(
+    lectureDictionary?.[nowPlaying]?.content,
+  )
+    ? lectureDictionary[nowPlaying].content.filter((item) => item?.type)
+    : [];
+
   return (
     <>
       {showToast && (
@@ -671,6 +611,7 @@ const Player = () => {
         exit={{ opacity: 0, x: 200 }}
         className="player-container"
       >
+        <div className="player-main">
         {lectureDictionary[nowPlaying]?.type &&
         lectureDictionary[nowPlaying]?.type === "video" ? (
           <VideoPlayer
@@ -696,7 +637,55 @@ const Player = () => {
           />
         )}
 
+        <div className="lecture-heading">
+          <span className="lecture-heading-section">
+            {lectureDictionary[nowPlaying]?.sectionName}
+          </span>
+          <h1 className="lecture-heading-title">
+            {lectureDictionary[nowPlaying]?.name}
+          </h1>
+        </div>
+
+        {currentMaterials.length > 0 && (
+          <section className="lecture-materials">
+            <h2 className="lecture-materials-title">Materiais desta aula</h2>
+            <div className="materials-list">
+              {currentMaterials.map((item, index) => {
+                const viewable = VIEWABLE.has(item.type?.toLowerCase());
+                const href =
+                  "/api/course/content/" +
+                  item.pathId +
+                  (viewable ? "" : "?download=1");
+                return (
+                  <a
+                    key={item.pathId ?? index}
+                    className="material-card"
+                    href={href}
+                    {...(viewable
+                      ? { target: "_blank", rel: "noreferrer" }
+                      : { download: true })}
+                  >
+                    <span className="material-card-icon">
+                      <LectureTypeIcon type={item.type} />
+                    </span>
+                    <span className="material-card-text">
+                      <span className="material-card-name">
+                        {item.originalName}
+                      </span>
+                      <span className="material-card-action">
+                        {viewable ? "Abrir em nova aba" : "Baixar"}
+                      </span>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        )}
+        </div>
+
         <div className="playlist-container">
+          <div className="playlist-header">Conteúdo do curso</div>
           {courseData?.sections.map((section) => (
             <div key={section.id} className="section-item">
               <SectionHeader
