@@ -750,9 +750,6 @@ const IndividualCourses = () => {
                   </div>
                 </div>
               </div>
-              <div className="img-container course-info-image instructor-info-image">
-                <img src={course?.photo || "/assets/placeholder.avif"} alt="" />
-              </div>
             </div>
           </div>
           <div className="content-heading">Course Content</div>
