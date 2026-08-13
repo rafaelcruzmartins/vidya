@@ -1,5 +1,5 @@
 name: VIDYA Media Server
-version: "1.0.3"
+version: "1.0.4"
 slug: vidya
 description: Servidor auto-hospedado para cursos e videoaulas
 url: https://github.com/rafaelcruzmartins/vidya

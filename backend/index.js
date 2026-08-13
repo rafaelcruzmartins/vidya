@@ -1,5 +1,5 @@
 import express from "express";
-import sequelize from "./config/database.js";
+import sequelize, { applySqlitePragmas } from "./config/database.js";
 import crypto from "crypto";
 import cors from "cors";
 import passport from "passport";
@@ -41,6 +41,7 @@ const secretKey = async () => {
 };
 const expressSecret = await secretKey();
 const syncdb = async () => {
+  await applySqlitePragmas();
   await sequelize.sync({ logging: false });
   console.log("Database & tables created!");
   await Server.findOrCreate({
@@ -48,7 +49,9 @@ const syncdb = async () => {
     defaults: { name: "VIDYA" },
   });
 };
-syncdb();
+// Precisa terminar antes de o servidor aceitar requisições: a primeira coisa
+// que o navegador pede é /isFirstStartUp, que lê a tabela criada aqui.
+await syncdb();
 
 passport.use(
   new LocalStrategy(async (username, password, done) => {
@@ -114,10 +117,16 @@ app.use(
 );
 app.use(express.static(WEB_PATH));
 
+// O modelo Session só existe depois desta linha. Como o sequelize.sync() já
+// rodou, a tabela dele precisa ser criada à parte, com o sessionStore.sync()
+// logo abaixo — sem isso nenhuma requisição autenticada funciona.
+const sessionStore = new SequelizeStore({ db: sequelize });
+await sessionStore.sync();
+
 app.use(
   session({
     secret: expressSecret,
-    store: new SequelizeStore({ db: sequelize }),
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -144,8 +153,16 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/search", searchRoutes);
 
 app.get("/isFirstStartUp", async (req, res) => {
-  const server = await Server.findAll();
-  res.status(200).json(server[0].isFirstStartUp);
+  try {
+    const [server] = await Server.findOrCreate({
+      where: { name: "VIDYA" },
+      defaults: { name: "VIDYA" },
+    });
+    res.status(200).json(server.isFirstStartUp);
+  } catch (error) {
+    console.error("Error reading server state:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 app.get("*", (req, res) => {
   res.sendFile(path.join(WEB_PATH, "index.html"));

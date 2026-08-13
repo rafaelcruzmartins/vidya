@@ -5,6 +5,20 @@ const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: DB_PATH,
 
+  // SQLite aceita um único escritor por vez. Com o pool padrão o Sequelize
+  // abre várias conexões para o mesmo arquivo e elas disputam a escrita entre
+  // si — é o que produz SQLITE_BUSY quando a varredura grava aulas enquanto o
+  // player registra progresso. Uma conexão só serializa essas gravações.
+  //
+  // O idle alto mantém essa conexão viva: busy_timeout e synchronous valem por
+  // conexão e se perderiam se o pool a reciclasse.
+  pool: {
+    max: 1,
+    min: 1,
+    idle: 3600000,
+    acquire: 60000,
+  },
+
   retry: {
     match: [/SQLITE_BUSY/],
     max: 5,
@@ -12,4 +26,16 @@ const sequelize = new Sequelize({
   },
   logging: false,
 });
+
+// Precisa rodar antes de qualquer escrita. O hook afterConnect do Sequelize
+// não é chamado no dialeto SQLite, então os PRAGMAs vão por consulta direta.
+export const applySqlitePragmas = async () => {
+  // Gravado no próprio arquivo do banco, vale para todas as conexões futuras:
+  // permite ler enquanto uma escrita acontece, em vez de travar o arquivo.
+  await sequelize.query("PRAGMA journal_mode = WAL;");
+  // Faz a conexão esperar a trava sair. Sem isso o SQLite desiste na hora.
+  await sequelize.query("PRAGMA busy_timeout = 10000;");
+  await sequelize.query("PRAGMA synchronous = NORMAL;");
+};
+
 export default sequelize;
