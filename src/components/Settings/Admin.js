@@ -592,7 +592,7 @@ const Admin = () => {
                     className="modal-buttons"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
-                    style={{ color: "#0a2463" }}
+                    style={{ color: "var(--text)" }}
                     onClick={cancelAction}
                   >
                     No

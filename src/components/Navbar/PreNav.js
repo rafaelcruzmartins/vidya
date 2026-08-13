@@ -15,6 +15,7 @@ import {
   User,
 } from "../../assets";
 import { useAuth } from "../../context/AuthContext";
+import ThemeToggle from "../ThemeToggle/ThemeToggle";
 
 const PreNav = ({ name, progress }) => {
   const location = useLocation();
@@ -90,6 +91,7 @@ const PreNav = ({ name, progress }) => {
           <Search />
         </div>
         <div className="profile">
+          <ThemeToggle />
           <div className="svg-div">
             {progress ? (
               progress
@@ -135,7 +137,7 @@ const PreNav = ({ name, progress }) => {
             className="lecture-categories"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            style={{ color: "#0a2463" }}
+            style={{ color: "var(--text)" }}
             onClick={handleCourses}
           >
             <div className="svg-div">
@@ -147,7 +149,7 @@ const PreNav = ({ name, progress }) => {
             className="lecture-categories"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            style={{ color: "#0a2463" }}
+            style={{ color: "var(--text)" }}
             onClick={handleCategories}
           >
             <div className="svg-div">
@@ -159,7 +161,7 @@ const PreNav = ({ name, progress }) => {
             className="lecture-instructor"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            style={{ color: "#0a2463" }}
+            style={{ color: "var(--text)" }}
             onClick={handleInstructor}
           >
             <div className="svg-div">
@@ -174,7 +176,7 @@ const PreNav = ({ name, progress }) => {
             className="dashboard-nav"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            style={{ color: "#0a2463" }}
+            style={{ color: "var(--text)" }}
             onClick={handleDashboard}
           >
             <div className="svg-div">
@@ -186,7 +188,7 @@ const PreNav = ({ name, progress }) => {
             className="settings"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            style={{ color: "#0a2463" }}
+            style={{ color: "var(--text)" }}
             onClick={handleSettings}
           >
             <div className="svg-div">
@@ -198,7 +200,7 @@ const PreNav = ({ name, progress }) => {
             className="log-out"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
-            style={{ color: "#0a2463" }}
+            style={{ color: "var(--text)" }}
             onClick={handleLogOut}
           >
             <div className="svg-div">
