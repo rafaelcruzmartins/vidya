@@ -70,7 +70,9 @@ const SectionHeader = memo(
           <span className="section-duration">
             {secondsToMinutesRounded(duration)}
           </span>
-          <span className="section-lectures-total"> {total} lectures</span>
+          <span className="section-lectures-total">
+            {total} {total === 1 ? "aula" : "aulas"}
+          </span>
         </div>
       </div>
       {hasLectures && (

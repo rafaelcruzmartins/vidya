@@ -76,7 +76,9 @@ const SectionHeader = memo(
           <span className="section-duration">
             {secondsToMinutesRounded(duration)}
           </span>
-          <span className="section-lectures-total"> {total} lectures</span>
+          <span className="section-lectures-total">
+            {total} {total === 1 ? "aula" : "aulas"}
+          </span>
         </div>
       </div>
       {hasLectures && (
@@ -616,7 +618,8 @@ const IndividualCourses = () => {
     const hours = Math.floor(seconds / 3600);
     const remainingSecondsAfterHours = seconds % 3600;
     const minutes = Math.floor(remainingSecondsAfterHours / 60);
-    return `${hours} hours and ${minutes} minutes`;
+    if (hours > 0) return `${hours}h ${minutes}min`;
+    return `${minutes}min`;
   };
   const handleUpload = async () => {
     const formData = new FormData();
@@ -714,45 +717,69 @@ const IndividualCourses = () => {
               </div>
               <div className="bottom">
                 <div className="bottom-container">
-                  <div className="instructor-section">
-                    Instructors :{" "}
-                    {courseInstructors?.map((instructor, index) => (
+                  <div className="course-meta-row">
+                    <span className="course-meta-item">
+                      {course?.sections?.length || 0} seções
+                    </span>
+                    <span className="course-meta-item">
+                      {course?.sections?.reduce(
+                        (soma, s) => soma + (s.lectures?.length || 0),
+                        0,
+                      ) || 0}{" "}
+                      aulas
+                    </span>
+                    <span className="course-meta-item">
+                      {secondsToHoursRounded(course?.duration)}
+                    </span>
+                    {course?.courseprogresses?.[0]?.progress > 0 && (
+                      <span className="course-meta-item course-meta-progress">
+                        {course.courseprogresses[0].progress}% concluído
+                      </span>
+                    )}
+                  </div>
+
+                  {courseInstructors?.length > 0 && (
+                    <div className="instructor-section">
+                      <span className="drop-cap">Instrutores: </span>
+                      {courseInstructors.map((instructor, index) => (
+                        <span
+                          onClick={() =>
+                            navigate(`/instructor/${instructor.id}`)
+                          }
+                          key={instructor.id}
+                          className="featured-instructor-link"
+                        >
+                          {(index ? ", " : "") + instructor.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+
+                  {course?.category?.category && (
+                    <div className="category-bottom-container">
+                      <span className="drop-cap">Categoria: </span>
                       <span
-                        onClick={() => navigate(`/instructor/${instructor.id}`)}
-                        key={instructor.id}
+                        onClick={() =>
+                          navigate(`/category/${course?.category?.id}`)
+                        }
                         className="featured-instructor-link"
                       >
-                        {(index ? ", " : "") + instructor.name}
+                        {course.category.category}
                       </span>
-                    ))}
-                  </div>
-                  <div className="category-bottom-container">
-                    <span className="drop-cap">Category : </span>
-                    <span
-                      onClick={() =>
-                        navigate(`/category/${course?.category?.id}`)
-                      }
-                      className="featured-instructor-link"
-                    >
-                      {course?.category?.category}
-                    </span>
-                  </div>
-                  <div className="description">
-                    <span className="drop-cap">Description : </span>
-                    {course?.description}
-                  </div>
-                  <div> {secondsToHoursRounded(course?.duration)}</div>
-                  <div>
-                    Progress :{" "}
-                    {course?.courseprogresses?.[0]?.progress
-                      ? `${course?.courseprogresses?.[0]?.progress}%`
-                      : ""}
-                  </div>
+                    </div>
+                  )}
+
+                  {course?.description && (
+                    <div className="description">
+                      <span className="drop-cap">Descrição: </span>
+                      {course.description}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           </div>
-          <div className="content-heading">Course Content</div>
+          <div className="content-heading">Conteúdo do curso</div>
           <div className="course-content">
             <div className="course-section">
               <div className="section-list">
