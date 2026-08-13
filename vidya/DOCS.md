@@ -1,25 +1,26 @@
 # VIDYA Media Server — add-on do Home Assistant
 
-Add-on local que compila o VIDYA a partir deste repositório, já com as
-correções dos materiais complementares e a interface revisada.
+Servidor auto-hospedado para cursos e videoaulas, com as correções dos
+materiais complementares, do arranque e das travas do SQLite, e com a
+interface revisada.
 
-O repositório é privado, então o Home Assistant compila a imagem localmente a
-partir do código que você copia pelo Samba — sem depender de nenhum registro
-externo.
+A imagem é compilada pelo GitHub e publicada em
+`ghcr.io/rafaelcruzmartins/vidya`. O Home Assistant apenas baixa a imagem
+pronta — não compila nada no seu equipamento.
 
 ## Instalação
 
-1. Baixe este repositório como ZIP pelo GitHub (botão **Code → Download ZIP**).
-2. Descompacte. O conteúdo vem dentro de uma pasta chamada `vidya-main`.
-3. Pelo Samba, abra o compartilhamento `addons` e crie a pasta `vidya`.
-4. Copie **todo o conteúdo** de `vidya-main` para dentro de `addons/vidya`.
-   O `config.yaml` precisa ficar na raiz dessa pasta, ao lado do `Dockerfile`.
-5. No Home Assistant: **Configurações → Complementos → Loja de complementos →
-   ⋮ (canto superior direito) → Verificar atualizações**.
-6. O add-on **VIDYA Media Server** aparece em *Complementos locais*. Abra e
-   clique em **Instalar**.
+1. **Configurações → Complementos → Loja de complementos**.
+2. Menu **⋮** no canto superior direito → **Repositórios**.
+3. Cole a URL abaixo e clique em **Adicionar**:
 
-A primeira instalação compila a aplicação e leva alguns minutos.
+   ```
+   https://github.com/rafaelcruzmartins/vidya
+   ```
+
+4. Feche a janela e recarregue a página. O **VIDYA Media Server** aparece
+   numa seção com o nome do repositório.
+5. Abra e clique em **Instalar**.
 
 ## Configuração
 
@@ -59,8 +60,8 @@ O VIDYA lê exatamente três níveis. Subpastas dentro de uma seção são ignor
 ```
 
 Arquivos com o mesmo prefixo numérico formam uma aula. O primeiro vídeo do
-grupo vira a aula; os demais arquivos reconhecidos viram anexos. Se o grupo não
-tiver vídeo, o primeiro documento vira a aula e o restante fica anexado.
+grupo vira a aula; os demais arquivos reconhecidos viram anexos. Se o grupo
+não tiver vídeo, o primeiro documento vira a aula e o restante fica anexado.
 
 Extensões reconhecidas:
 
@@ -71,13 +72,10 @@ Extensões reconhecidas:
 Arquivos `.ts` não são reconhecidos. Converta com
 `ffmpeg -i entrada.ts -c copy saida.mp4`.
 
-## Atualizando o add-on
+## Atualizações
 
-Depois de alterar o código:
-
-1. Baixe o ZIP novo e substitua os arquivos em `addons/vidya`.
-2. Aumente o campo `version` no `config.yaml` (por exemplo, para `"1.0.4"`).
-3. Em **Verificar atualizações**, o Home Assistant oferece a atualização.
+Quando houver versão nova, o Home Assistant mostra o botão **Atualizar**
+sozinho no add-on. Não é preciso copiar arquivo nenhum.
 
 ## Atenção após atualizar
 
