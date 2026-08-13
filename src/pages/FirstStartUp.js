@@ -50,10 +50,10 @@ const Username = ({
     className="username-container"
   >
     <div className="admin-setup">
-      <div className="username-title">Create a Admin Username & Password</div>
+      <div className="username-title">Crie um usuário e senha de administrador</div>
     </div>
     <div className="input-container">
-      <div className="username-label">Username</div>
+      <div className="username-label">Usuário</div>
       <div className="username-input">
         <input
           onChange={(e) => setUsernameInput(e.target.value)}
@@ -61,7 +61,7 @@ const Username = ({
           type="text"
         />
       </div>
-      <div className="password-label">Password</div>
+      <div className="password-label">Senha</div>
       <div className="password-input">
         <input
           onChange={(e) => setPasswordInput(e.target.value)}
@@ -98,7 +98,7 @@ const SelectedFolders = ({ selectedFolders, onAddFolder, onRemoveFolder }) => (
     <div className="add-folder-button-wrap">
       <div onClick={onAddFolder} className="add-folder-button">
         <Plus />
-        Add Folder
+        Adicionar pasta
       </div>
     </div>
   </motion.div>
@@ -116,7 +116,7 @@ const FileBrowser = ({ onSelect }) => {
       setLoading(true);
 
       const response = await axios.get("/api/drive/drives");
-      if (!response.status === 200) throw new Error("Failed to fetch drives");
+      if (!response.status === 200) throw new Error("Não foi possível listar os discos");
       const { data } = response;
       setDrives(data);
       if (!currentPath && data.length > 0) {
@@ -141,7 +141,7 @@ const FileBrowser = ({ onSelect }) => {
       );
 
       if (!response.status === 200)
-        throw new Error("Failed to fetch directory contents");
+        throw new Error("Não foi possível ler a pasta");
 
       const { data } = response;
       setItems(data.items);
@@ -174,7 +174,7 @@ const FileBrowser = ({ onSelect }) => {
   return (
     <div className="drive-container">
       <div className="drive-setup">
-        <div className="drive-title">Choose the Course directory</div>
+        <div className="drive-title">Escolha a pasta dos cursos</div>
       </div>
       <div className="drives">
         {drives.map((drive) => (
@@ -205,7 +205,7 @@ const FileBrowser = ({ onSelect }) => {
       )}
 
       {loading ? (
-        <div className="loading">Loading...</div>
+        <div className="loading">Carregando...</div>
       ) : (
         <div className="folder-list">
           {items.map((item) => (
@@ -232,7 +232,7 @@ const FileBrowser = ({ onSelect }) => {
             onSelect(currentPath);
           }}
         >
-          Select
+          Selecionar
         </div>
       </div>
     </div>
@@ -248,7 +248,7 @@ const FirstStartUp = () => {
   const [direction, setDirection] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastMessage, setToastMessage] = useState("Concluído com sucesso");
   const [toastType, setToastType] = useState("success");
   const tabs = [
     { title: "Welcome" },

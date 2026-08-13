@@ -4600,3 +4600,48 @@ textarea:focus {
   font-size: 0.9375rem;
   font-weight: 400;
 }
+
+/* ---- Movimento ---- */
+
+/* Entrada escalonada da grade: os cartões aparecem em sequência curta, não
+   todos de uma vez nem um a um demoradamente. O atraso é dado por --i. */
+@keyframes surgir {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.home-grid > *,
+.materials-list > * {
+  animation: surgir 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+  animation-delay: calc(var(--i, 0) * 35ms);
+}
+
+/* A barra corre até a marca em vez de já nascer preenchida. */
+.card-progress-fill {
+  transition: width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.section-header .chevron-icon {
+  transition: transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.section-header .chevron-icon.expanded {
+  transform: rotate(90deg);
+}
+
+/* Quem pediu menos movimento no sistema recebe menos movimento. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

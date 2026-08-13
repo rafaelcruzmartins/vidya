@@ -321,7 +321,7 @@ const SkeletonLoader = () => (
     viewBox="0 0 640 360"
     preserveAspectRatio="none"
   >
-    <title id="loading-aria">Loading...</title>
+    <title id="loading-aria">Carregando...</title>
     <rect
       x="0"
       y="0"

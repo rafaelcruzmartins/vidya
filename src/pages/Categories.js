@@ -14,7 +14,7 @@ const Categories = () => {
   const [newCategoryInput, setnewCategoryInput] = useState("");
   const [loading, setLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastMessage, setToastMessage] = useState("Concluído com sucesso");
   const [toastType, setToastType] = useState("success");
   const { user, setCategoryNeedsUpdate, categoryNeedsUpdate } = useAuth();
   const isAdmin = user.role === "admin";
@@ -94,7 +94,7 @@ const Categories = () => {
             <div className="modal-overlay">
               <div className="modal small-modal">
                 <div className="add-user-modal">
-                  <div className="modal-heading">Add new category</div>
+                  <div className="modal-heading">Nova categoria</div>
                   <input
                     type="text"
                     className="input"
@@ -109,7 +109,7 @@ const Categories = () => {
                       style={{ color: "#00a6a6" }}
                       onClick={handleAddCategory}
                     >
-                      Add
+                      Adicionar
                     </motion.div>
                     <motion.div
                       className="modal-buttons"
@@ -118,7 +118,7 @@ const Categories = () => {
                       style={{ color: "#45312d" }}
                       onClick={() => setIsModalOpen(false)}
                     >
-                      Cancel
+                      Cancelar
                     </motion.div>
                   </div>
                 </div>

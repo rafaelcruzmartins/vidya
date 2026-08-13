@@ -141,13 +141,13 @@ const LectureItem = memo(
           },
           { withCredentials: true }
         );
-        setToastMessage("lecture is bookmarked");
+        setToastMessage("Aula adicionada aos marcadores");
         setToastType("success");
         setShowToast(true);
       } catch (error) {
         console.error(error);
         if (error.status === 409) {
-          setToastMessage("lecture is already bookmarked");
+          setToastMessage("Esta aula já está nos marcadores");
           setToastType("warning");
           setShowToast(true);
         }
@@ -169,13 +169,13 @@ const LectureItem = memo(
           },
           { withCredentials: true }
         );
-        setToastMessage("lecture is tagged");
+        setToastMessage("Aula etiquetada");
         setToastType("success");
         setShowToast(true);
       } catch (error) {
         console.error(error);
         if (error.status === 409) {
-          setToastMessage("lecture is already tagged");
+          setToastMessage("Esta aula já está etiquetada");
           setToastType("warning");
           setShowToast(true);
         }
@@ -227,10 +227,10 @@ const LectureItem = memo(
             {isMenuOpen && (
               <div className="lecture-menu-modal">
                 <div className="menu-option" onClick={handleAddTag}>
-                  Add as a tag
+                  Etiquetar aula
                 </div>
                 <div className="menu-option" onClick={handleAddBookmark}>
-                  Add to bookmarks
+                  Adicionar aos marcadores
                 </div>
               </div>
             )}
@@ -242,21 +242,21 @@ const LectureItem = memo(
                   data-tag="difficult"
                   onClick={(e) => handleTagSelection("difficult", e)}
                 >
-                  Difficult
+                  Difícil
                 </div>
                 <div
                   className="tag-option"
                   data-tag="need-review"
                   onClick={(e) => handleTagSelection("need-review", e)}
                 >
-                  Need Review
+                  Revisar
                 </div>
                 <div
                   className="tag-option"
                   data-tag="important"
                   onClick={(e) => handleTagSelection("important", e)}
                 >
-                  Important
+                  Importante
                 </div>
               </div>
             )}
@@ -608,9 +608,10 @@ const Player = () => {
         progress={(completedLectures.size / totalLectures).toFixed(2) + "%"}
       />
       <motion.div
-        initial={{ opacity: 0, x: -200 }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: 200 }}
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -6 }}
+        transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
         className="player-container"
       >
         <div className="player-main">

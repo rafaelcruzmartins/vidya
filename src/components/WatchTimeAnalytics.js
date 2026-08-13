@@ -39,7 +39,7 @@ const WatchTimeAnalytics = ({ weeklyWatchTime, categoryWatchTime }) => {
   return (
     <div className="watch-time-analytics">
       <div className="watch-time-analytics-graph">
-        <div className="watch-time-title">Watch Time Analytics</div>
+        <div className="watch-time-title">Tempo assistido</div>
         <div className="watch-time-details">
           Your learning activity this week
         </div>

@@ -69,11 +69,11 @@ const Dashboard = () => {
         );
         setDashboardData(data);
         setToastType("success");
-        setToastMessage("Item has been successfully deleted");
+        setToastMessage("Item excluído com sucesso");
         setShowToast(true);
       } catch (error) {
         const errorMessage =
-          error.response?.data?.message || "Failed to delete item";
+          error.response?.data?.message || "Não foi possível excluir o item";
         setToastType("error");
         setToastMessage(errorMessage);
         setShowToast(true);
@@ -220,11 +220,11 @@ const Dashboard = () => {
       );
       setDashboardData(data);
       setToastType("success");
-      setToastMessage("Item has been successfully deleted");
+      setToastMessage("Item excluído com sucesso");
       setShowToast(true);
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to delete item";
+        error.response?.data?.message || "Não foi possível excluir o item";
       setToastType("error");
       setToastMessage(errorMessage);
       setShowToast(true);
@@ -249,14 +249,15 @@ const Dashboard = () => {
           />
         )}
         <motion.div
-          initial={{ opacity: 0, x: -200 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 200 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
           className="inner-container"
         >
           <div className="welcome-streak">
             <div className="welcome">
-              <div className="welcome-heading">Welcome Back</div>
+              <div className="welcome-heading">Bem-vindo de volta</div>
               <div className="student-name">{user.username}</div>
             </div>
             <div className="streak">
@@ -275,7 +276,7 @@ const Dashboard = () => {
           </div>
           <div className="current-progress-quick-stats">
             <div className="current-progress">
-              <div className="current-progress-name">Current Progress</div>
+              <div className="current-progress-name">Progresso atual</div>
 
               {dashboardData &&
                 dashboardData.recentCoursesProgress.map((item) => (
@@ -306,11 +307,11 @@ const Dashboard = () => {
                 ))}
             </div>
             <div className="quick-stats">
-              <div className="quick-stats-name">Quick Stats</div>
+              <div className="quick-stats-name">Resumo</div>
               <div className="quick-stats-data-wrap">
                 <div className="quick-stats-data">
                   <BookContent />
-                  Completed Courses
+                  Cursos concluídos
                 </div>
                 {dashboardData?.courseCompletionStats.completedCourses}/
                 {dashboardData?.courseCompletionStats.totalCourses}
@@ -318,14 +319,14 @@ const Dashboard = () => {
               <div className="quick-stats-data-wrap">
                 <div className="quick-stats-data">
                   <Play />
-                  Currently Watching
+                  Assistindo agora
                 </div>
                 {dashboardData?.courseCompletionStats.currentlyWatching} Courses
               </div>
               <div className="quick-stats-data-wrap">
                 <div className="quick-stats-data">
                   <Bookmark />
-                  Bookmark
+                  Marcadores
                 </div>
                 {dashboardData?.tagsAndBookmarks.bookmark.length} Lectures
               </div>
@@ -340,7 +341,7 @@ const Dashboard = () => {
 
           <div className="bookmark-tags">
             <div className="bookmark">
-              <div className="bookmark-name">Bookmark</div>
+              <div className="bookmark-name">Marcadores</div>
               <div className="bookmark-tags-wrap">
                 {dashboardData &&
                 dashboardData?.tagsAndBookmarks.bookmark.length === 0 ? (
@@ -381,7 +382,7 @@ const Dashboard = () => {
             </div>
             <div className="tags">
               <div className="tag-tab-group">
-                <div className="tag-name">Tags</div>
+                <div className="tag-name">Etiquetas</div>
                 <div className="tag-tab">
                   <div
                     style={{ cursor: "pointer" }}

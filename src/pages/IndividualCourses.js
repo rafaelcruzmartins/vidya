@@ -147,13 +147,13 @@ const LectureItem = memo(
           },
           { withCredentials: true }
         );
-        setToastMessage("lecture is bookmarked");
+        setToastMessage("Aula adicionada aos marcadores");
         setToastType("success");
         setShowToast(true);
       } catch (error) {
         console.error(error);
         if (error.status === 409) {
-          setToastMessage("lecture is already bookmarked");
+          setToastMessage("Esta aula já está nos marcadores");
           setToastType("warning");
           setShowToast(true);
         }
@@ -175,13 +175,13 @@ const LectureItem = memo(
           },
           { withCredentials: true }
         );
-        setToastMessage("lecture is tagged");
+        setToastMessage("Aula etiquetada");
         setToastType("success");
         setShowToast(true);
       } catch (error) {
         console.error(error);
         if (error.status === 409) {
-          setToastMessage("lecture is already tagged");
+          setToastMessage("Esta aula já está etiquetada");
           setToastType("warning");
           setShowToast(true);
         }
@@ -218,7 +218,7 @@ const LectureItem = memo(
                       toggleDropdown();
                     }}
                   >
-                    <span>Content</span>
+                    <span>Materiais</span>
                     <svg
                       className="content-arrow"
                       fill="none"
@@ -283,10 +283,10 @@ const LectureItem = memo(
             {isMenuOpen && (
               <div className="lecture-menu-modal">
                 <div className="menu-option" onClick={handleAddTag}>
-                  Add as a tag
+                  Etiquetar aula
                 </div>
                 <div className="menu-option" onClick={handleAddBookmark}>
-                  Add to bookmarks
+                  Adicionar aos marcadores
                 </div>
               </div>
             )}
@@ -298,21 +298,21 @@ const LectureItem = memo(
                   data-tag="difficult"
                   onClick={(e) => handleTagSelection("difficult", e)}
                 >
-                  Difficult
+                  Difícil
                 </div>
                 <div
                   className="tag-option"
                   data-tag="need-review"
                   onClick={(e) => handleTagSelection("need-review", e)}
                 >
-                  Need Review
+                  Revisar
                 </div>
                 <div
                   className="tag-option"
                   data-tag="important"
                   onClick={(e) => handleTagSelection("important", e)}
                 >
-                  Important
+                  Importante
                 </div>
               </div>
             )}
@@ -679,9 +679,10 @@ const IndividualCourses = () => {
       {loading && <Loader />}
       {!loading && (
         <motion.div
-          initial={{ opacity: 0, x: -200 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 200 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
         >
           <div className="course-instructor-info">
             <div className="course-instructor-info-container">
@@ -846,10 +847,10 @@ const IndividualCourses = () => {
             >
               <div className="edit-course-modal">
                 <div className="edit-course-modal-inner">
-                  <div className="modal-heading">Edit Course</div>
+                  <div className="modal-heading">Editar curso</div>
                   <div className="edit-course-form">
                     <div className="course-title-edit">
-                      <div>Edit Title</div>
+                      <div>Editar título</div>
                       <div className="modal-input-course-edit">
                         <input
                           onChange={(e) => setCourseTitle(e.target.value)}
@@ -860,7 +861,7 @@ const IndividualCourses = () => {
                       </div>
                     </div>
                     <div className="course-title-edit">
-                      <div>Edit Image</div>
+                      <div>Editar imagem</div>
                       <div className="modal-input-course-edit">
                         <input
                           className="input"
@@ -926,7 +927,7 @@ const IndividualCourses = () => {
                       </div>
                     </div>
                     <div className="course-title-edit">
-                      <div>Edit Description</div>
+                      <div>Editar descrição</div>
                       <div className="modal-input-description-edit">
                         <textarea
                           onChange={(e) => setCourseDescription(e.target.value)}
@@ -992,7 +993,7 @@ const IndividualCourses = () => {
                   onChange={(e) => setnewCategoryInput(e.target.value)}
                   value={newCategoryInput}
                   onKeyDown={handleKeyDown}
-                  placeholder="create new category"
+                  placeholder="nova categoria"
                 />
                 <div
                   className="svg-div "
@@ -1049,7 +1050,7 @@ const IndividualCourses = () => {
                   onChange={(e) => setnewInstructorInput(e.target.value)}
                   value={newInstructorInput}
                   onKeyDown={handleKeyDownInstructor}
-                  placeholder="create new instructor"
+                  placeholder="novo instrutor"
                 />
                 <div
                   className="svg-div"

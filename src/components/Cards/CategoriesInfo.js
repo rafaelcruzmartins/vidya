@@ -63,12 +63,12 @@ const CategoriesInfo = ({
         categoryId: categoryId,
       };
       setToastType("warning");
-      setToastMessage("Updating category");
+      setToastMessage("Atualizando categoria");
       setShowToast(true);
       const category = await updateCategoryBackend(newCategory);
 
       setToastType("success");
-      setToastMessage("Category updated");
+      setToastMessage("Categoria atualizada");
       setShowToast(true);
       setIsModalOpen(false);
       setCategoryNeedsUpdate(categoryNeedsUpdate + 1);
@@ -84,20 +84,20 @@ const CategoriesInfo = ({
     setShowToast(false);
     try {
       setToastType("warning");
-      setToastMessage("Deleting category");
+      setToastMessage("Excluindo categoria");
       setShowToast(true);
 
       const category = await deleteCategoryBackend(categoryId);
 
       setToastType("success");
-      setToastMessage("Category deleted successfully");
+      setToastMessage("Categoria excluída com sucesso");
       setShowToast(true);
       setIsDeleteModalOpen(false);
       setCategoryNeedsUpdate(categoryNeedsUpdate + 1);
       setCategoriesList(category.data);
     } catch (error) {
       setToastType("error");
-      setToastMessage("Failed to delete category");
+      setToastMessage("Não foi possível excluir a categoria");
       setShowToast(true);
     }
   };
@@ -122,7 +122,7 @@ const CategoriesInfo = ({
         <div className="modal-overlay">
           <div className="modal small-medium-modal">
             <div className="add-user-modal">
-              <div className="modal-heading">Update Category</div>
+              <div className="modal-heading">Atualizar categoria</div>
               <input
                 type="text"
                 className="input"
@@ -172,7 +172,7 @@ const CategoriesInfo = ({
         <div className="modal-overlay">
           <div className="modal small-medium-modal">
             <div className="add-user-modal">
-              <div className="modal-heading">Delete Confirmation</div>
+              <div className="modal-heading">Confirmar exclusão</div>
               <p>Are you sure you want to delete "{name}"?</p>
               <div className="modal-buttons-group-user">
                 <div

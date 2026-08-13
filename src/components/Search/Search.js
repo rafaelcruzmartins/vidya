@@ -119,7 +119,7 @@ const Search = () => {
     <>
       <div className="search-placeholder" onClick={() => setShowSearch(true)}>
         <div style={{ marginLeft: "1rem", opacity: ".7" }}>
-          Search courses, lectures, & more...
+          Buscar cursos, aulas e mais...
         </div>
         <svg
           className="search-icon"
@@ -149,7 +149,7 @@ const Search = () => {
                   className="search-input"
                   value={searchTerm}
                   onChange={handleSearch}
-                  placeholder="Search courses, lectures, & more..."
+                  placeholder="Buscar cursos, aulas e mais..."
                   autoFocus
                 />
                 <svg
@@ -180,7 +180,7 @@ const Search = () => {
                     {searchResults.courses &&
                       searchResults.courses.length > 0 && (
                         <div className="result-section">
-                          <div className="result-heading">Courses</div>
+                          <div className="result-heading">Cursos</div>
                           {searchResults.courses.map((course) => (
                             <div
                               key={course.id}
@@ -199,7 +199,7 @@ const Search = () => {
                     {searchResults.lectures &&
                       searchResults.lectures.length > 0 && (
                         <div className="result-section">
-                          <div className="result-heading">Lectures</div>
+                          <div className="result-heading">Aulas</div>
                           {searchResults.lectures.map((lecture) => (
                             <div
                               key={lecture.id}
@@ -229,7 +229,7 @@ const Search = () => {
                     {searchResults.sections &&
                       searchResults.sections.length > 0 && (
                         <div className="result-section">
-                          <div className="result-heading">Sections</div>
+                          <div className="result-heading">Seções</div>
                           {searchResults.sections.map((section) => (
                             <div
                               key={section.id}
@@ -260,7 +260,7 @@ const Search = () => {
                     {searchResults.instructors &&
                       searchResults.instructors.length > 0 && (
                         <div className="result-section">
-                          <div className="result-heading">Instructors</div>
+                          <div className="result-heading">Instrutores</div>
                           {searchResults.instructors.map((instructor) => (
                             <div
                               key={instructor.id}
@@ -284,7 +284,7 @@ const Search = () => {
                     {searchResults.categories &&
                       searchResults.categories.length > 0 && (
                         <div className="result-section">
-                          <div className="result-heading">Categories</div>
+                          <div className="result-heading">Categorias</div>
                           {searchResults.categories.map((category) => (
                             <div
                               key={category.id}

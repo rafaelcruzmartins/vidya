@@ -82,19 +82,19 @@ const InstructorInfo = ({
         };
 
         setToastType("warning");
-        setToastMessage("Updating instructor");
+        setToastMessage("Atualizando instrutor");
         setShowToast(true);
 
         const instructor = await updateInstructorBackend(updatedInstructor);
 
         setToastType("success");
-        setToastMessage("Instructor updated successfully");
+        setToastMessage("Instrutor atualizado com sucesso");
         setShowToast(true);
         setIsModalOpen(false);
         setInstructors(instructor.data);
       } catch (error) {
         setToastType("error");
-        setToastMessage("Failed to update instructor");
+        setToastMessage("Não foi possível atualizar o instrutor");
         setShowToast(true);
       }
     } else {
@@ -108,19 +108,19 @@ const InstructorInfo = ({
     setShowToast(false);
     try {
       setToastType("warning");
-      setToastMessage("Deleting instructor");
+      setToastMessage("Excluindo instrutor");
       setShowToast(true);
 
       const instructor = await deleteInstructorBackend(data.id);
 
       setToastType("success");
-      setToastMessage("Instructor deleted successfully");
+      setToastMessage("Instrutor excluído com sucesso");
       setShowToast(true);
       setIsDeleteModalOpen(false);
       setInstructors(instructor.data);
     } catch (error) {
       setToastType("error");
-      setToastMessage("Failed to delete instructor");
+      setToastMessage("Não foi possível excluir o instrutor");
       setShowToast(true);
     }
   };
@@ -166,7 +166,7 @@ const InstructorInfo = ({
         <div className="modal-overlay">
           <div className="modal small-medium-modal">
             <div className="add-user-modal">
-              <div className="modal-heading">Update Instructor</div>
+              <div className="modal-heading">Atualizar instrutor</div>
               <input
                 type="text"
                 className="input"
@@ -216,7 +216,7 @@ const InstructorInfo = ({
         <div className="modal-overlay">
           <div className="modal small-medium-modal">
             <div className="add-user-modal">
-              <div className="modal-heading">Delete Confirmation</div>
+              <div className="modal-heading">Confirmar exclusão</div>
               <p className="confirmation-dialog-small">
                 Are you sure you want to delete "{data.name}"?
               </p>

@@ -32,10 +32,10 @@ const LogIn = () => {
       <div className="login-container">
         <div className="login-inner">
           <div className="admin-setup">
-            <div className="username-title">Log In</div>
+            <div className="username-title">Entrar</div>
           </div>
           <div className="input-container">
-            <div className="username-label">Username</div>
+            <div className="username-label">Usuário</div>
             <div className="username-input">
               <input
                 onChange={(e) => setUsernameInput(e.target.value)}
@@ -43,7 +43,7 @@ const LogIn = () => {
                 type="text"
               />
             </div>
-            <div className="password-label">Password</div>
+            <div className="password-label">Senha</div>
             <div className="password-input">
               <input
                 onChange={(e) => setPasswordInput(e.target.value)}
@@ -91,7 +91,7 @@ const LogIn = () => {
                     transition={{ duration: 0.3 }}
                     style={{ display: "flex", alignItems: "center" }}
                   >
-                    Log In
+                    Entrar
                   </motion.span>
                 )}
               </AnimatePresence>

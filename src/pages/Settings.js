@@ -72,7 +72,7 @@ const ProfileSettings = ({ user }) => {
   const [newPass, setNewPass] = useState("");
   const [confirmNewPass, setConfirmNewPass] = useState("");
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastMessage, setToastMessage] = useState("Concluído com sucesso");
   const [toastType, setToastType] = useState("success");
 
   const handlePassChange = async () => {
@@ -103,13 +103,13 @@ const ProfileSettings = ({ user }) => {
         );
 
         setToastType("success");
-        setToastMessage("Password changed successfully");
+        setToastMessage("Senha alterada com sucesso");
         setShowToast(true);
         setNewPass("");
         setConfirmNewPass("");
       } catch (error) {
         const errorMessage =
-          error.response?.data?.message || "Failed to change password";
+          error.response?.data?.message || "Não foi possível alterar a senha";
         setToastType("error");
         setToastMessage(errorMessage);
         setShowToast(true);
@@ -117,7 +117,7 @@ const ProfileSettings = ({ user }) => {
       }
     } else {
       setToastType("error");
-      setToastMessage("Please fill in both password fields");
+      setToastMessage("Preencha os dois campos de senha");
       setShowToast(true);
     }
   };
@@ -132,17 +132,17 @@ const ProfileSettings = ({ user }) => {
         />
       )}
       <div className="settings-content">
-        <div className="settings-title">Profile Settings</div>
+        <div className="settings-title">Perfil</div>
         <div className="img-container">{user?.username}</div>
         <div className="password-form">
-          <label>New Password</label>
+          <label>Nova senha</label>
           <input
             type="password"
             className="password"
             value={newPass}
             onChange={(e) => setNewPass(e.target.value)}
           />
-          <label>Confirm New Password</label>
+          <label>Confirmar nova senha</label>
           <input
             type="password"
             className="password"
@@ -160,8 +160,8 @@ const ProfileSettings = ({ user }) => {
 
 const DisplaySettings = () => (
   <div className="settings-content">
-    <div className="settings-title">Display Settings</div>
-    <div className="theme-label">Theme</div>
+    <div className="settings-title">Aparência</div>
+    <div className="theme-label">Tema</div>
     <select name="languages" id="lang">
       <option value="glassmorphism">Glassmorphism</option>
     </select>

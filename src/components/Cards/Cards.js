@@ -10,6 +10,7 @@ const formatDuration = (seconds) => {
 };
 
 const Cards = ({
+  index = 0,
   info,
   courseId,
   sectionCount = 0,
@@ -42,7 +43,11 @@ const Cards = ({
   const pct = Math.min(100, Math.max(0, Math.round(progress)));
 
   return (
-    <div className="cards" onClick={handleCourse}>
+    <div
+      className="cards"
+      onClick={handleCourse}
+      style={{ "--i": index }}
+    >
       <div className="card-head">
         <div className="card-info-course-title">{info}</div>
         <button className="card-play" onClick={handlePlayer} title="Assistir">

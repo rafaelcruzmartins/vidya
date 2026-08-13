@@ -32,7 +32,7 @@ const Admin = () => {
   const [folderDelete, setFolderDelete] = useState(null);
   const [folderDeleteModal, setFolderDeleteModal] = useState(false);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastMessage, setToastMessage] = useState("Concluído com sucesso");
   const [toastType, setToastType] = useState("success");
 
   useEffect(() => {
@@ -97,11 +97,11 @@ const Admin = () => {
       setToastType("success");
 
       if (inputValue && inputValuePass) {
-        setToastMessage("Username and password updated successfully");
+        setToastMessage("Usuário e senha atualizados com sucesso");
       } else if (inputValue) {
-        setToastMessage("Username updated successfully");
+        setToastMessage("Usuário atualizado com sucesso");
       } else {
-        setToastMessage("Password updated successfully");
+        setToastMessage("Senha atualizada com sucesso");
       }
       const { data } = await axios.get("/api/admin/admin", {
         withCredentials: true,
@@ -114,7 +114,7 @@ const Admin = () => {
       closeModal();
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to update user";
+        error.response?.data?.message || "Não foi possível atualizar o usuário";
       setToastType("error");
       setToastMessage(errorMessage);
       setShowToast(true);
@@ -157,7 +157,7 @@ const Admin = () => {
       );
 
       setToastType("success");
-      setToastMessage("User has been successfully promoted to admin");
+      setToastMessage("Usuário promovido a administrador");
       setShowToast(true);
       const { data } = await axios.get("/api/admin/admin", {
         withCredentials: true,
@@ -167,7 +167,7 @@ const Admin = () => {
       closeModal();
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to promote user to admin";
+        error.response?.data?.message || "Não foi possível promover o usuário";
       setToastType("error");
       setToastMessage(errorMessage);
       setShowToast(true);
@@ -186,7 +186,7 @@ const Admin = () => {
       );
 
       setToastType("success");
-      setToastMessage("User has been successfully removed");
+      setToastMessage("Usuário removido com sucesso");
       setShowToast(true);
       const { data } = await axios.get("/api/admin/admin", {
         withCredentials: true,
@@ -196,7 +196,7 @@ const Admin = () => {
       closeModal();
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to remove user";
+        error.response?.data?.message || "Não foi possível remover o usuário";
       setToastType("error");
       setToastMessage(errorMessage);
       setShowToast(true);
@@ -209,7 +209,7 @@ const Admin = () => {
 
     if (!newUserName.trim()) {
       setToastType("error");
-      setToastMessage("Username is required");
+      setToastMessage("O usuário é obrigatório");
       setShowToast(true);
       return;
     }
@@ -239,7 +239,7 @@ const Admin = () => {
       );
 
       setToastType("success");
-      setToastMessage("User has been successfully added");
+      setToastMessage("Usuário adicionado com sucesso");
       setShowToast(true);
       const { data } = await axios.get("/api/admin/admin", {
         withCredentials: true,
@@ -251,7 +251,7 @@ const Admin = () => {
       closeAddUserModal();
     } catch (error) {
       const errorMessage =
-        error.response?.data?.message || "Failed to add user";
+        error.response?.data?.message || "Não foi possível adicionar o usuário";
       setToastType("error");
       setToastMessage(errorMessage);
       setShowToast(true);
@@ -311,18 +311,18 @@ const Admin = () => {
   const handleScan = async () => {
     try {
       setToastType("warning");
-      setToastMessage("scanning folders");
+      setToastMessage("Varrendo pastas");
       setShowToast(true);
       setIsScanning(true);
       await axios.post("/api/admin/scan", {}, { withCredentials: true });
       setToastType("success");
-      setToastMessage("folders scanned");
+      setToastMessage("Pastas varridas");
       setShowToast(true);
       setIsScanning(false);
     } catch (error) {
       console.error(error);
       setToastType("error");
-      setToastMessage("error scanning");
+      setToastMessage("Erro ao varrer");
       setShowToast(true);
       setIsScanning(false);
     }
@@ -390,7 +390,7 @@ const Admin = () => {
         const response = await axios.get("/api/drive/drives", {
           withCredentials: true,
         });
-        if (!response.status === 200) throw new Error("Failed to fetch drives");
+        if (!response.status === 200) throw new Error("Não foi possível listar os discos");
         const { data } = response;
         setDrives(data);
         if (!currentPath && data.length > 0) {
@@ -415,7 +415,7 @@ const Admin = () => {
           { withCredentials: true }
         );
         if (!response.status === 200)
-          throw new Error("Failed to fetch directory contents");
+          throw new Error("Não foi possível ler a pasta");
         const { data } = response;
         setItems(data.items);
         setCurrentPath(data.currentPath);
@@ -448,7 +448,7 @@ const Admin = () => {
     return (
       <div className="drive-container-admin">
         <div className="drive-setup">
-          <div className="drive-title">Choose the Course directory</div>
+          <div className="drive-title">Escolha a pasta dos cursos</div>
         </div>
         <div className="drives">
           {drives.map((drive) => (
@@ -478,7 +478,7 @@ const Admin = () => {
           </div>
         )}
         {loading ? (
-          <div className="loading">Loading...</div>
+          <div className="loading">Carregando...</div>
         ) : (
           <div className="folder-list">
             {items.map((item) => (
@@ -508,9 +508,9 @@ const Admin = () => {
               onSelect(currentPath);
             }}
           >
-            Select
+            Selecionar
           </div>
-          <div onClick={() => setIsChoosingFolder(false)}>Close</div>
+          <div onClick={() => setIsChoosingFolder(false)}>Fechar</div>
         </div>
       </div>
     );
@@ -522,14 +522,14 @@ const Admin = () => {
         return (
           <div className="modal-profile">
             <div className="modal-heading">{selectedUser.name}</div>
-            <label htmlFor="">Username</label>
+            <label htmlFor="">Usuário</label>
             <input
               type="text"
               className="input"
               onChange={(e) => setInputValue(e.target.value)}
               value={inputValue}
             />
-            <label htmlFor="">Password</label>
+            <label htmlFor="">Senha</label>
             <input
               className="input"
               onChange={(e) => setInputValuePass(e.target.value)}
@@ -617,8 +617,8 @@ const Admin = () => {
           onClose={() => setShowToast(false)}
         />
       )}
-      <div className="settings-title">Admin Settings</div>
-      <div className="folders-title">Folders</div>
+      <div className="settings-title">Administração</div>
+      <div className="folders-title">Pastas</div>
       {adminData &&
         adminData.folders.map((item) => (
           <div className="folder-div" key={item.id}>
@@ -653,13 +653,13 @@ const Admin = () => {
       )}
       <div className="folders-action-group">
         <div style={{ cursor: "pointer" }} onClick={openAddFolderModal}>
-          Add Folder
+          Adicionar pasta
           <div className="svg-div folder-plus">
             <FolderPlusSolid />
           </div>
         </div>
         <div style={{ cursor: "pointer" }} onClick={handleScan}>
-          Scan Folders
+          Varrer pastas
           <div
             className={`svg-div folder-refresh ${isScanning ? "rotating" : ""}`}
           >
@@ -725,7 +725,7 @@ const Admin = () => {
           <div className="modal-overlay">
             <div className="modal medium-modal">
               <div className="add-user-modal">
-                <div className="modal-heading">Add New User</div>
+                <div className="modal-heading">Novo usuário</div>
                 <label htmlFor="">username</label>
                 <input
                   className="input"
@@ -797,7 +797,7 @@ const Admin = () => {
                         className="add-folder-button"
                       >
                         <Plus />
-                        Add Folder
+                        Adicionar pasta
                       </div>
                     </div>
                   </div>
@@ -814,7 +814,7 @@ const Admin = () => {
                       className="save-cancel-folder-buttons"
                       onClick={closeAddFolderModal}
                     >
-                      Cancel
+                      Cancelar
                     </div>
                   </div>
                 </>

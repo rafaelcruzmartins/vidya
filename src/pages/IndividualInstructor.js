@@ -118,9 +118,10 @@ const IndividualInstrucor = () => {
       {loading && <Loader />}
       {!loading && (
         <motion.div
-          initial={{ opacity: 0, x: -200 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 200 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
         >
           <div className="course-instructor-info">
             <div className="course-instructor-info-container">
@@ -160,7 +161,7 @@ const IndividualInstrucor = () => {
             </div>
           </div>
 
-          <div className="courses">Courses</div>
+          <div className="courses">Cursos</div>
 
           <div className="card-divs-wrap">
             {instructorsData?.courses?.map((data) => (
@@ -184,10 +185,10 @@ const IndividualInstrucor = () => {
             >
               <div className="edit-course-modal">
                 <div className="edit-course-modal-inner">
-                  <div className="modal-heading">Edit Instructor</div>
+                  <div className="modal-heading">Editar instrutor</div>
                   <div className="edit-course-form">
                     <div className="course-title-edit">
-                      <div>Edit Title</div>
+                      <div>Editar título</div>
                       <div className="modal-input-course-edit">
                         <input
                           onChange={(e) => setInstructorTitle(e.target.value)}
@@ -198,7 +199,7 @@ const IndividualInstrucor = () => {
                       </div>
                     </div>
                     <div className="course-title-edit">
-                      <div>Edit Image</div>
+                      <div>Editar imagem</div>
                       <div className="modal-input-course-edit">
                         <input
                           className="input"
@@ -209,7 +210,7 @@ const IndividualInstrucor = () => {
                       </div>
                     </div>
                     <div className="course-title-edit">
-                      <div>Edit Description</div>
+                      <div>Editar descrição</div>
                       <div className="modal-input-description-edit">
                         <textarea
                           onChange={(e) =>

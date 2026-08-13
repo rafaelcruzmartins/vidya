@@ -10,7 +10,7 @@ import { useAuth } from "../context/AuthContext";
 const Instructor = () => {
   const [instructors, setInstructors] = useState([]);
   const [showToast, setShowToast] = useState(false);
-  const [toastMessage, setToastMessage] = useState("Completed successfully");
+  const [toastMessage, setToastMessage] = useState("Concluído com sucesso");
   const [toastType, setToastType] = useState("success");
   const [newInstructorInput, setNewInstructorInput] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -91,7 +91,7 @@ const Instructor = () => {
                 onClick={() => setIsModalOpen(true)}
               >
                 <div className="add-instructor">
-                  <div className="instructor-title">Add New Instructor</div>
+                  <div className="instructor-title">Novo instrutor</div>
 
                   <Plus />
                 </div>
@@ -102,7 +102,7 @@ const Instructor = () => {
             <div className="modal-overlay">
               <div className="modal small-modal">
                 <div className="add-user-modal">
-                  <div className="modal-heading">Add new Instructor</div>
+                  <div className="modal-heading">Novo instrutor</div>
                   <input
                     type="text"
                     className="input"
@@ -117,7 +117,7 @@ const Instructor = () => {
                       style={{ color: "#00a6a6" }}
                       onClick={handleAddInstructor}
                     >
-                      Add
+                      Adicionar
                     </motion.div>
                     <motion.div
                       className="modal-buttons"
@@ -126,7 +126,7 @@ const Instructor = () => {
                       style={{ color: "#45312d" }}
                       onClick={() => setIsModalOpen(false)}
                     >
-                      Cancel
+                      Cancelar
                     </motion.div>
                   </div>
                 </div>

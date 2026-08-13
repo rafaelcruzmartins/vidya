@@ -132,7 +132,7 @@ const PreNav = ({ name, progress }) => {
         }}
       >
         <div className="lectures">
-          <div className="lecture-label">Courses</div>
+          <div className="lecture-label">Cursos</div>
           <motion.div
             className="lecture-categories"
             whileHover={{ scale: 1.1 }}
@@ -143,7 +143,7 @@ const PreNav = ({ name, progress }) => {
             <div className="svg-div">
               <ChalkboardSolid />
             </div>
-            All Courses
+            Todos os cursos
           </motion.div>
           <motion.div
             className="lecture-categories"
@@ -155,7 +155,7 @@ const PreNav = ({ name, progress }) => {
             <div className="svg-div">
               <CategoryAlt />
             </div>
-            Categories
+            Categorias
           </motion.div>
           <motion.div
             className="lecture-instructor"
@@ -167,11 +167,11 @@ const PreNav = ({ name, progress }) => {
             <div className="svg-div">
               <GraduationSolid />
             </div>
-            Instructors
+            Instrutores
           </motion.div>
         </div>
         <div className="user">
-          <div className="user-label">User</div>
+          <div className="user-label">Usuário</div>
           <motion.div
             className="dashboard-nav"
             whileHover={{ scale: 1.1 }}
@@ -182,7 +182,7 @@ const PreNav = ({ name, progress }) => {
             <div className="svg-div">
               <DashboardSolid />
             </div>
-            Dashboard
+            Painel
           </motion.div>
           <motion.div
             className="settings"
@@ -194,7 +194,7 @@ const PreNav = ({ name, progress }) => {
             <div className="svg-div">
               <Cog />
             </div>
-            Settings
+            Configurações
           </motion.div>
           <motion.div
             className="log-out"
@@ -206,7 +206,7 @@ const PreNav = ({ name, progress }) => {
             <div className="svg-div">
               <LogOutCircle />
             </div>
-            Log Out
+            Sair
           </motion.div>
         </div>
       </motion.div>

@@ -118,9 +118,10 @@ const Home = ({ category }) => {
       {isLoading && <Loader />}
       {!isLoading && (
         <motion.div
-          initial={{ opacity: 0, x: -200 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: 200 }}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.28, ease: [0.22, 0.61, 0.36, 1] }}
         >
           {homeData?.continueWatching?.length > 0 && (
             <section className="home-hero">
@@ -197,6 +198,7 @@ const Home = ({ category }) => {
               {homeData?.latestCourse?.map((item, index) => (
                 <Cards
                   key={index}
+                  index={index}
                   info={item.cleanedName}
                   courseId={item.id}
                   sectionCount={item.sectionCount}
