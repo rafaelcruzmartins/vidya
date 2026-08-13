@@ -2,7 +2,6 @@ import Stats from "../components/Stats";
 import Navbar from "../components/Navbar/Navbar";
 import PreNav from "../components/Navbar/PreNav";
 import Cards from "../components/Cards/Cards";
-import Tilt from "react-parallax-tilt";
 import Loader from "../components/Loader/Loader.js";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -123,87 +122,64 @@ const Home = ({ category }) => {
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: 200 }}
         >
-          <div className="featured">
-            <p className="pinned-title featured-title">FEATURED</p>
-            <div className="feat-stats">
-              <div className="featured-course">
-                <div className="featured-info">
-                  <div className="featured-info-details">
-                    <div className="info-title" onClick={handleCourse}>
-                      {homeData &&
-                        (!(homeData?.featuredCourse === null)
-                          ? homeData.featuredCourse?.cleanedName
-                          : homeData.latestCourse[0]?.cleanedName)}
-                    </div>
-                    <div className="instructor-name">
-                      by{" "}
-                      {homeData &&
-                        (!(homeData?.featuredCourse === null)
-                          ? homeData.featuredCourse?.instructors
-                          : homeData.latestCourse[0]?.instructors
-                        )?.map((item, index) => (
-                          <span
-                            className="featured-instructor-link"
-                            onClick={() => {
-                              handleInstructor(item.id);
-                            }}
-                            key={item.id}
-                          >
-                            {(index ? ", " : "") + item.name}
-                          </span>
-                        ))}
-                    </div>
-                    <div className="play-button" onClick={handlePlayer}>
-                      Play Now
-                    </div>
-                  </div>
-                </div>
+          {homeData?.continueWatching?.length > 0 && (
+            <section className="home-hero">
+              <div className="home-hero-main">
+                <span className="home-hero-eyebrow">CONTINUAR DE ONDE PAROU</span>
+                <h1 className="home-hero-title">
+                  {homeData.continueWatching[0].course?.cleanedName}
+                </h1>
+                <p className="home-hero-lecture">
+                  {homeData.continueWatching[0].lecture?.cleanedName}
+                </p>
+                <button
+                  className="home-hero-button"
+                  onClick={() =>
+                    navigate(
+                      `/course/play/${homeData.continueWatching[0].course.id}`,
+                    )
+                  }
+                >
+                  Retomar
+                </button>
               </div>
-              <Tilt className="stats" perspective={4000}>
-                <Stats watchtimeData={topCategoryStats} />
-                <div className="watch">
-                  <div className="watch-hours">WATCH TIME</div>
-                  <div className="hours">
-                    {formatTime(homeData?.categoryWatchTime?.totalWatchtime)}
-                  </div>
-                </div>
-                <div className="labels">
-                  {topCategoryStats &&
-                    topCategoryStats.map((item, index) => (
-                      <div className="label-names" key={index}>
-                        <div
-                          className="rectangle"
-                          style={{ backgroundColor: statsColor[index] }}
-                        ></div>
-                        {item.category} -{" "}
-                        {(
-                          (item.watchtime /
-                            homeData?.categoryWatchTime?.totalWatchtime) *
-                          100
-                        ).toFixed(1)}{" "}
-                        %
-                      </div>
-                    ))}
-                </div>
-              </Tilt>
-            </div>
-          </div>
 
-          <div className="continue">
-            <div className="title-scroll-buttons">
-              <p className="pinned-title">CONTINUE LEARNING</p>
-              <div className="scroll-button">
-                <button className=" left-scroll" onClick={scrollLeftContinue}>
-                  <ChevronRight />
-                </button>
-                <button className=" right-scroll" onClick={scrollRightContinue}>
-                  <ChevronRight />
-                </button>
+              <div className="home-stats">
+                <div className="home-stat">
+                  <span className="home-stat-value">
+                    {formatTime(homeData?.categoryWatchTime?.totalWatchtime)}
+                  </span>
+                  <span className="home-stat-label">Tempo assistido</span>
+                </div>
+                <div className="home-stat">
+                  <span className="home-stat-value">
+                    {homeData?.stats?.courseCount ?? 0}
+                  </span>
+                  <span className="home-stat-label">Cursos</span>
+                </div>
+                <div className="home-stat">
+                  <span className="home-stat-value">
+                    {homeData?.stats?.lectureCount ?? 0}
+                  </span>
+                  <span className="home-stat-label">Aulas</span>
+                </div>
+                <div className="home-stat">
+                  <span className="home-stat-value">
+                    {homeData?.stats?.streak ?? 0}
+                  </span>
+                  <span className="home-stat-label">
+                    {homeData?.stats?.streak === 1 ? "Dia seguido" : "Dias seguidos"}
+                  </span>
+                </div>
               </div>
-            </div>
-            <div className="card-divs home-card-divs" ref={continueRef}>
-              {homeData &&
-                homeData.continueWatching.map((item, index) => (
+            </section>
+          )}
+
+          {homeData?.continueWatching?.length > 1 && (
+            <section className="home-section">
+              <h2 className="home-section-title">Continuar assistindo</h2>
+              <div className="home-grid">
+                {homeData.continueWatching.slice(1).map((item, index) => (
                   <ContinueWatching
                     key={index}
                     lectureName={item.lecture?.cleanedName}
@@ -211,32 +187,55 @@ const Home = ({ category }) => {
                     courseName={item.course.cleanedName}
                   />
                 ))}
-            </div>
-          </div>
-          <div className="latest-courses">
-            <div className="title-scroll-buttons">
-              <p className="pinned-title">LATEST COURSES</p>
-              <div className="scroll-button">
-                <button className=" left-scroll" onClick={scrollLeft}>
-                  <ChevronRight />
-                </button>
-                <button className=" right-scroll" onClick={scrollRight}>
-                  <ChevronRight />
-                </button>
               </div>
-            </div>
+            </section>
+          )}
 
-            <div className="card-divs home-card-divs" ref={latestRef}>
-              {homeData &&
-                homeData.latestCourse.map((item, index) => (
-                  <Cards
-                    key={index}
-                    info={item.cleanedName}
-                    courseId={item.id}
-                  />
-                ))}
+          <section className="home-section">
+            <h2 className="home-section-title">Seus cursos</h2>
+            <div className="home-grid">
+              {homeData?.latestCourse?.map((item, index) => (
+                <Cards
+                  key={index}
+                  info={item.cleanedName}
+                  courseId={item.id}
+                  sectionCount={item.sectionCount}
+                  lectureCount={item.lectureCount}
+                  duration={item.duration}
+                  progress={item.progress}
+                />
+              ))}
             </div>
-          </div>
+          </section>
+
+          {topCategoryStats && topCategoryStats.length > 0 && (
+            <section className="home-section">
+              <h2 className="home-section-title">Tempo por categoria</h2>
+              <div className="home-panel home-categories">
+                <div className="home-categories-chart">
+                  <Stats watchtimeData={topCategoryStats} />
+                </div>
+                <div className="labels">
+                  {topCategoryStats.map((item, index) => (
+                    <div className="label-names" key={index}>
+                      <div
+                        className="rectangle"
+                        style={{ backgroundColor: statsColor[index] }}
+                      ></div>
+                      {item.category} -{" "}
+                      {(
+                        (item.watchtime /
+                          homeData?.categoryWatchTime?.totalWatchtime) *
+                        100
+                      ).toFixed(1)}{" "}
+                      %
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
         </motion.div>
       )}
     </>

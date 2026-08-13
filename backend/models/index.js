@@ -1,3 +1,4 @@
+import { Op } from "sequelize";
 import User from "./User.js";
 import Server from "./Server.js";
 import Course from "./Course.js";

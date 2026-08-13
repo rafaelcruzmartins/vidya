@@ -5,6 +5,7 @@ import {
   CourseProgress,
   Instructor,
   Lecture,
+  Section,
   TrackingSystem,
 } from "../models/index.js";
 const router = Router();
@@ -42,7 +43,7 @@ const getUserData = async (userId, featuredCourseId) => {
         Course.findAll({
           order: [["createdAt", "DESC"]],
           limit: 10,
-          attributes: ["id", "cleanedName", "photo", "createdAt"],
+          attributes: ["id", "cleanedName", "photo", "createdAt", "duration"],
           include: [
             {
               model: Instructor,
@@ -52,11 +53,63 @@ const getUserData = async (userId, featuredCourseId) => {
         }),
       ]);
 
+    // Sem capa, o cartão precisa de números para ter o que mostrar: quantas
+    // seções e aulas o curso tem, e quanto dele já foi assistido.
+    const courseIds = latestCourse.map((c) => c.id);
+    const [sections, progressos, streak] = await Promise.all([
+      Section.findAll({
+        where: { CourseId: courseIds },
+        attributes: ["id", "CourseId"],
+        include: [{ model: Lecture, as: "lectures", attributes: ["id"] }],
+      }),
+      CourseProgress.findAll({
+        where: { UserId: userId, CourseId: courseIds },
+        attributes: ["CourseId", "progress", "hasCompleted"],
+      }),
+      TrackingSystem.getWatchStreak(userId),
+    ]);
+
+    const resumoPorCurso = new Map();
+    for (const section of sections) {
+      const atual = resumoPorCurso.get(section.CourseId) || {
+        sections: 0,
+        lectures: 0,
+      };
+      atual.sections += 1;
+      atual.lectures += section.lectures?.length || 0;
+      resumoPorCurso.set(section.CourseId, atual);
+    }
+
+    const progressoPorCurso = new Map(
+      progressos.map((p) => [p.CourseId, p.progress || 0]),
+    );
+
+    const latestCourseComResumo = latestCourse.map((course) => {
+      const resumo = resumoPorCurso.get(course.id) || {
+        sections: 0,
+        lectures: 0,
+      };
+      return {
+        ...course.toJSON(),
+        sectionCount: resumo.sections,
+        lectureCount: resumo.lectures,
+        progress: progressoPorCurso.get(course.id) || 0,
+      };
+    });
+
     return {
       continueWatching: lastWatched || [],
       categoryWatchTime: watchTime || {},
       featuredCourse: featuredCourse || null,
-      latestCourse: latestCourse || [],
+      latestCourse: latestCourseComResumo,
+      stats: {
+        courseCount: latestCourse.length,
+        lectureCount: latestCourseComResumo.reduce(
+          (soma, c) => soma + c.lectureCount,
+          0,
+        ),
+        streak: streak || 0,
+      },
     };
   } catch (error) {
     console.error("Error fetching home data:", error);
@@ -68,7 +121,10 @@ router.get("/", isAuthenticated, async (req, res) => {
     const homeData = await getUserData(req.user.id, req.user.featuredCourse);
     res.json(homeData);
   } catch (error) {
+    // Sem esta resposta a requisição fica pendurada até o navegador desistir,
+    // e a tela inicial nunca sai do carregando.
     console.error(error);
+    res.status(500).json({ error: "Failed to fetch home data" });
   }
 });
 
