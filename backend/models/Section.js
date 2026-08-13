@@ -12,6 +12,10 @@ const Section = sequelize.define("Section", {
   cleanedName: DataTypes.STRING,
   order: DataTypes.FLOAT,
   duration: DataTypes.FLOAT,
+  // Identidade do arquivo no sistema de arquivos (dispositivo:inode). Sobrevive
+  // a renomeações, ao contrário do nome, e é o que permite reconhecer o mesmo
+  // curso/seção/aula depois que a pasta muda de nome.
+  sourceId: DataTypes.STRING,
 });
 
 export default Section;

@@ -38,4 +38,29 @@ export const applySqlitePragmas = async () => {
   await sequelize.query("PRAGMA synchronous = NORMAL;");
 };
 
+// sequelize.sync() cria tabelas novas, mas não adiciona colunas às que já
+// existem. Bancos criados antes da identidade por inode precisam ganhar a
+// coluna sem perder nada do que está gravado.
+export const ensureSchemaColumns = async () => {
+  const novasColunas = {
+    Courses: { sourceId: "VARCHAR(255)" },
+    Sections: { sourceId: "VARCHAR(255)" },
+    Lectures: { sourceId: "VARCHAR(255)" },
+  };
+
+  for (const [tabela, colunas] of Object.entries(novasColunas)) {
+    const [info] = await sequelize.query(`PRAGMA table_info(\`${tabela}\`);`);
+    if (!info.length) continue;
+
+    const existentes = new Set(info.map((c) => c.name));
+    for (const [coluna, tipo] of Object.entries(colunas)) {
+      if (existentes.has(coluna)) continue;
+      await sequelize.query(
+        `ALTER TABLE \`${tabela}\` ADD COLUMN \`${coluna}\` ${tipo};`,
+      );
+      console.log(`Migration: added ${tabela}.${coluna}`);
+    }
+  }
+};
+
 export default sequelize;

@@ -118,6 +118,19 @@ const cleanName = (filename) => {
     .trim();
 };
 
+// dispositivo:inode. Renomear um arquivo ou pasta preserva o inode, então
+// este par identifica o mesmo conteúdo mesmo depois que o nome muda. Só é
+// estável dentro do mesmo sistema de arquivos, que é o caso de uma biblioteca
+// num disco só.
+const sourceIdOf = (targetPath) => {
+  try {
+    const stats = fs.statSync(targetPath);
+    return `${stats.dev}:${stats.ino}`;
+  } catch {
+    return null;
+  }
+};
+
 const parseBaseNumber = (filename) => {
   const match = filename.match(/^(\d+)/);
   return match ? parseInt(match[1], 10) : null;
@@ -282,16 +295,47 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
     return null;
   }
 
-  let course = await Course.findOne({ where: { directory } });
+  const courseName = path.basename(directory);
+  const courseSourceId = sourceIdOf(directory);
+
+  // A busca pela identidade vem primeiro: se a pasta foi renomeada, o caminho
+  // antigo não existe mais, mas o inode continua o mesmo.
+  let course = courseSourceId
+    ? await Course.findOne({
+        where: { sourceId: courseSourceId, CourseFolderId: courseFolderId },
+      })
+    : null;
+
+  if (!course) {
+    course = await Course.findOne({ where: { directory } });
+  }
+
   if (!course) {
     course = await Course.create({
-      originalName: path.basename(directory),
-      cleanedName: cleanNameCourse(path.basename(directory)),
+      originalName: courseName,
+      cleanedName: cleanNameCourse(courseName),
       directory,
       duration: 0,
+      sourceId: courseSourceId,
       CourseFolderId: courseFolderId,
     });
     console.log("new course created");
+  } else {
+    const mudancas = {};
+    if (course.directory !== directory) mudancas.directory = directory;
+    if (course.originalName !== courseName) {
+      mudancas.originalName = courseName;
+      mudancas.cleanedName = cleanNameCourse(courseName);
+    }
+    if (courseSourceId && course.sourceId !== courseSourceId) {
+      mudancas.sourceId = courseSourceId;
+    }
+    if (Object.keys(mudancas).length > 0) {
+      await course.update(mudancas);
+      if (mudancas.originalName) {
+        console.log(`Course renamed: ${course.cleanedName}`);
+      }
+    }
   }
 
   const currentSectionDirs = new Set(
@@ -302,10 +346,40 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
     ),
   );
 
+  // Identidade de cada pasta de seção presente no disco agora.
+  const sectionDirBySourceId = new Map();
+  for (const sectionDir of currentSectionDirs) {
+    const sid = sourceIdOf(path.join(directory, sectionDir));
+    if (sid) sectionDirBySourceId.set(sid, sectionDir);
+  }
+
   const existingSections = await Section.findAll({
     where: { CourseId: course.id },
     include: [{ model: Lecture, as: "lectures" }],
   });
+
+  // Uma seção renomeada tem nome novo e inode antigo. Reconciliar antes de
+  // decidir o que apagar evita destruir o registro e o progresso junto.
+  for (const section of existingSections) {
+    const dirPorIdentidade = section.sourceId
+      ? sectionDirBySourceId.get(section.sourceId)
+      : null;
+
+    if (dirPorIdentidade && dirPorIdentidade !== section.originalName) {
+      await section.update({
+        originalName: dirPorIdentidade,
+        cleanedName: cleanName(dirPorIdentidade),
+        order: parseBaseNumber(dirPorIdentidade) || 0,
+      });
+      console.log(`Section renamed: ${section.cleanedName}`);
+    } else if (currentSectionDirs.has(section.originalName)) {
+      // O nome bate mas a identidade não: registro anterior à coluna, ou
+      // inode trocado por restauração de backup ou disco novo. Readota o
+      // inode atual, senão a próxima renomeação passaria despercebida.
+      const sid = sourceIdOf(path.join(directory, section.originalName));
+      if (sid && section.sourceId !== sid) await section.update({ sourceId: sid });
+    }
+  }
 
   for (const section of existingSections) {
     const sectionPath = path.join(directory, section.originalName);
@@ -329,6 +403,38 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         .filter((group) => group.main)
         .map((group) => group.main),
     );
+
+    // Mesmo tratamento das seções: o arquivo renomeado mantém o inode, então
+    // a aula é reconhecida e atualizada em vez de apagada e recriada.
+    const mainFileBySourceId = new Map();
+    for (const mainFile of validLectureFiles) {
+      const sid = sourceIdOf(path.join(sectionPath, mainFile));
+      if (sid) mainFileBySourceId.set(sid, mainFile);
+    }
+
+    for (const lecture of section.lectures) {
+      const nomeAtual = path.basename(lecture.path || "");
+
+      const arquivoPorIdentidade = lecture.sourceId
+        ? mainFileBySourceId.get(lecture.sourceId)
+        : null;
+
+      if (!arquivoPorIdentidade && validLectureFiles.has(nomeAtual)) {
+        // Mesma readoção feita nas seções.
+        const sid = sourceIdOf(path.join(sectionPath, nomeAtual));
+        if (sid && lecture.sourceId !== sid) await lecture.update({ sourceId: sid });
+      }
+
+      if (arquivoPorIdentidade && arquivoPorIdentidade !== nomeAtual) {
+        await lecture.update({
+          originalName: arquivoPorIdentidade,
+          cleanedName: cleanName(arquivoPorIdentidade),
+          order: parseBaseNumber(arquivoPorIdentidade) ?? lecture.order,
+          path: path.join(sectionPath, arquivoPorIdentidade),
+        });
+        console.log(`Lecture renamed: ${lecture.cleanedName}`);
+      }
+    }
 
     for (const lecture of section.lectures) {
       const lectureName = path.basename(lecture.path || "");
@@ -367,6 +473,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         order: parseBaseNumber(sectionDir) || 0,
         CourseId: course.id,
         duration: 0,
+        sourceId: sourceIdOf(sectionPath),
       });
     }
 
@@ -389,12 +496,19 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         : path.extname(mainFile).replace(".", "");
       const filePath = path.join(sectionPath, mainFile);
 
-      let lecture = await Lecture.findOne({
-        where: {
-          SectionId: section.id,
-          originalName: mainFile,
-        },
-      });
+      const lectureSourceId = sourceIdOf(filePath);
+
+      let lecture = lectureSourceId
+        ? await Lecture.findOne({
+            where: { SectionId: section.id, sourceId: lectureSourceId },
+          })
+        : null;
+
+      if (!lecture) {
+        lecture = await Lecture.findOne({
+          where: { SectionId: section.id, originalName: mainFile },
+        });
+      }
 
       const contentPromises = group.contents.map(async (f) => {
         const contentPath = path.join(sectionPath, f);
@@ -573,6 +687,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
           content,
           subtitles,
           lecture,
+          sourceId: lectureSourceId,
         });
       } else {
         if (!lecture) {
@@ -586,6 +701,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
             subtitles: subtitles,
             SectionId: section.id,
             duration: 0,
+            sourceId: lectureSourceId,
           });
         } else {
           lectureUpdates.push({
@@ -620,6 +736,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         content,
         subtitles,
         lecture,
+        sourceId,
       } = videoInfo;
       const duration = durationResults[filePath] || 0;
 
@@ -634,6 +751,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
           subtitles: subtitles,
           SectionId: sectionId,
           duration,
+          sourceId,
         });
       } else {
         lectureUpdates.push({

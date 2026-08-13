@@ -1,5 +1,8 @@
 import express from "express";
-import sequelize, { applySqlitePragmas } from "./config/database.js";
+import sequelize, {
+  applySqlitePragmas,
+  ensureSchemaColumns,
+} from "./config/database.js";
 import crypto from "crypto";
 import cors from "cors";
 import passport from "passport";
@@ -43,6 +46,7 @@ const expressSecret = await secretKey();
 const syncdb = async () => {
   await applySqlitePragmas();
   await sequelize.sync({ logging: false });
+  await ensureSchemaColumns();
   console.log("Database & tables created!");
   await Server.findOrCreate({
     where: { name: "VIDYA" },
