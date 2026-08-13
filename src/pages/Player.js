@@ -28,6 +28,11 @@ import {
 import { useParams, useLocation } from "react-router-dom";
 import FileRenderer from "../components/FileRenderer/FileRenderer.js";
 import Loader from "../components/Loader/Loader.js";
+
+// Formatos que o navegador exibe sozinho. Para eles abrir vale mais que
+// baixar; o resto (zip e afins) continua como download.
+const VIEWABLE = new Set(["pdf", "html", "txt", "md"]);
+
 const ICON_MAP = {
   video: <VideoSolid />,
   pdf: <FilePdfSolid />,
@@ -248,16 +253,30 @@ const LectureItem = memo(
                           <span>
                             <LectureTypeIcon type={item.type} />
                           </span>
-                          <a
-                            href={"/api/course/content/" + item.pathId}
-                            download
-                            target="_blank"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                            }}
-                          >
-                            {item.originalName}
-                          </a>
+                          {VIEWABLE.has(item.type?.toLowerCase()) ? (
+                            <a
+                              href={"/api/course/content/" + item.pathId}
+                              target="_blank"
+                              rel="noreferrer"
+                              title="Abrir em nova aba"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {item.originalName}
+                            </a>
+                          ) : (
+                            <a
+                              href={
+                                "/api/course/content/" +
+                                item.pathId +
+                                "?download=1"
+                              }
+                              download
+                              title="Baixar"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {item.originalName}
+                            </a>
+                          )}
                         </div>
                       ))}
                     </div>

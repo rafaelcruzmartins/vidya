@@ -16,6 +16,24 @@ import {
 import fs, { promises as fsp } from "fs";
 import path from "path";
 const router = Router();
+
+// Formatos que o navegador exibe sozinho. O restante continua como download.
+const INLINE_MIME = {
+  ".pdf": "application/pdf",
+  ".html": "text/html; charset=utf-8",
+  ".txt": "text/plain; charset=utf-8",
+  ".md": "text/plain; charset=utf-8",
+};
+
+// Nomes com acento quebram o filename simples, que só aceita ASCII. O
+// filename* leva a versão UTF-8 e o filename fica como reserva.
+const contentDisposition = (fileName, inline) => {
+  const type = inline ? "inline" : "attachment";
+  const ascii = fileName.replace(/[^\x20-\x7e]/g, "_").replace(/["\\]/g, "_");
+  return `${type}; filename="${ascii}"; filename*=UTF-8''${encodeURIComponent(
+    fileName,
+  )}`;
+};
 const convertSRTToWebVTT = (srtContent) => {
   return [
     "WEBVTT\n",
@@ -289,12 +307,17 @@ router.get(
       const fileSize = stat.size;
       const fileName = path.basename(filePath);
 
+      // Servir tudo como octet-stream/attachment obriga o navegador a baixar,
+      // mesmo um PDF que ele exibiria sozinho. Formatos visualizáveis vão com
+      // o tipo real e disposição inline; ?download=1 força o download.
+      const ext = path.extname(fileName).toLowerCase();
+      const forceDownload = req.query.download === "1";
+      const mimeType = INLINE_MIME[ext];
+      const inline = Boolean(mimeType) && !forceDownload;
+
       res.setHeader("Content-Length", fileSize);
-      res.setHeader("Content-Type", "application/octet-stream");
-      res.setHeader(
-        "Content-Disposition",
-        `attachment; filename="${fileName}"`
-      );
+      res.setHeader("Content-Type", mimeType || "application/octet-stream");
+      res.setHeader("Content-Disposition", contentDisposition(fileName, inline));
 
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
