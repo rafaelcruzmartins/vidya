@@ -11,6 +11,7 @@ import DailyWatch from "./DailyWatch.js";
 import Instructor from "./Instructor.js";
 import PathFile from "./PathFile.js";
 import TagsAndBookmark from "./TagsAndBookmark.js";
+import HiddenCourse from "./HiddenCourse.js";
 import CourseProgress from "./CourseProgress.js";
 import sequelize from "../config/database.js";
 
@@ -19,6 +20,15 @@ Course.belongsTo(CourseFolder, {
   foreignKey: "CourseFolderId",
   as: "coursefolder",
 });
+User.hasMany(HiddenCourse, { foreignKey: "UserId", as: "hiddenCourses" });
+HiddenCourse.belongsTo(User, { foreignKey: "UserId" });
+Course.hasMany(HiddenCourse, {
+  foreignKey: "CourseId",
+  as: "hiddenBy",
+  onDelete: "CASCADE",
+});
+HiddenCourse.belongsTo(Course, { foreignKey: "CourseId" });
+
 Course.hasMany(Section, {
   foreignKey: "CourseId",
   as: "sections",
@@ -297,5 +307,6 @@ export {
   PathFile,
   TagsAndBookmark,
   CourseProgress,
+  HiddenCourse,
   TrackingSystem,
 };

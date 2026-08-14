@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated } from "../middleware/owner.js";
+import { getHiddenCourseIds } from "../utils/hiddenCourses.js";
 import {
   Course,
   CourseProgress,
@@ -11,6 +12,7 @@ import {
 const router = Router();
 const getUserData = async (userId, featuredCourseId) => {
   try {
+    const ocultos = await getHiddenCourseIds(userId);
     const [lastWatched, watchTime, featuredCourse, latestCourse] =
       await Promise.all([
         CourseProgress.findAll({
@@ -55,7 +57,8 @@ const getUserData = async (userId, featuredCourseId) => {
 
     // Sem capa, o cartão precisa de números para ter o que mostrar: quantas
     // seções e aulas o curso tem, e quanto dele já foi assistido.
-    const courseIds = latestCourse.map((c) => c.id);
+    const visiveis = latestCourse.filter((c) => !ocultos.has(c.id));
+    const courseIds = visiveis.map((c) => c.id);
     const [sections, progressos, streak] = await Promise.all([
       Section.findAll({
         where: { CourseId: courseIds },
@@ -84,7 +87,7 @@ const getUserData = async (userId, featuredCourseId) => {
       progressos.map((p) => [p.CourseId, p.progress || 0]),
     );
 
-    const latestCourseComResumo = latestCourse.map((course) => {
+    const latestCourseComResumo = visiveis.map((course) => {
       const resumo = resumoPorCurso.get(course.id) || {
         sections: 0,
         lectures: 0,
@@ -98,12 +101,17 @@ const getUserData = async (userId, featuredCourseId) => {
     });
 
     return {
-      continueWatching: lastWatched || [],
+      continueWatching: (lastWatched || []).filter(
+        (item) => item.course && !ocultos.has(item.course.id),
+      ),
       categoryWatchTime: watchTime || {},
-      featuredCourse: featuredCourse || null,
+      featuredCourse:
+        featuredCourse && !ocultos.has(featuredCourse.id)
+          ? featuredCourse
+          : null,
       latestCourse: latestCourseComResumo,
       stats: {
-        courseCount: latestCourse.length,
+        courseCount: visiveis.length,
         lectureCount: latestCourseComResumo.reduce(
           (soma, c) => soma + c.lectureCount,
           0,

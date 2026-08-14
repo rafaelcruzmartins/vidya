@@ -6,8 +6,9 @@ import {
   Instructor,
   Category,
 } from "../models/index.js";
+import { getHiddenCourseIds } from "../utils/hiddenCourses.js";
 
-export const advancedSearch = async (query, limit = 5) => {
+export const advancedSearch = async (query, limit = 5, ocultos = new Set()) => {
   if (!query || query.trim() === "") {
     return {
       courses: [],
@@ -95,15 +96,19 @@ export const advancedSearch = async (query, limit = 5) => {
         }),
       ]);
 
+    // Um curso oculto não pode reaparecer pela busca, nem pelas seções e aulas
+    // que pertencem a ele.
+    const visivel = (id) => !id || !ocultos.has(id);
+
     return {
-      courses: courses.map((course) => ({
+      courses: courses.filter((c) => visivel(c.id)).map((course) => ({
         id: course.id,
         name: course.cleanedName,
 
         type: "course",
       })),
 
-      sections: sections.map((section) => ({
+      sections: sections.filter((s) => visivel(s.CourseId)).map((section) => ({
         id: section.id,
         name: section.cleanedName,
         courseId: section.CourseId,
@@ -111,7 +116,7 @@ export const advancedSearch = async (query, limit = 5) => {
         type: "section",
       })),
 
-      lectures: lectures.map((lecture) => {
+      lectures: lectures.filter((l) => visivel(l.section?.CourseId)).map((lecture) => {
         const courseId = lecture.section?.CourseId || null;
         const courseName = lecture.section?.course?.cleanedName || null;
 
@@ -146,7 +151,8 @@ export const advancedSearch = async (query, limit = 5) => {
 export const doSearch = async (req, res) => {
   const { query, limit } = req.query;
   try {
-    const results = await advancedSearch(query, limit);
+    const ocultos = await getHiddenCourseIds(req.user?.id);
+    const results = await advancedSearch(query, limit, ocultos);
     res.json(results);
   } catch (error) {
     console.error(error);

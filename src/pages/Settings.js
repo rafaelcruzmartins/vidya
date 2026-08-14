@@ -15,6 +15,7 @@ const Settings = () => {
   const tabs = [
     { id: "profile", label: "Perfil" },
     { id: "display", label: "Aparência" },
+    { id: "courses", label: "Cursos visíveis" },
     ...(user?.role === "admin" ? [{ id: "admin", label: "Administração" }] : []),
   ];
 
@@ -60,6 +61,7 @@ const Settings = () => {
           <div style={{ height: "100%" }} key={activeTab}>
             {activeTab === "profile" && <ProfileSettings user={user} />}
             {activeTab === "display" && <DisplaySettings />}
+            {activeTab === "courses" && <CourseVisibility />}
             {activeTab === "admin" && user?.role === "admin" && <Admin />}
           </div>
         </div>
@@ -168,4 +170,94 @@ const DisplaySettings = () => (
     </p>
   </div>
 );
+// Ocultar é por conta: o catálogo no disco não muda e as outras contas
+// seguem enxergando tudo.
+const CourseVisibility = () => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState(null);
+
+  useEffect(() => {
+    let ativo = true;
+    axios
+      .get("/api/user/course-visibility", { withCredentials: true })
+      .then((r) => ativo && setCourses(r.data))
+      .catch(() => ativo && setErro("Não foi possível carregar os cursos"))
+      .finally(() => ativo && setLoading(false));
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  const alternar = async (course) => {
+    const novo = !course.hidden;
+    // Aplica na hora e desfaz se o servidor recusar: o interruptor não pode
+    // ficar esperando a rede para responder ao clique.
+    setCourses((atual) =>
+      atual.map((c) => (c.id === course.id ? { ...c, hidden: novo } : c)),
+    );
+    try {
+      await axios.put(
+        "/api/user/course-visibility",
+        { courseId: course.id, hidden: novo },
+        { withCredentials: true },
+      );
+    } catch {
+      setCourses((atual) =>
+        atual.map((c) => (c.id === course.id ? { ...c, hidden: !novo } : c)),
+      );
+      setErro("Não foi possível salvar a alteração");
+    }
+  };
+
+  const ocultos = courses.filter((c) => c.hidden).length;
+
+  return (
+    <div className="settings-content">
+      <div className="settings-title">Cursos visíveis</div>
+      <p className="settings-hint">
+        Desmarque os cursos que você não quer ver. A escolha vale só para esta
+        conta — os arquivos continuam no disco e as outras contas seguem
+        enxergando tudo.
+      </p>
+
+      {loading && <p className="settings-hint">Carregando...</p>}
+      {erro && <p className="settings-error">{erro}</p>}
+
+      {!loading && courses.length === 0 && (
+        <p className="settings-hint">Nenhum curso na biblioteca ainda.</p>
+      )}
+
+      {!loading && courses.length > 0 && (
+        <>
+          <p className="settings-hint">
+            {ocultos === 0
+              ? "Todos os cursos estão visíveis."
+              : `${ocultos} ${
+                  ocultos === 1 ? "curso oculto" : "cursos ocultos"
+                } de ${courses.length}.`}
+          </p>
+          <ul className="visibility-list">
+            {courses.map((course) => (
+              <li key={course.id} className="visibility-item">
+                <label className="visibility-label">
+                  <input
+                    type="checkbox"
+                    checked={!course.hidden}
+                    onChange={() => alternar(course)}
+                  />
+                  <span className="visibility-name">{course.cleanedName}</span>
+                </label>
+                {course.hidden && (
+                  <span className="visibility-badge">Oculto</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </div>
+  );
+};
+
 export default Settings;

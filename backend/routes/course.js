@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { isAuthenticated, verifyQueryToken } from "../middleware/owner.js";
+import { getHiddenCourseIds } from "../utils/hiddenCourses.js";
 import {
   Category,
   Course,
@@ -56,7 +57,9 @@ const convertSRTToWebVTT = (srtContent) => {
 
 router.get("/", isAuthenticated, async (req, res) => {
   try {
-    const course = await Course.findAll();
+    const ocultos = await getHiddenCourseIds(req.user?.id);
+    const todos = await Course.findAll();
+    const course = todos.filter((c) => !ocultos.has(c.id));
     res.status(200).json(course);
   } catch (error) {
     console.error(error);
