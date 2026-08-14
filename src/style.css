@@ -1137,7 +1137,8 @@ select option {
   padding: 0.2rem 0.4rem;
 }
 .folder-plus {
-  fill: #00a6a6;
+  fill: currentColor;
+  color: var(--text-muted);
 
   svg {
     width: 1.8rem;
@@ -1158,7 +1159,8 @@ select option {
   margin: 1rem;
 }
 .folder-refresh {
-  fill: rgb(10, 36, 99);
+  fill: currentColor;
+  color: var(--text-muted);
 
   svg {
     width: 1.8rem;
@@ -4791,14 +4793,59 @@ textarea::placeholder {
 /* ---- Agrupamento de seções (cursos com três níveis de pasta) ---- */
 
 .section-group-title {
-  padding: 0.75rem 1rem 0.5rem;
-  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 0.8125rem;
   font-weight: 600;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-muted);
   background: var(--surface);
+  border: none;
   border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  text-align: left;
+}
+
+.section-group-title:hover {
+  color: var(--text);
+  background: var(--surface-muted);
+}
+
+.section-group-chevron {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.section-group-chevron svg {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+  transition: transform 0.2s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.section-group-title.expanded .section-group-chevron svg {
+  transform: rotate(90deg);
+}
+
+.section-group-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.section-group-count {
+  flex-shrink: 0;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.75rem;
 }
 
 .section-group + .section-group .section-group-title {
@@ -4809,4 +4856,37 @@ textarea::placeholder {
 .section-group:has(.section-group-title) .section-header,
 .section-group:has(.section-group-title) .section-item-course {
   padding-left: 0.75rem;
+}
+
+/* ---- Administração ---- */
+
+/* Vários ícones desta tela não declaravam cor e caíam no preto padrão do SVG,
+   sumindo no tema escuro. */
+.settings-content .svg-div svg,
+.folder-plus svg,
+.folder-refresh svg,
+.add-folder-button svg,
+.user-item svg,
+.folder-item svg {
+  fill: currentColor;
+}
+
+.settings-content .svg-div,
+.folder-plus,
+.folder-refresh,
+.add-folder-button {
+  color: var(--text-muted);
+}
+
+.settings-content .svg-div:hover,
+.folder-plus:hover,
+.folder-refresh:hover,
+.add-folder-button:hover {
+  color: var(--text);
+}
+
+.folder-name-div,
+.folder-item,
+.user-item {
+  color: var(--text);
 }

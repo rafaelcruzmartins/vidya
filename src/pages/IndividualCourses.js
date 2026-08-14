@@ -575,6 +575,18 @@ const IndividualCourses = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+  // Os módulos abrem por padrão: esconder tudo de uma vez faria o curso
+  // parecer vazio ao abrir. Fechar é escolha de quem quer só a visão geral.
+  const [collapsedGroups, setCollapsedGroups] = useState(new Set());
+  const toggleGroup = useCallback((nome) => {
+    setCollapsedGroups((prev) => {
+      const novo = new Set(prev);
+      if (novo.has(nome)) novo.delete(nome);
+      else novo.add(nome);
+      return novo;
+    });
+  }, []);
+
   const toggleSection = useCallback((sectionId) => {
     setExpandedSections((prev) => {
       const newSet = new Set(prev);
@@ -788,54 +800,70 @@ const IndividualCourses = () => {
                 {agruparSecoes(course?.sections).map((grupo, gi) => (
                   <div key={grupo.nome ?? `g${gi}`} className="section-group">
                     {grupo.nome && (
-                      <div className="section-group-title">{grupo.nome}</div>
+                      <button
+                        className={`section-group-title ${
+                          collapsedGroups.has(grupo.nome) ? "" : "expanded"
+                        }`}
+                        onClick={() => toggleGroup(grupo.nome)}
+                        aria-expanded={!collapsedGroups.has(grupo.nome)}
+                      >
+                        <span className="section-group-chevron">
+                          <ChevronRight />
+                        </span>
+                        <span className="section-group-name">{grupo.nome}</span>
+                        <span className="section-group-count">
+                          {grupo.sections.length}{" "}
+                          {grupo.sections.length === 1 ? "seção" : "seções"}
+                        </span>
+                      </button>
                     )}
-                    {grupo.sections.map((section) => (
-                      <div key={section.id} className="section-item-course">
-                        <SectionHeader
-                          sectionOrder={section.order}
-                          title={section.cleanedName}
-                          hasLectures={section.lectures.length > 0}
-                          isExpanded={expandedSections.has(section.id)}
-                          duration={section.duration}
-                          onToggle={() => toggleSection(section.id)}
-                          total={section.lectures.length}
-                          sectionRef={sectionRef}
-                          sectionId={section.id}
-                          referalData={referalData}
-                        />
-                        <AnimatePresence>
-                          {expandedSections.has(section.id) &&
-                            section.lectures.length > 0 && (
-                              <motion.div
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="lectures-container"
-                              >
-                                {section.lectures.map((lecture, index) => (
-                                  <LectureItem
-                                    key={lecture.id}
-                                    lectureId={lecture.id}
-                                    lectureOrder={index + 1}
-                                    sectionOrder={section.order}
-                                    title={lecture.cleanedName}
-                                    type={lecture.type}
-                                    duration={lecture.duration}
-                                    content={lecture.content}
-                                    courseId={id}
-                                    setToastMessage={setToastMessage}
-                                    setToastType={setToastType}
-                                    setShowToast={setShowToast}
-                                    onLectureClick={handleLectureClick}
-                                    courseName={course.cleanedName}
-                                  />
-                                ))}
-                              </motion.div>
-                            )}
-                        </AnimatePresence>
-                      </div>
-                    ))}
+                    {!(grupo.nome && collapsedGroups.has(grupo.nome)) &&
+                      grupo.sections.map((section) => (
+                        <div key={section.id} className="section-item-course">
+                          <SectionHeader
+                            sectionOrder={section.order}
+                            title={section.cleanedName}
+                            hasLectures={section.lectures.length > 0}
+                            isExpanded={expandedSections.has(section.id)}
+                            duration={section.duration}
+                            onToggle={() => toggleSection(section.id)}
+                            total={section.lectures.length}
+                            sectionRef={sectionRef}
+                            sectionId={section.id}
+                            referalData={referalData}
+                          />
+                          <AnimatePresence>
+                            {expandedSections.has(section.id) &&
+                              section.lectures.length > 0 && (
+                                <motion.div
+                                  initial={{ opacity: 0, height: 0 }}
+                                  animate={{ opacity: 1, height: "auto" }}
+                                  exit={{ opacity: 0, height: 0 }}
+                                  className="lectures-container"
+                                >
+                                  {section.lectures.map((lecture, index) => (
+                                    <LectureItem
+                                      key={lecture.id}
+                                      lectureId={lecture.id}
+                                      lectureOrder={index + 1}
+                                      sectionOrder={section.order}
+                                      title={lecture.cleanedName}
+                                      type={lecture.type}
+                                      duration={lecture.duration}
+                                      content={lecture.content}
+                                      courseId={id}
+                                      setToastMessage={setToastMessage}
+                                      setToastType={setToastType}
+                                      setShowToast={setShowToast}
+                                      onLectureClick={handleLectureClick}
+                                      courseName={course.cleanedName}
+                                    />
+                                  ))}
+                                </motion.div>
+                              )}
+                          </AnimatePresence>
+                        </div>
+                      ))}
                   </div>
                 ))}
               </div>
