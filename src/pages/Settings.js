@@ -13,9 +13,9 @@ const Settings = () => {
   const path = location.pathname.split("/").pop();
 
   const tabs = [
-    { id: "profile", label: "Profile" },
-    { id: "display", label: "Display" },
-    ...(user?.role === "admin" ? [{ id: "admin", label: "Admin" }] : []),
+    { id: "profile", label: "Perfil" },
+    { id: "display", label: "Aparência" },
+    ...(user?.role === "admin" ? [{ id: "admin", label: "Administração" }] : []),
   ];
 
   const validTab = tabs.find((tab) => tab.id === path);
@@ -41,7 +41,7 @@ const Settings = () => {
 
   return (
     <>
-      <PreNav name="SETTINGS" />
+      <PreNav name="CONFIGURAÇÕES" />
       <div className="settings-container">
         <div className="settings-sidebar">
           {tabs.map((tab) => (
@@ -150,7 +150,7 @@ const ProfileSettings = ({ user }) => {
             onChange={(e) => setConfirmNewPass(e.target.value)}
           />
           <div onClick={handlePassChange} className="change-password-button">
-            Change Password
+            Alterar senha
           </div>
         </div>
       </div>
@@ -162,9 +162,10 @@ const DisplaySettings = () => (
   <div className="settings-content">
     <div className="settings-title">Aparência</div>
     <div className="theme-label">Tema</div>
-    <select name="languages" id="lang">
-      <option value="glassmorphism">Glassmorphism</option>
-    </select>
+    <p className="settings-hint">
+      Use o botão de sol e lua na barra superior para alternar entre claro e
+      escuro. Sem escolha manual, o VIDYA segue o tema do sistema.
+    </p>
   </div>
 );
 export default Settings;

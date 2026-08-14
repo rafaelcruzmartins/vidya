@@ -543,7 +543,7 @@ const Admin = () => {
               style={{ color: "#00a6a6" }}
               onClick={handleUserChangeByAdmin}
             >
-              Save
+              Salvar
             </motion.div>
           </div>
         );
@@ -559,7 +559,7 @@ const Admin = () => {
                 style={{ color: "#00a6a6" }}
                 onClick={() => handleAction("make admin")}
               >
-                Make Admin
+                Tornar administrador
               </motion.div>
               <motion.div
                 className="modal-buttons"
@@ -568,7 +568,7 @@ const Admin = () => {
                 style={{ color: "#e20044" }}
                 onClick={() => handleAction("remove")}
               >
-                Remove User
+                Remover usuário
               </motion.div>
             </div>
             {showConfirmation && (
@@ -645,7 +645,7 @@ const Admin = () => {
                 className="cancel-button"
                 onClick={() => setFolderDeleteModal(false)}
               >
-                Cancel
+                Cancelar
               </div>
             </div>
           </div>
@@ -668,7 +668,7 @@ const Admin = () => {
         </div>
       </div>
       <div className="users-title">
-        Users
+        Usuários
         <div
           title="Add User"
           onClick={openAddUserModal}
@@ -716,7 +716,7 @@ const Admin = () => {
                 style={{ color: "#45312d", marginTop: "1rem" }}
                 onClick={closeModal}
               >
-                Close
+                Fechar
               </motion.div>
             </div>
           </div>
@@ -749,7 +749,7 @@ const Admin = () => {
                     style={{ color: "#00a6a6" }}
                     onClick={addUser}
                   >
-                    Add User
+                    Adicionar usuário
                   </motion.div>
                   <motion.div
                     className="modal-buttons"
@@ -758,7 +758,7 @@ const Admin = () => {
                     style={{ color: "#45312d" }}
                     onClick={closeAddUserModal}
                   >
-                    Cancel
+                    Cancelar
                   </motion.div>
                 </div>
               </div>
@@ -775,7 +775,7 @@ const Admin = () => {
                   <div className="selected-folders-container">
                     <div className="folders-setup">
                       <div className="folders-title">
-                        Add Folders to scan for courses
+                        Adicione as pastas a serem varridas
                       </div>
                     </div>
                     <div className="folders-list">
@@ -807,7 +807,7 @@ const Admin = () => {
                       className="save-cancel-folder-buttons"
                       onClick={saveSelectedFolders}
                     >
-                      Save Folders
+                      Salvar pastas
                     </div>
 
                     <div

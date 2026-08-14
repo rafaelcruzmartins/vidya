@@ -4645,3 +4645,75 @@ textarea:focus {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ---- Campos de formulário ---- */
+
+/* Vários campos não declaravam fundo nem borda e herdavam o branco padrão do
+   navegador: no tema escuro viravam caixas berrantes, no claro sumiam por
+   completo, brancas sobre branco. */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+textarea,
+select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0 0.75rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+select {
+  height: 2.25rem;
+}
+
+textarea {
+  padding: 0.625rem 0.75rem;
+  line-height: 1.5;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-muted);
+}
+
+/* Campos que já vivem dentro de um invólucro com borda mantêm o desenho
+   antigo: a borda é do invólucro, não do campo. */
+.password-input input,
+.search input,
+.modal input,
+.modal textarea {
+  background: none;
+  border: none;
+  height: auto;
+}
+
+.password {
+  margin: 0.25rem 0 1rem;
+}
+
+.settings-hint {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  max-width: 34rem;
+  margin: 0.5rem 0 0;
+}
+
+.change-password-button {
+  color: #fff;
+  cursor: pointer;
+  height: 2.25rem;
+}
+
+.change-password-button:hover {
+  background: var(--accent-hover);
+}
