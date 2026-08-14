@@ -136,6 +136,81 @@ const parseBaseNumber = (filename) => {
   return match ? parseInt(match[1], 10) : null;
 };
 
+
+const subpastas = (dir) =>
+  naturalSort(
+    fs.readdirSync(dir).filter((f) => {
+      try {
+        return fs.statSync(path.join(dir, f)).isDirectory();
+      } catch {
+        return false;
+      }
+    }),
+  );
+
+const temArquivoReconhecido = (dir) => {
+  try {
+    return fs.readdirSync(dir).some((f) => {
+      const ext = path.extname(f).toLowerCase();
+      return VIDEO_EXT.has(ext) || CONTENT_EXT.has(ext) || SUB_EXT.has(ext);
+    });
+  } catch {
+    return false;
+  }
+};
+
+// Um curso pode ter dois níveis (módulo > aulas) ou três (módulo > unidade >
+// aulas), e os dois podem conviver na mesma biblioteca. A decisão é por pasta:
+// módulo sem subpastas continua sendo a seção; módulo com subpastas vira um
+// agrupamento e cada subpasta vira uma seção.
+//
+// O nome interno da seção é o caminho relativo ao curso, então tudo que já
+// montava caminho com path.join(curso, seção) segue funcionando.
+const enumerarSecoes = (directory) => {
+  const resultado = [];
+
+  for (const modulo of subpastas(directory)) {
+    const moduloPath = path.join(directory, modulo);
+    const moduloOrder = parseBaseNumber(modulo) || 0;
+    const filhas = subpastas(moduloPath);
+
+    if (filhas.length === 0) {
+      resultado.push({
+        rel: modulo,
+        cleanedName: cleanName(modulo),
+        order: moduloOrder,
+        groupName: null,
+        groupOrder: moduloOrder,
+      });
+      continue;
+    }
+
+    // Arquivos soltos no módulo que também tem subpastas não podem sumir:
+    // viram uma seção própria, dentro do mesmo agrupamento.
+    if (temArquivoReconhecido(moduloPath)) {
+      resultado.push({
+        rel: modulo,
+        cleanedName: cleanName(modulo),
+        order: moduloOrder,
+        groupName: cleanName(modulo),
+        groupOrder: moduloOrder,
+      });
+    }
+
+    for (const filha of filhas) {
+      resultado.push({
+        rel: path.join(modulo, filha),
+        cleanedName: cleanName(filha),
+        order: parseBaseNumber(filha) || 0,
+        groupName: cleanName(modulo),
+        groupOrder: moduloOrder,
+      });
+    }
+  }
+
+  return resultado;
+};
+
 const groupFiles = (files) => {
   const groups = new Map();
   files.forEach((file) => {
@@ -338,13 +413,9 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
     }
   }
 
-  const currentSectionDirs = new Set(
-    naturalSort(
-      fs
-        .readdirSync(directory)
-        .filter((f) => fs.statSync(path.join(directory, f)).isDirectory()),
-    ),
-  );
+  const secoes = enumerarSecoes(directory);
+  const currentSectionDirs = new Set(secoes.map((s) => s.rel));
+  const dadosPorRel = new Map(secoes.map((s) => [s.rel, s]));
 
   // Identidade de cada pasta de seção presente no disco agora.
   const sectionDirBySourceId = new Map();
@@ -366,10 +437,13 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
       : null;
 
     if (dirPorIdentidade && dirPorIdentidade !== section.originalName) {
+      const dados = dadosPorRel.get(dirPorIdentidade);
       await section.update({
         originalName: dirPorIdentidade,
-        cleanedName: cleanName(dirPorIdentidade),
-        order: parseBaseNumber(dirPorIdentidade) || 0,
+        cleanedName: dados?.cleanedName ?? cleanName(dirPorIdentidade),
+        order: dados?.order ?? 0,
+        groupName: dados?.groupName ?? null,
+        groupOrder: dados?.groupOrder ?? 0,
       });
       console.log(`Section renamed: ${section.cleanedName}`);
     } else if (currentSectionDirs.has(section.originalName)) {
@@ -467,10 +541,13 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
     });
 
     if (!section) {
+      const dados = dadosPorRel.get(sectionDir);
       section = await Section.create({
         originalName: sectionDir,
-        cleanedName: cleanName(sectionDir),
-        order: parseBaseNumber(sectionDir) || 0,
+        cleanedName: dados?.cleanedName ?? cleanName(sectionDir),
+        order: dados?.order ?? 0,
+        groupName: dados?.groupName ?? null,
+        groupOrder: dados?.groupOrder ?? 0,
         CourseId: course.id,
         duration: 0,
         sourceId: sourceIdOf(sectionPath),
@@ -716,9 +793,19 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
       }
     }
 
-    const newOrder = parseBaseNumber(sectionDir) || 0;
-    if (section.order !== newOrder) {
-      await section.update({ order: newOrder });
+    const dados = dadosPorRel.get(sectionDir);
+    const mudancasSecao = {};
+    if (dados) {
+      if (section.order !== dados.order) mudancasSecao.order = dados.order;
+      if (section.groupName !== dados.groupName)
+        mudancasSecao.groupName = dados.groupName;
+      if (section.groupOrder !== dados.groupOrder)
+        mudancasSecao.groupOrder = dados.groupOrder;
+      if (section.cleanedName !== dados.cleanedName)
+        mudancasSecao.cleanedName = dados.cleanedName;
+    }
+    if (Object.keys(mudancasSecao).length > 0) {
+      await section.update(mudancasSecao);
     }
   }
 

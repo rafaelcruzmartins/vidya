@@ -4787,3 +4787,26 @@ textarea::placeholder {
   color: var(--accent);
   font-size: 0.9375rem;
 }
+
+/* ---- Agrupamento de seções (cursos com três níveis de pasta) ---- */
+
+.section-group-title {
+  padding: 0.75rem 1rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.section-group + .section-group .section-group-title {
+  border-top: 1px solid var(--border);
+}
+
+/* O recuo é o que comunica "isto está dentro daquilo". */
+.section-group:has(.section-group-title) .section-header,
+.section-group:has(.section-group-title) .section-item-course {
+  padding-left: 0.75rem;
+}

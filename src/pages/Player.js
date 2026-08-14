@@ -28,6 +28,7 @@ import {
 import { useParams, useLocation } from "react-router-dom";
 import FileRenderer from "../components/FileRenderer/FileRenderer.js";
 import Loader from "../components/Loader/Loader.js";
+import { agruparSecoes } from "../utils/agruparSecoes";
 
 // Formatos que o navegador exibe sozinho. Para eles abrir vale mais que
 // baixar; o resto (zip e afins) continua como download.
@@ -83,7 +84,7 @@ const SectionHeader = memo(
         </span>
       )}
     </div>
-  )
+  ),
 );
 
 const LectureItem = memo(
@@ -139,7 +140,7 @@ const LectureItem = memo(
             courseId,
             courseName,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setToastMessage("Aula adicionada aos marcadores");
         setToastType("success");
@@ -167,7 +168,7 @@ const LectureItem = memo(
             courseId,
             courseName,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setToastMessage("Aula etiquetada");
         setToastType("success");
@@ -264,7 +265,7 @@ const LectureItem = memo(
         </div>
       </>
     );
-  }
+  },
 );
 
 const Player = () => {
@@ -328,7 +329,7 @@ const Player = () => {
               CourseId: id,
               hasCompleted: completedLectures.size === totalLectures,
             },
-            { withCredentials: true }
+            { withCredentials: true },
           );
         }
       } catch (error) {
@@ -352,14 +353,14 @@ const Player = () => {
     (sectionId) => {
       if (!courseData) return false;
       const section = courseData.sections.find(
-        (section) => section.id === sectionId
+        (section) => section.id === sectionId,
       );
       if (!section) return false;
       return section.lectures.every((lecture) =>
-        completedLectures.has(lecture.id)
+        completedLectures.has(lecture.id),
       );
     },
-    [courseData, completedLectures]
+    [courseData, completedLectures],
   );
 
   useEffect(() => {
@@ -382,7 +383,7 @@ const Player = () => {
           LectureId: lectureId,
           CourseId: id,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
     } catch (error) {
       console.error(error);
@@ -397,7 +398,7 @@ const Player = () => {
           LectureId: lectureId,
           CourseId: id,
         },
-        { withCredentials: true }
+        { withCredentials: true },
       );
     } catch (error) {
       console.error(error);
@@ -437,7 +438,7 @@ const Player = () => {
             data.sections[sectionIndex + 1]?.lectures[0]?.id;
 
         const isCompleted = lecture.lectureprogresses?.some(
-          (progress) => progress.hasCompleted
+          (progress) => progress.hasCompleted,
         );
 
         if (isCompleted) {
@@ -476,7 +477,7 @@ const Player = () => {
         const newData = await axios.post(
           "/api/course/player",
           { CourseId: id },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setCourseData(newData.data[0]);
         setError(null);
@@ -501,7 +502,7 @@ const Player = () => {
           : courseData.courseprogresses[0].LectureId;
         setNowPlaying(initiallecture);
         setInitialVideoProgress(
-          lectureDictionary[initiallecture]?.progress?.[0]?.progress
+          lectureDictionary[initiallecture]?.progress?.[0]?.progress,
         );
       }
 
@@ -542,7 +543,7 @@ const Player = () => {
     if (!courseData || isLoading || !nowPlaying) return;
 
     const currentSection = courseData.sections.find((section) =>
-      section.lectures.some((lecture) => lecture.id === nowPlaying)
+      section.lectures.some((lecture) => lecture.id === nowPlaying),
     );
 
     if (currentSection) {
@@ -615,126 +616,133 @@ const Player = () => {
         className="player-container"
       >
         <div className="player-main">
-        {lectureDictionary[nowPlaying]?.type &&
-        lectureDictionary[nowPlaying]?.type === "video" ? (
-          <VideoPlayer
-            videoSource={currentVideo}
-            initialVideoProgress={initialVideoProgress}
-            onPlayRequest={playRequest}
-            onVideoEnd={handleVideoEnd}
-            onNextVideo={handleVideoNext}
-            onPreviousVideo={handleVideoPrev}
-            isNextVideo={isNextVideo}
-            isPrevVideo={isPrevVideo}
-            handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
-            LectureId={nowPlaying}
-            CourseId={id}
-            subtitles={subtitles}
-            deflang={defLang}
-          />
-        ) : (
-          <FileRenderer
-            fileType={lectureDictionary?.[nowPlaying]?.type}
-            fileSrc={currentVideo}
-            fileName={lectureDictionary[nowPlaying]?.cleanedName}
-          />
-        )}
+          {lectureDictionary[nowPlaying]?.type &&
+          lectureDictionary[nowPlaying]?.type === "video" ? (
+            <VideoPlayer
+              videoSource={currentVideo}
+              initialVideoProgress={initialVideoProgress}
+              onPlayRequest={playRequest}
+              onVideoEnd={handleVideoEnd}
+              onNextVideo={handleVideoNext}
+              onPreviousVideo={handleVideoPrev}
+              isNextVideo={isNextVideo}
+              isPrevVideo={isPrevVideo}
+              handleLectureCompleteOnVideoEnd={handleLectureCompleteOnVideoEnd}
+              LectureId={nowPlaying}
+              CourseId={id}
+              subtitles={subtitles}
+              deflang={defLang}
+            />
+          ) : (
+            <FileRenderer
+              fileType={lectureDictionary?.[nowPlaying]?.type}
+              fileSrc={currentVideo}
+              fileName={lectureDictionary[nowPlaying]?.cleanedName}
+            />
+          )}
 
-        <div className="lecture-heading">
-          <span className="lecture-heading-section">
-            {lectureDictionary[nowPlaying]?.sectionName}
-          </span>
-          <h1 className="lecture-heading-title">
-            {lectureDictionary[nowPlaying]?.name}
-          </h1>
-        </div>
+          <div className="lecture-heading">
+            <span className="lecture-heading-section">
+              {lectureDictionary[nowPlaying]?.sectionName}
+            </span>
+            <h1 className="lecture-heading-title">
+              {lectureDictionary[nowPlaying]?.name}
+            </h1>
+          </div>
 
-        {currentMaterials.length > 0 && (
-          <section className="lecture-materials">
-            <h2 className="lecture-materials-title">Materiais desta aula</h2>
-            <div className="materials-list">
-              {currentMaterials.map((item, index) => {
-                const viewable = VIEWABLE.has(item.type?.toLowerCase());
-                const href =
-                  "/api/course/content/" +
-                  item.pathId +
-                  (viewable ? "" : "?download=1");
-                return (
-                  <a
-                    key={item.pathId ?? index}
-                    className="material-card"
-                    href={href}
-                    {...(viewable
-                      ? { target: "_blank", rel: "noreferrer" }
-                      : { download: true })}
-                  >
-                    <span className="material-card-icon">
-                      <LectureTypeIcon type={item.type} />
-                    </span>
-                    <span className="material-card-text">
-                      <span className="material-card-name">
-                        {item.originalName}
+          {currentMaterials.length > 0 && (
+            <section className="lecture-materials">
+              <h2 className="lecture-materials-title">Materiais desta aula</h2>
+              <div className="materials-list">
+                {currentMaterials.map((item, index) => {
+                  const viewable = VIEWABLE.has(item.type?.toLowerCase());
+                  const href =
+                    "/api/course/content/" +
+                    item.pathId +
+                    (viewable ? "" : "?download=1");
+                  return (
+                    <a
+                      key={item.pathId ?? index}
+                      className="material-card"
+                      href={href}
+                      {...(viewable
+                        ? { target: "_blank", rel: "noreferrer" }
+                        : { download: true })}
+                    >
+                      <span className="material-card-icon">
+                        <LectureTypeIcon type={item.type} />
                       </span>
-                      <span className="material-card-action">
-                        {viewable ? "Abrir em nova aba" : "Baixar"}
+                      <span className="material-card-text">
+                        <span className="material-card-name">
+                          {item.originalName}
+                        </span>
+                        <span className="material-card-action">
+                          {viewable ? "Abrir em nova aba" : "Baixar"}
+                        </span>
                       </span>
-                    </span>
-                  </a>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                    </a>
+                  );
+                })}
+              </div>
+            </section>
+          )}
         </div>
 
         <div className="playlist-container">
           <div className="playlist-header">Conteúdo do curso</div>
-          {courseData?.sections.map((section) => (
-            <div key={section.id} className="section-item">
-              <SectionHeader
-                sectionOrder={section.order}
-                title={section.cleanedName}
-                hasLectures={section.lectures.length > 0}
-                isSectionCompleted={completedSections.has(section.id)}
-                isExpanded={expandedSections.has(section.id)}
-                duration={section.duration}
-                onToggle={() => toggleSection(section.id)}
-                total={section.lectures.length}
-              />
-              <AnimatePresence>
-                {expandedSections.has(section.id) &&
-                  section.lectures.length > 0 && (
-                    <motion.div
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: "auto" }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="lectures-container"
-                    >
-                      {section.lectures.map((lecture, index) => (
-                        <LectureItem
-                          key={lecture.id}
-                          lectureId={lecture.id}
-                          lectureOrder={index + 1}
-                          sectionOrder={section.order}
-                          title={lecture.cleanedName}
-                          isCompleted={completedLectures.has(lecture.id)}
-                          nowPlaying={nowPlaying}
-                          handleNowPlaying={handleNowPlaying}
-                          onToggle={toggleLecture}
-                          lectureRef={lectureRef}
-                          type={lecture.type}
-                          duration={lecture.duration}
-                          content={lecture.content}
-                          courseId={id}
-                          setToastMessage={setToastMessage}
-                          setToastType={setToastType}
-                          setShowToast={setShowToast}
-                          courseName={courseData.cleanedName}
-                        />
-                      ))}
-                    </motion.div>
-                  )}
-              </AnimatePresence>
+          {agruparSecoes(courseData?.sections).map((grupo, gi) => (
+            <div key={grupo.nome ?? `g${gi}`} className="section-group">
+              {grupo.nome && (
+                <div className="section-group-title">{grupo.nome}</div>
+              )}
+              {grupo.sections.map((section) => (
+                <div key={section.id} className="section-item">
+                  <SectionHeader
+                    sectionOrder={section.order}
+                    title={section.cleanedName}
+                    hasLectures={section.lectures.length > 0}
+                    isSectionCompleted={completedSections.has(section.id)}
+                    isExpanded={expandedSections.has(section.id)}
+                    duration={section.duration}
+                    onToggle={() => toggleSection(section.id)}
+                    total={section.lectures.length}
+                  />
+                  <AnimatePresence>
+                    {expandedSections.has(section.id) &&
+                      section.lectures.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="lectures-container"
+                        >
+                          {section.lectures.map((lecture, index) => (
+                            <LectureItem
+                              key={lecture.id}
+                              lectureId={lecture.id}
+                              lectureOrder={index + 1}
+                              sectionOrder={section.order}
+                              title={lecture.cleanedName}
+                              isCompleted={completedLectures.has(lecture.id)}
+                              nowPlaying={nowPlaying}
+                              handleNowPlaying={handleNowPlaying}
+                              onToggle={toggleLecture}
+                              lectureRef={lectureRef}
+                              type={lecture.type}
+                              duration={lecture.duration}
+                              content={lecture.content}
+                              courseId={id}
+                              setToastMessage={setToastMessage}
+                              setToastType={setToastType}
+                              setShowToast={setShowToast}
+                              courseName={courseData.cleanedName}
+                            />
+                          ))}
+                        </motion.div>
+                      )}
+                  </AnimatePresence>
+                </div>
+              ))}
             </div>
           ))}
         </div>

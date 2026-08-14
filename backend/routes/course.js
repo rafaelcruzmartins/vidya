@@ -76,7 +76,7 @@ router.post("/player", isAuthenticated, async (req, res) => {
         {
           model: Section,
           as: "sections",
-          attributes: ["id", "cleanedName", "order", "duration"],
+          attributes: ["id", "cleanedName", "order", "duration", "groupName"],
           include: {
             model: Lecture,
             as: "lectures",
@@ -106,7 +106,12 @@ router.post("/player", isAuthenticated, async (req, res) => {
         },
       ],
       order: [
+        [{ model: Section, as: "sections" }, "groupOrder", "ASC"],
         [{ model: Section, as: "sections" }, "order", "ASC"],
+        // Desempate: um módulo com subpastas e arquivos soltos gera duas
+        // entradas de mesma ordem. O caminho relativo põe o módulo antes
+        // das suas subpastas, que é a leitura natural.
+        [{ model: Section, as: "sections" }, "originalName", "ASC"],
         [
           { model: Section, as: "sections" },
           { model: Lecture, as: "lectures" },
@@ -130,7 +135,7 @@ const getCourseData = async (CourseId) => {
           {
             model: Section,
             as: "sections",
-            attributes: ["id", "cleanedName", "order", "duration"],
+            attributes: ["id", "cleanedName", "order", "duration", "groupName"],
             include: {
               model: Lecture,
               as: "lectures",
@@ -142,7 +147,12 @@ const getCourseData = async (CourseId) => {
           { model: Instructor, as: "instructors" },
         ],
         order: [
+          [{ model: Section, as: "sections" }, "groupOrder", "ASC"],
           [{ model: Section, as: "sections" }, "order", "ASC"],
+          // Desempate: um módulo com subpastas e arquivos soltos gera duas
+          // entradas de mesma ordem. O caminho relativo põe o módulo antes
+          // das suas subpastas, que é a leitura natural.
+          [{ model: Section, as: "sections" }, "originalName", "ASC"],
           [
             { model: Section, as: "sections" },
             { model: Lecture, as: "lectures" },
@@ -238,7 +248,7 @@ router.get(
 
       fs.createReadStream(videoPath).pipe(res);
     }
-  }
+  },
 );
 router.get(
   "/download/:LectureId",
@@ -271,7 +281,7 @@ router.get(
         res.setHeader("Content-Type", "application/octet-stream");
         res.setHeader(
           "Content-Disposition",
-          `attachment; filename="${fileName}"`
+          `attachment; filename="${fileName}"`,
         );
       }
 
@@ -286,7 +296,7 @@ router.get(
       console.error("Error downloading file:", error);
       res.status(500).send("Internal server error");
     }
-  }
+  },
 );
 router.get(
   "/content/:contentId",
@@ -320,7 +330,10 @@ router.get(
 
       res.setHeader("Content-Length", fileSize);
       res.setHeader("Content-Type", mimeType || "application/octet-stream");
-      res.setHeader("Content-Disposition", contentDisposition(fileName, inline));
+      res.setHeader(
+        "Content-Disposition",
+        contentDisposition(fileName, inline),
+      );
 
       const fileStream = fs.createReadStream(filePath);
       fileStream.pipe(res);
@@ -333,7 +346,7 @@ router.get(
       console.error("Error downloading file:", error);
       res.status(500).send("Internal server error");
     }
-  }
+  },
 );
 router.get("/subtitle/:subtitleId", async (req, res) => {
   try {
@@ -377,14 +390,14 @@ router.post(
       await TrackingSystem.toggleLectureComplete(
         req.user.id,
         LectureId,
-        CourseId
+        CourseId,
       );
       res.status(201).send("Lecture Progress Updated");
     } catch (error) {
       console.error(error);
       res.status(500);
     }
-  }
+  },
 );
 router.post(
   "/progress/lecturetogglenotcomplete",
@@ -395,14 +408,14 @@ router.post(
       await TrackingSystem.toggleLectureNotComplete(
         req.user.id,
         LectureId,
-        CourseId
+        CourseId,
       );
       res.status(201).send("Lecture Progress Updated");
     } catch (error) {
       console.error(error);
       res.status(500);
     }
-  }
+  },
 );
 router.post("/progress/courseprogress", isAuthenticated, async (req, res) => {
   const { CourseId, progress, hasCompleted } = req.body;
@@ -411,7 +424,7 @@ router.post("/progress/courseprogress", isAuthenticated, async (req, res) => {
       req.user.id,
       CourseId,
       progress,
-      hasCompleted
+      hasCompleted,
     );
     res.status(201).send("Course Progress Updated");
   } catch (error) {
@@ -439,7 +452,7 @@ router.post("/progress/watchtime", isAuthenticated, async (req, res) => {
       seconds,
       lectureId,
       progress,
-      courseId
+      courseId,
     );
     res.status(201).send("Lecture Progress Updated");
   } catch (error) {

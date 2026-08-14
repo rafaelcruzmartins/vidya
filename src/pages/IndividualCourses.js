@@ -29,6 +29,7 @@ import {
 } from "react";
 import Toast from "../components/Toast/Toast.js";
 import { useAuth } from "../context/AuthContext.js";
+import { agruparSecoes } from "../utils/agruparSecoes";
 
 // Formatos que o navegador exibe sozinho. Para eles abrir vale mais que
 // baixar; o resto (zip e afins) continua como download.
@@ -89,7 +90,7 @@ const SectionHeader = memo(
         </span>
       )}
     </div>
-  )
+  ),
 );
 
 const LectureItem = memo(
@@ -145,7 +146,7 @@ const LectureItem = memo(
             courseId,
             courseName,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setToastMessage("Aula adicionada aos marcadores");
         setToastType("success");
@@ -173,7 +174,7 @@ const LectureItem = memo(
             courseId,
             courseName,
           },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setToastMessage("Aula etiquetada");
         setToastType("success");
@@ -320,7 +321,7 @@ const LectureItem = memo(
         </div>
       </>
     );
-  }
+  },
 );
 
 const IndividualCourses = () => {
@@ -369,7 +370,7 @@ const IndividualCourses = () => {
         const { data } = await axios.post(
           "/api/course/individual",
           { CourseId: id },
-          { withCredentials: true }
+          { withCredentials: true },
         );
         setCourse(data.course);
         setCourseTitle(data.course.cleanedName);
@@ -378,7 +379,7 @@ const IndividualCourses = () => {
         setCategoriesList(data.categories);
         setInstructorList(data.instructors);
         setCourseInstructors(
-          data.course.instructors ? data.course.instructors : null
+          data.course.instructors ? data.course.instructors : null,
         );
         setLoading(false);
       } catch (error) {
@@ -404,7 +405,7 @@ const IndividualCourses = () => {
         instructor,
         {
           withCredentials: true,
-        }
+        },
       );
       return instructors;
     } catch (error) {
@@ -431,7 +432,7 @@ const IndividualCourses = () => {
 
   const handleRemoveInstructor = (instructor) => {
     setCourseInstructors(
-      courseInstructors.filter((i) => i.id !== instructor.id)
+      courseInstructors.filter((i) => i.id !== instructor.id),
     );
   };
 
@@ -594,7 +595,7 @@ const IndividualCourses = () => {
       await axios.post(
         "/api/course/pin",
         { courseId: id },
-        { withCredentials: true }
+        { withCredentials: true },
       );
       setShowToast(false);
       setToastMessage("course added to featured");
@@ -633,7 +634,7 @@ const IndividualCourses = () => {
     if (courseInstructors) {
       formData.append(
         "Instructors",
-        JSON.stringify(courseInstructors.map((instructor) => instructor.id))
+        JSON.stringify(courseInstructors.map((instructor) => instructor.id)),
       );
     }
     formData.append("CourseName", courseTitle);
@@ -784,50 +785,57 @@ const IndividualCourses = () => {
           <div className="course-content">
             <div className="course-section">
               <div className="section-list">
-                {course?.sections.map((section) => (
-                  <div key={section.id} className="section-item-course">
-                    <SectionHeader
-                      sectionOrder={section.order}
-                      title={section.cleanedName}
-                      hasLectures={section.lectures.length > 0}
-                      isExpanded={expandedSections.has(section.id)}
-                      duration={section.duration}
-                      onToggle={() => toggleSection(section.id)}
-                      total={section.lectures.length}
-                      sectionRef={sectionRef}
-                      sectionId={section.id}
-                      referalData={referalData}
-                    />
-                    <AnimatePresence>
-                      {expandedSections.has(section.id) &&
-                        section.lectures.length > 0 && (
-                          <motion.div
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="lectures-container"
-                          >
-                            {section.lectures.map((lecture, index) => (
-                              <LectureItem
-                                key={lecture.id}
-                                lectureId={lecture.id}
-                                lectureOrder={index + 1}
-                                sectionOrder={section.order}
-                                title={lecture.cleanedName}
-                                type={lecture.type}
-                                duration={lecture.duration}
-                                content={lecture.content}
-                                courseId={id}
-                                setToastMessage={setToastMessage}
-                                setToastType={setToastType}
-                                setShowToast={setShowToast}
-                                onLectureClick={handleLectureClick}
-                                courseName={course.cleanedName}
-                              />
-                            ))}
-                          </motion.div>
-                        )}
-                    </AnimatePresence>
+                {agruparSecoes(course?.sections).map((grupo, gi) => (
+                  <div key={grupo.nome ?? `g${gi}`} className="section-group">
+                    {grupo.nome && (
+                      <div className="section-group-title">{grupo.nome}</div>
+                    )}
+                    {grupo.sections.map((section) => (
+                      <div key={section.id} className="section-item-course">
+                        <SectionHeader
+                          sectionOrder={section.order}
+                          title={section.cleanedName}
+                          hasLectures={section.lectures.length > 0}
+                          isExpanded={expandedSections.has(section.id)}
+                          duration={section.duration}
+                          onToggle={() => toggleSection(section.id)}
+                          total={section.lectures.length}
+                          sectionRef={sectionRef}
+                          sectionId={section.id}
+                          referalData={referalData}
+                        />
+                        <AnimatePresence>
+                          {expandedSections.has(section.id) &&
+                            section.lectures.length > 0 && (
+                              <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="lectures-container"
+                              >
+                                {section.lectures.map((lecture, index) => (
+                                  <LectureItem
+                                    key={lecture.id}
+                                    lectureId={lecture.id}
+                                    lectureOrder={index + 1}
+                                    sectionOrder={section.order}
+                                    title={lecture.cleanedName}
+                                    type={lecture.type}
+                                    duration={lecture.duration}
+                                    content={lecture.content}
+                                    courseId={id}
+                                    setToastMessage={setToastMessage}
+                                    setToastType={setToastType}
+                                    setShowToast={setShowToast}
+                                    onLectureClick={handleLectureClick}
+                                    courseName={course.cleanedName}
+                                  />
+                                ))}
+                              </motion.div>
+                            )}
+                        </AnimatePresence>
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>

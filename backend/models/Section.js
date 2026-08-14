@@ -11,6 +11,11 @@ const Section = sequelize.define("Section", {
   originalName: DataTypes.STRING,
   cleanedName: DataTypes.STRING,
   order: DataTypes.FLOAT,
+  // Módulo ao qual esta seção pertence, quando o curso usa três níveis de
+  // pasta. Nulo nos cursos de dois níveis. groupOrder existe para ordenar os
+  // agrupamentos entre si.
+  groupName: DataTypes.STRING,
+  groupOrder: DataTypes.FLOAT,
   duration: DataTypes.FLOAT,
   // Identidade do arquivo no sistema de arquivos (dispositivo:inode). Sobrevive
   // a renomeações, ao contrário do nome, e é o que permite reconhecer o mesmo

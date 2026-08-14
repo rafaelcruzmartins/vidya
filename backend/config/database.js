@@ -44,7 +44,11 @@ export const applySqlitePragmas = async () => {
 export const ensureSchemaColumns = async () => {
   const novasColunas = {
     Courses: { sourceId: "VARCHAR(255)" },
-    Sections: { sourceId: "VARCHAR(255)" },
+    Sections: {
+      sourceId: "VARCHAR(255)",
+      groupName: "VARCHAR(255)",
+      groupOrder: "FLOAT",
+    },
     Lectures: { sourceId: "VARCHAR(255)" },
   };
 
