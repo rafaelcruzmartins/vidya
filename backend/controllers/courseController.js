@@ -1,7 +1,7 @@
 import path from "path";
 import os from "os";
 import fs, { promises as fsp } from "fs";
-import { exec } from "child_process";
+import { execFile } from "child_process";
 import { v4 as uuidv4 } from "uuid";
 import {
   Server,
@@ -267,8 +267,19 @@ const getVideoDurations = async (filePaths) => {
     const chunk = filesToProcess.slice(i, i + concurrencyLimit);
     const promises = chunk.map((filePath) => {
       return new Promise((resolve) => {
-        exec(
-          `"${ffprobePath}" -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 "${filePath}"`,
+        // execFile com argumentos em lista, sem shell: aspas, $() ou crases
+        // no nome do arquivo não viram comandos
+        execFile(
+          ffprobePath,
+          [
+            "-v",
+            "error",
+            "-show_entries",
+            "format=duration",
+            "-of",
+            "default=noprint_wrappers=1:nokey=1",
+            filePath,
+          ],
           (error, stdout) => {
             if (error) {
               console.error(`Error getting duration for ${filePath}:`, error);

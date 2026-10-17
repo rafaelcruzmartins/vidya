@@ -23,6 +23,9 @@ WORKDIR /app
 COPY --from=frontend-builder /src/build ./build
 COPY backend/ ./backend/
 COPY --from=backend-deps /deps/node_modules ./backend/node_modules
+# O pacote instala o ffprobe com permissão 0744: sem isso, rodando como
+# usuário comum (ex.: user: 1000:1000), toda duração de aula vira 0
+RUN chmod 755 /app/backend/node_modules/@ffprobe-installer/linux-x64/ffprobe
 COPY assets/ /app/defaults/
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
