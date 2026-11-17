@@ -211,38 +211,60 @@ const enumerarSecoes = (directory) => {
   return resultado;
 };
 
+// Chave do agrupamento: o prefixo numérico completo ("08.01", "05.1", "00"),
+// para que 08.01, 08.02 e 08.03 não caiam todos na aula 8. Sem número no
+// início, a chave é o próprio nome sem extensão (antes esses arquivos eram
+// descartados).
+const chaveDoArquivo = (filename) => {
+  const match = filename.match(/^(\d+(?:[.-]\d+)*)/);
+  return match
+    ? match[1]
+    : `~${filename.replace(/\.[^.]+$/, "").trim().toLowerCase()}`;
+};
+
+// Recebe os arquivos já em ordem natural. Dois vídeos com a mesma chave viram
+// aulas separadas (antes o segundo substituía o primeiro). PDFs, txt, zip etc.
+// com a mesma chave continuam como anexo da aula. As chaves do Map devolvido
+// são a posição (1, 2, 3...) na ordem natural, usada como "order" da aula.
 const groupFiles = (files) => {
-  const groups = new Map();
+  const porChave = new Map();
+  const lista = [];
   files.forEach((file) => {
-    const base = parseBaseNumber(file);
-    if (base === null) return;
-    if (!groups.has(base)) {
-      groups.set(base, {
-        main: null,
-        contents: [],
-        subtitles: [],
-      });
-    }
     const ext = path.extname(file).toLowerCase();
-    const group = groups.get(base);
+    if (!VIDEO_EXT.has(ext) && !CONTENT_EXT.has(ext) && !SUB_EXT.has(ext)) {
+      return;
+    }
+    const chave = chaveDoArquivo(file);
+    let group = porChave.get(chave);
+    if (
+      VIDEO_EXT.has(ext) &&
+      group &&
+      group.main &&
+      VIDEO_EXT.has(path.extname(group.main).toLowerCase())
+    ) {
+      group = null;
+    }
+    if (!group) {
+      group = { main: null, contents: [], subtitles: [] };
+      porChave.set(chave, group);
+      lista.push(group);
+    }
     if (VIDEO_EXT.has(ext)) {
-      const previousMain = group.main;
-      if (
-        previousMain &&
-        !VIDEO_EXT.has(path.extname(previousMain).toLowerCase())
-      ) {
-        group.contents.push(previousMain);
-      }
+      if (group.main) group.contents.push(group.main);
       group.main = file;
     } else if (SUB_EXT.has(ext)) {
       group.subtitles.push(file);
-    } else if (CONTENT_EXT.has(ext) && !group.main) {
-      group.main = group.main || file;
-    } else if (CONTENT_EXT.has(ext)) {
+    } else if (!group.main) {
+      group.main = file;
+    } else {
       group.contents.push(file);
     }
   });
-  groups.forEach((group) => naturalSort(group.contents));
+  const groups = new Map();
+  lista.forEach((group, index) => {
+    naturalSort(group.contents);
+    groups.set(index + 1, group);
+  });
   return groups;
 };
 
@@ -491,6 +513,11 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
 
     // Mesmo tratamento das seções: o arquivo renomeado mantém o inode, então
     // a aula é reconhecida e atualizada em vez de apagada e recriada.
+    const orderByMainFile = new Map();
+    for (const [order, group] of fileGroups) {
+      if (group.main) orderByMainFile.set(group.main, order);
+    }
+
     const mainFileBySourceId = new Map();
     for (const mainFile of validLectureFiles) {
       const sid = sourceIdOf(path.join(sectionPath, mainFile));
@@ -514,7 +541,7 @@ const syncCourseDirectory = async (coursedirectory, courseFolderId) => {
         await lecture.update({
           originalName: arquivoPorIdentidade,
           cleanedName: cleanName(arquivoPorIdentidade),
-          order: parseBaseNumber(arquivoPorIdentidade) ?? lecture.order,
+          order: orderByMainFile.get(arquivoPorIdentidade) ?? lecture.order,
           path: path.join(sectionPath, arquivoPorIdentidade),
         });
         console.log(`Lecture renamed: ${lecture.cleanedName}`);
