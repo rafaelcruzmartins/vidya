@@ -212,14 +212,11 @@ const enumerarSecoes = (directory) => {
 };
 
 // Chave do agrupamento: o prefixo numérico completo ("08.01", "05.1", "00"),
-// para que 08.01, 08.02 e 08.03 não caiam todos na aula 8. Sem número no
-// início, a chave é o próprio nome sem extensão (antes esses arquivos eram
-// descartados).
+// para que 08.01, 08.02 e 08.03 não caiam todos na aula 8. Arquivo sem número
+// no início continua fora das aulas (o curso precisa estar numerado).
 const chaveDoArquivo = (filename) => {
   const match = filename.match(/^(\d+(?:[.-]\d+)*)/);
-  return match
-    ? match[1]
-    : `~${filename.replace(/\.[^.]+$/, "").trim().toLowerCase()}`;
+  return match ? match[1] : null;
 };
 
 // Recebe os arquivos já em ordem natural. Dois vídeos com a mesma chave viram
@@ -235,6 +232,7 @@ const groupFiles = (files) => {
       return;
     }
     const chave = chaveDoArquivo(file);
+    if (chave === null) return;
     let group = porChave.get(chave);
     if (
       VIDEO_EXT.has(ext) &&
